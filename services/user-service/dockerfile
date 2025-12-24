@@ -1,0 +1,28 @@
+# ---------- Build Stage ----------
+FROM golang:1.25-bookworm AS builder
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN go build -o main .
+
+# ---------- Runtime Stage ----------
+FROM gcr.io/distroless/base-debian12
+
+WORKDIR /app
+
+ENV DB_HOST=postgres
+ENV DB_PORT=5432
+ENV DB_USER=admin
+ENV DB_NAME=finaluser
+ENV SSL_MODE=disable
+ENV GRPC_PORT=50051
+
+COPY --from=builder /app/user-service /app/user-service
+
+EXPOSE 50051
+
+CMD ["/app/user-service"]
