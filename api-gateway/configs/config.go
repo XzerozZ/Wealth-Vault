@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"log"
@@ -8,20 +8,17 @@ import (
 )
 
 type Configs struct {
-	GRPC       GRPC
-	PostgreSQL PostgreSQL
+	APP         APP
+	UserService User
 }
 
-type GRPC struct {
+type APP struct {
 	Port string
 }
 
-type PostgreSQL struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	Database string
+type User struct {
+	Host string
+	Port string
 }
 
 func LoadConfigs() *Configs {
@@ -39,15 +36,12 @@ func LoadConfigs() *Configs {
 	}
 
 	return &Configs{
-		GRPC: GRPC{
-			Port: requireEnv("GRPC_PORT"),
+		APP: APP{
+			Port: requireEnv("APP_PORT"),
 		},
-		PostgreSQL: PostgreSQL{
-			Host:     requireEnv("DB_HOST"),
-			Port:     requireEnv("DB_PORT"),
-			Username: requireEnv("DB_USER"),
-			Password: requireEnv("DB_PASSWORD"),
-			Database: requireEnv("DB_NAME"),
+		UserService: User{
+			Host: requireEnv("User_HOST"),
+			Port: requireEnv("User_PORT"),
 		},
 	}
 }

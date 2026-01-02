@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: wealth_and_vault
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: wealthvault
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_wealth
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: always
+    depends_on:
+      - postgres
+
+  user-service:
+    build:
+      context: ./services/user-service  
+      dockerfile: dockerfile 
+    container_name: user-service
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+      - ./services/user-service/.user.env
+    ports:
+      - "50051:50051"
+
+  api-gateway:
+    build:
+      context: ./api-gateway              
+      dockerfile: dockerfile
+    container_name: api-gateway
+    restart: always
+    depends_on:
+      - user-service
+    env_file:
+      - ./api-gateway/.env
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

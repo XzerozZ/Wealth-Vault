@@ -14,13 +14,12 @@ var db *gorm.DB
 
 func InitDB(config config.PostgreSQL) {
 	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		config.Host,
 		config.Username,
 		config.Password,
 		config.Database,
 		config.Port,
-		config.SSLMode,
 	)
 
 	var err error
