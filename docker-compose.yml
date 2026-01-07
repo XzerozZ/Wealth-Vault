@@ -38,6 +38,19 @@ services:
     ports:
       - "50051:50051"
 
+  auth-service:
+    build:
+      context: ./services/auth-service  
+      dockerfile: dockerfile 
+    container_name: auth-service
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+      - ./services/auth-service/.auth.env
+    ports:
+      - "50052:50052"
+
   api-gateway:
     build:
       context: ./api-gateway              
@@ -46,6 +59,7 @@ services:
     restart: always
     depends_on:
       - user-service
+      - auth-service
     env_file:
       - ./api-gateway/.env
     ports:

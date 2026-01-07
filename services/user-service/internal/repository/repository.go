@@ -22,13 +22,3 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *domain.User) erro
 
 	return nil
 }
-
-func (r *UserRepository) FindByID(ctx context.Context, id string) (*domain.User, error) {
-	var user domain.User
-	err := r.db.Where("id = ?", id).First(&user).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}

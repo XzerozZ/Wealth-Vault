@@ -25,7 +25,3 @@ func (u *UserUsecase) CreateUser(ctx context.Context, user *domain.User) (string
 
 	return user.ID, nil
 }
-
-func (u *UserUsecase) GetByID(ctx context.Context, id string) (*domain.User, error) {
-	return u.userRepo.FindByID(ctx, id)
-}

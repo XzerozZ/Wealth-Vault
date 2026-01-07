@@ -1,7 +1,7 @@
 package client
 
 import (
-	pb "wealth-vault/api-gateway/proto/userpb"
+	pb "wealth-vault/api-gateway/pkg/pb/proto/user"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
-	"wealth-vault/user-service/config"
+	"wealth-vault/user-service/configs"
 	"wealth-vault/user-service/internal/domain"
 
 	"gorm.io/driver/postgres"
@@ -12,7 +12,7 @@ import (
 
 var db *gorm.DB
 
-func InitDB(config config.PostgreSQL) {
+func InitDB(config configs.PostgreSQL) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		config.Host,
@@ -30,6 +30,11 @@ func InitDB(config config.PostgreSQL) {
 
 	_ = db.AutoMigrate(
 		&domain.User{},
+		&domain.FriendList{},
+		&domain.Group{},
+		&domain.GroupItem{},
+		&domain.GroupLog{},
+		&domain.Notification{},
 	)
 
 	log.Println("Database connection established successfully!")

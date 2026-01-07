@@ -4,7 +4,8 @@ import (
 	"context"
 	"time"
 
-	pb "wealth-vault/api-gateway/proto/userpb"
+	"wealth-vault/api-gateway/internal/domain"
+	pb "wealth-vault/api-gateway/pkg/pb/proto/user"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,15 +18,8 @@ func NewUserHandler(c pb.UserServiceClient) *UserHandler {
 	return &UserHandler{client: c}
 }
 
-type CreateUserDTO struct {
-	Firstname   string `json:"firstname"`
-	Lastname    string `json:"lastname"`
-	Username    string `json:"username"`
-	Phonenumber string `json:"phonenumber"`
-}
-
 func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
-	var body CreateUserDTO
+	var body domain.CreateUser
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -34,10 +28,8 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	defer cancel()
 
 	res, err := h.client.CreateUser(ctx, &pb.CreateUserRequest{
-		Firstname:   body.Firstname,
-		Lastname:    body.Lastname,
-		Username:    body.Username,
-		Phonenumber: body.Phonenumber,
+		Email:    body.Email,
+		Username: body.Username,
 	})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})

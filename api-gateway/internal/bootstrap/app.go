@@ -20,11 +20,17 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 		log.Fatal("user service:", err)
 	}
 
+	authClient, err := grpcclient.NewAuthClient(cfg.AuthService.Host, cfg.AuthService.Port)
+	if err != nil {
+		log.Fatal("auth service:", err)
+	}
+
 	// ---------- handlers ----------
 	userHandler := handlers.NewUserHandler(userClient)
+	authHandler := handlers.NewAuthHandler(authClient)
 
 	// ---------- routes ----------
-	routes.Setup(app, userHandler)
+	routes.Setup(app, userHandler, authHandler)
 
 	return app
 }

@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"log"
@@ -8,12 +8,23 @@ import (
 )
 
 type Configs struct {
+	JWT        JWT
 	GRPC       GRPC
+	UserGRPC   UserGRPC
 	PostgreSQL PostgreSQL
 }
 
 type GRPC struct {
 	Port string
+}
+
+type UserGRPC struct {
+	Host string
+	Port string
+}
+
+type JWT struct {
+	Secret string
 }
 
 type PostgreSQL struct {
@@ -39,8 +50,15 @@ func LoadConfigs() *Configs {
 	}
 
 	return &Configs{
+		JWT: JWT{
+			Secret: os.Getenv("JWT_SECRET"),
+		},
 		GRPC: GRPC{
 			Port: requireEnv("GRPC_PORT"),
+		},
+		UserGRPC: UserGRPC{
+			Host: requireEnv("User_HOST"),
+			Port: requireEnv("User_PORT"),
 		},
 		PostgreSQL: PostgreSQL{
 			Host:     requireEnv("DB_HOST"),

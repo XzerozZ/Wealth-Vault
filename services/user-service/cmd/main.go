@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 	"net"
-	"wealth-vault/user-service/config"
+	config "wealth-vault/user-service/configs"
 	userHandler "wealth-vault/user-service/internal/handler/grpc"
 	userRepo "wealth-vault/user-service/internal/repository"
 	userUsecase "wealth-vault/user-service/internal/usecase"
 	"wealth-vault/user-service/pkg/database"
-	userpb "wealth-vault/user-service/proto/userpb"
+	userpb "wealth-vault/user-service/pkg/pb/proto/user"
 
 	"google.golang.org/grpc"
 )

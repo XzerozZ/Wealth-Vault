@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option go_package = "wealth-vault/pkg/pb";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string username = 3;
+}
+
+message CreateUserResponse {
+  string id = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetUserByEmailResponse {
+  string id = 1;
+}
