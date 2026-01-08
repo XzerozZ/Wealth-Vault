@@ -15,4 +15,5 @@ func Setup(
 
 	api.Post("/user", userHandler.CreateUser)
 	api.Post("/register", authHandler.RegisterLocal)
+	api.Post("/login", authHandler.Login)
 }

@@ -7,9 +7,12 @@ import (
 type User struct {
 	ID              string    `json:"user_id" gorm:"primaryKey"`
 	Email           string    `json:"email" gorm:"not null;uniqueIndex"`
+	Firstname       string    `json:"firstname"`
+	Lastname        string    `json:"lastname"`
 	Username        string    `json:"username" gorm:"not null"`
 	Profile         string    `json:"profile"`
 	Phonenumber     string    `json:"phone_number"`
+	Birthday        time.Time `json:"birthday" gorm:"type:date"`
 	IsEmailVerified bool      `json:"is_email_verified" gorm:"default:false"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`

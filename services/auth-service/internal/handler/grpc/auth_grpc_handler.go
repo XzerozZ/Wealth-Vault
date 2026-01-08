@@ -40,3 +40,24 @@ func (h *AuthGRPCHandler) Register(ctx context.Context, req *pb.AuthRequest) (*p
 		RefreshToken: output.RefreshToken,
 	}, nil
 }
+
+func (h *AuthGRPCHandler) Login(ctx context.Context, req *pb.AuthRequest) (*pb.AuthResponse, error) {
+	input := &domain.LoginInput{
+		Email:    req.Email,
+		Password: req.Password,
+	}
+
+	output, err := h.usecase.Login(ctx, input)
+	if err != nil {
+		if err.Error() == "invalid email" || err.Error() == "invalid password" {
+			return nil, status.Error(codes.Unauthenticated, err.Error())
+		}
+		return nil, status.Errorf(codes.Internal, "login failed: %v", err)
+	}
+
+	return &pb.AuthResponse{
+		UserId:       output.UserID,
+		AccessToken:  output.AccessToken,
+		RefreshToken: output.RefreshToken,
+	}, nil
+}

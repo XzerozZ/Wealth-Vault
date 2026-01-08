@@ -119,7 +119,7 @@ func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput)
 
 	userRes, err := u.userClient.CreateUser(ctx, &pb.CreateUserRequest{
 		Email:    input.Email,
-		Username: input.Username,
+		Username: username,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create user profile: %v", err)
@@ -146,14 +146,31 @@ func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput)
 		return nil, fmt.Errorf("failed to register auth account: %w", err)
 	}
 
-	accessToken, refreshToken, err := u.generateTokenPair(userRes.Id, newAuth.Email)
+	return &domain.AuthOutput{
+		UserID:       userRes.Id,
+		AccessToken:  "",
+		RefreshToken: "",
+	}, nil
+}
+
+func (u *AuthUsecase) Login(ctx context.Context, input *domain.LoginInput) (*domain.AuthOutput, error) {
+	existingUser, err := u.authRepo.FindByEmail(ctx, input.Email)
+	if err != nil {
+		return nil, fmt.Errorf("invalid email")
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(input.Password)); err != nil {
+		return nil, fmt.Errorf("invalid password")
+	}
+
+	accessToken, refreshToken, err := u.generateTokenPair(existingUser.ID, existingUser.Email)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate tokens: %w", err)
 	}
 
 	session := &domain.AuthSession{
 		ID:               uuid.New().String(),
-		UserID:           userRes.Id,
+		UserID:           existingUser.UserID,
 		AccessToken:      accessToken,
 		RefreshToken:     refreshToken,
 		ExpiresAt:        time.Now().Add(time.Hour * 1),
@@ -166,7 +183,7 @@ func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput)
 	}
 
 	return &domain.AuthOutput{
-		UserID:       userRes.Id,
+		UserID:       existingUser.UserID,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
