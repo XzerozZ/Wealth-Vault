@@ -61,3 +61,16 @@ func (h *AuthGRPCHandler) Login(ctx context.Context, req *pb.AuthRequest) (*pb.A
 		RefreshToken: output.RefreshToken,
 	}, nil
 }
+
+func (h *AuthGRPCHandler) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.AuthResponse, error) {
+	output, err := h.usecase.RefreshToken(ctx, req.RefreshToken)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "refresh token failed: %v", err)
+	}
+
+	return &pb.AuthResponse{
+		UserId:       output.UserID,
+		AccessToken:  output.AccessToken,
+		RefreshToken: output.RefreshToken,
+	}, nil
+}

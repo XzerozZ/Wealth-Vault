@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 	"wealth-vault/auth-service/internal/domain"
 
 	"gorm.io/gorm"
@@ -53,6 +54,18 @@ func (r *AuthRepository) RevokeSession(ctx context.Context, refreshToken string)
 		Model(&domain.AuthSession{}).
 		Where("refresh_token = ?", refreshToken).
 		Update("revoked", true).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *AuthRepository) DeleteExpiredSessions(ctx context.Context) error {
+	fourteenDaysAgo := time.Now().AddDate(0, 0, -14)
+	err := r.db.WithContext(ctx).
+		Where("refresh_expires_at < ?", time.Now()).
+		Or("revoked = ? AND updated_at < ?", true, fourteenDaysAgo).
+		Delete(&domain.AuthSession{}).Error
 	if err != nil {
 		return err
 	}

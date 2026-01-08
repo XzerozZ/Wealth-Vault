@@ -58,54 +58,6 @@ func (u *AuthUsecase) generateTokenPair(userID string, email string) (string, st
 	return accessTokenString, refreshTokenString, nil
 }
 
-func (u *AuthUsecase) RefreshToken(ctx context.Context, refreshTokenStr string) (*domain.AuthOutput, error) {
-	token, err := jwt.Parse(refreshTokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte(u.jwtSecret), nil
-	})
-
-	if err != nil || !token.Valid {
-		return nil, errors.New("invalid refresh token")
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["type"] != "refresh" {
-		return nil, errors.New("invalid token type")
-	}
-
-	session, err := u.authRepo.GetSessionByRefreshToken(ctx, refreshTokenStr)
-	if err != nil {
-		return nil, errors.New("invalid or revoked refresh token")
-	}
-
-	if time.Now().After(session.RefreshExpiresAt) {
-		return nil, errors.New("refresh token expired")
-	}
-
-	_ = u.authRepo.RevokeSession(ctx, refreshTokenStr)
-
-	newAccess, newRefresh, err := u.generateTokenPair(session.UserID, "")
-	if err != nil {
-		return nil, err
-	}
-
-	newSession := &domain.AuthSession{
-		ID:               uuid.New().String(),
-		UserID:           session.UserID,
-		AccessToken:      newAccess,
-		RefreshToken:     newRefresh,
-		ExpiresAt:        time.Now().Add(time.Hour * 1),
-		RefreshExpiresAt: time.Now().Add(time.Hour * 24 * 7),
-	}
-
-	_ = u.authRepo.CreateSession(ctx, newSession)
-
-	return &domain.AuthOutput{
-		UserID:       session.UserID,
-		AccessToken:  newAccess,
-		RefreshToken: newRefresh,
-	}, nil
-}
-
 func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput) (*domain.AuthOutput, error) {
 	existingUser, err := u.authRepo.FindByEmail(ctx, input.Email)
 	if err == nil && existingUser != nil {
@@ -187,4 +139,64 @@ func (u *AuthUsecase) Login(ctx context.Context, input *domain.LoginInput) (*dom
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
+}
+
+func (u *AuthUsecase) RefreshToken(ctx context.Context, refreshTokenStr string) (*domain.AuthOutput, error) {
+	token, err := jwt.Parse(refreshTokenStr, func(token *jwt.Token) (interface{}, error) {
+		return []byte(u.jwtSecret), nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, errors.New("invalid refresh token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || claims["type"] != "refresh" {
+		return nil, errors.New("invalid token type")
+	}
+
+	session, err := u.authRepo.GetSessionByRefreshToken(ctx, refreshTokenStr)
+	if err != nil {
+		return nil, errors.New("invalid or revoked refresh token")
+	}
+
+	if time.Now().After(session.RefreshExpiresAt) {
+		return nil, errors.New("refresh token expired")
+	}
+
+	if err := u.authRepo.RevokeSession(ctx, refreshTokenStr); err != nil {
+		return nil, err
+	}
+
+	newAccess, newRefresh, err := u.generateTokenPair(session.UserID, "")
+	if err != nil {
+		return nil, err
+	}
+
+	newSession := &domain.AuthSession{
+		ID:               uuid.New().String(),
+		UserID:           session.UserID,
+		AccessToken:      newAccess,
+		RefreshToken:     newRefresh,
+		ExpiresAt:        time.Now().Add(time.Hour * 1),
+		RefreshExpiresAt: time.Now().Add(time.Hour * 24 * 7),
+	}
+
+	if err = u.authRepo.CreateSession(ctx, newSession); err != nil {
+		return nil, err
+	}
+
+	return &domain.AuthOutput{
+		UserID:       session.UserID,
+		AccessToken:  newAccess,
+		RefreshToken: newRefresh,
+	}, nil
+}
+
+func (u *AuthUsecase) CleanupSessions(ctx context.Context) error {
+	if err := u.authRepo.DeleteExpiredSessions(ctx); err != nil {
+		return fmt.Errorf("failed to cleanup sessions: %w", err)
+	}
+
+	return nil
 }

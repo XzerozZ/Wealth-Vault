@@ -5,7 +5,8 @@ import (
 	"net"
 	grpcclient "wealth-vault/auth-service/client"
 	"wealth-vault/auth-service/configs"
-	authHandler "wealth-vault/auth-service/internal/handler/grpc"
+	authCron "wealth-vault/auth-service/internal/delivery/cron"
+	authHandler "wealth-vault/auth-service/internal/delivery/grpc"
 	authRepo "wealth-vault/auth-service/internal/repository"
 	authUsecase "wealth-vault/auth-service/internal/usecase"
 	"wealth-vault/auth-service/pkg/database"
@@ -30,6 +31,9 @@ func main() {
 	repo := authRepo.NewAuthRepository(db)
 	uc := authUsecase.NewAuthUsecase(repo, userClient)
 	handler := authHandler.NewAuthGRPCHandler(uc)
+	cronJob := authCron.NewAuthCronJob(uc)
+
+	cronJob.Start()
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {

@@ -13,7 +13,10 @@ func Setup(
 ) {
 	api := app.Group("/api")
 
+	auth := api.Group("/auth")
+	auth.Post("/register", authHandler.RegisterLocal)
+	auth.Post("/login", authHandler.Login)
+	auth.Post("/refresh", authHandler.RefreshToken)
+
 	api.Post("/user", userHandler.CreateUser)
-	api.Post("/register", authHandler.RegisterLocal)
-	api.Post("/login", authHandler.Login)
 }

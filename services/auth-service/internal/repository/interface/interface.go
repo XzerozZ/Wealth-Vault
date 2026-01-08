@@ -11,4 +11,5 @@ type AuthRepository interface {
 	CreateSession(ctx context.Context, session *domain.AuthSession) error
 	GetSessionByRefreshToken(ctx context.Context, refreshToken string) (*domain.AuthSession, error)
 	RevokeSession(ctx context.Context, refreshToken string) error
+	DeleteExpiredSessions(ctx context.Context) error
 }

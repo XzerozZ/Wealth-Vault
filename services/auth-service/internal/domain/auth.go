@@ -25,7 +25,7 @@ type AuthSession struct {
 	ID               string    `json:"id" gorm:"primaryKey"`
 	UserID           string    `json:"u_id"  gorm:"not null;index"`
 	AccessToken      string    `gorm:"type:text;not null;unique"`
-	RefreshToken     string    `gorm:"type:text;not null;unique"`
+	RefreshToken     string    `gorm:"type:text;not null;uniqueIndex"`
 	ExpiresAt        time.Time `gorm:"not null"`
 	RefreshExpiresAt time.Time `gorm:"not null"`
 	Revoked          bool      `gorm:"default:false"`
