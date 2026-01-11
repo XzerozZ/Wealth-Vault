@@ -4,14 +4,14 @@ import (
 	"log"
 
 	grpcclient "wealth-vault/api-gateway/client"
-	"wealth-vault/api-gateway/configs"
+	"wealth-vault/api-gateway/config"
 	"wealth-vault/api-gateway/handlers"
 	"wealth-vault/api-gateway/routes"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitApp(cfg *configs.Configs) *fiber.App {
+func InitApp(cfg *config.Configs) *fiber.App {
 	app := fiber.New()
 
 	// ---------- gRPC clients ----------
@@ -30,7 +30,7 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 	authHandler := handlers.NewAuthHandler(authClient)
 
 	// ---------- routes ----------
-	routes.Setup(app, userHandler, authHandler)
+	routes.Setup(app, cfg.JWT, userHandler, authHandler)
 
 	return app
 }

@@ -11,6 +11,7 @@ import (
 	authUsecase "wealth-vault/auth-service/internal/usecase"
 	"wealth-vault/auth-service/pkg/database"
 	authpb "wealth-vault/auth-service/pkg/pb/proto/auth"
+	authToken "wealth-vault/auth-service/pkg/token"
 
 	"google.golang.org/grpc"
 )
@@ -29,7 +30,8 @@ func main() {
 	}
 
 	repo := authRepo.NewAuthRepository(db)
-	uc := authUsecase.NewAuthUsecase(repo, userClient)
+	token := authToken.NewJWT(cfg.JWT.Secret)
+	uc := authUsecase.NewAuthUsecase(repo, userClient, token)
 	handler := authHandler.NewAuthGRPCHandler(uc)
 	cronJob := authCron.NewAuthCronJob(uc)
 

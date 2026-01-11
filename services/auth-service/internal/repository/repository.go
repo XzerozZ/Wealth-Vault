@@ -31,6 +31,14 @@ func (r *AuthRepository) FindByEmail(ctx context.Context, email string) (*domain
 	return &auth, nil
 }
 
+func (r *AuthRepository) FindByID(ctx context.Context, userid string) (*domain.AuthAccount, error) {
+	var auth domain.AuthAccount
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userid).First(&auth).Error; err != nil {
+		return nil, err
+	}
+	return &auth, nil
+}
+
 func (r *AuthRepository) CreateSession(ctx context.Context, session *domain.AuthSession) error {
 	if err := r.db.WithContext(ctx).Create(session).Error; err != nil {
 		return err

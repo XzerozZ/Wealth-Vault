@@ -9,8 +9,8 @@ import (
 	"wealth-vault/auth-service/internal/domain"
 	repo "wealth-vault/auth-service/internal/repository/interface"
 	pb "wealth-vault/auth-service/pkg/pb/proto/user"
+	"wealth-vault/auth-service/pkg/token"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -18,44 +18,19 @@ import (
 type AuthUsecase struct {
 	authRepo   repo.AuthRepository
 	userClient pb.UserServiceClient
-	jwtSecret  string
+	token      token.Generator
 }
 
 func NewAuthUsecase(
 	r repo.AuthRepository,
 	userClient pb.UserServiceClient,
+	t token.Generator,
 ) AuthUsecase {
 	return AuthUsecase{
 		authRepo:   r,
 		userClient: userClient,
+		token:      t,
 	}
-}
-
-func (u *AuthUsecase) generateTokenPair(userID string, email string) (string, string, error) {
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"email":   email,
-		"type":    "access",
-		"exp":     time.Now().Add(time.Hour * 1).Unix(),
-	})
-
-	accessTokenString, err := accessToken.SignedString([]byte(u.jwtSecret))
-	if err != nil {
-		return "", "", err
-	}
-
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"type":    "refresh",
-		"exp":     time.Now().Add(time.Hour * 24 * 7).Unix(),
-	})
-
-	refreshTokenString, err := refreshToken.SignedString([]byte(u.jwtSecret))
-	if err != nil {
-		return "", "", err
-	}
-
-	return accessTokenString, refreshTokenString, nil
 }
 
 func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput) (*domain.AuthOutput, error) {
@@ -115,9 +90,14 @@ func (u *AuthUsecase) Login(ctx context.Context, input *domain.LoginInput) (*dom
 		return nil, fmt.Errorf("invalid password")
 	}
 
-	accessToken, refreshToken, err := u.generateTokenPair(existingUser.ID, existingUser.Email)
+	accessToken, err := u.token.CreateToken(existingUser.UserID, existingUser.Email, "access", 15*time.Minute)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate tokens: %w", err)
+		return nil, fmt.Errorf("failed to create access token: %w", err)
+	}
+
+	refreshToken, err := u.token.CreateToken(existingUser.UserID, existingUser.Email, "refresh", 7*24*time.Hour)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create refresh token: %w", err)
 	}
 
 	session := &domain.AuthSession{
@@ -142,35 +122,42 @@ func (u *AuthUsecase) Login(ctx context.Context, input *domain.LoginInput) (*dom
 }
 
 func (u *AuthUsecase) RefreshToken(ctx context.Context, refreshTokenStr string) (*domain.AuthOutput, error) {
-	token, err := jwt.Parse(refreshTokenStr, func(token *jwt.Token) (interface{}, error) {
-		return []byte(u.jwtSecret), nil
-	})
-
-	if err != nil || !token.Valid {
-		return nil, errors.New("invalid refresh token")
+	claims, err := u.token.VerifyToken(refreshTokenStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid refresh token: %w", err)
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["type"] != "refresh" {
-		return nil, errors.New("invalid token type")
+	tokenType, ok := claims["type"].(string)
+	if !ok || tokenType != "refresh" {
+		return nil, fmt.Errorf("invalid token type")
 	}
 
 	session, err := u.authRepo.GetSessionByRefreshToken(ctx, refreshTokenStr)
 	if err != nil {
-		return nil, errors.New("invalid or revoked refresh token")
+		return nil, fmt.Errorf("invalid or revoked refresh token")
 	}
 
 	if time.Now().After(session.RefreshExpiresAt) {
-		return nil, errors.New("refresh token expired")
+		return nil, fmt.Errorf("refresh token expired")
 	}
 
 	if err := u.authRepo.RevokeSession(ctx, refreshTokenStr); err != nil {
 		return nil, err
 	}
 
-	newAccess, newRefresh, err := u.generateTokenPair(session.UserID, "")
+	user, err := u.authRepo.FindByID(ctx, session.UserID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("user not found")
+	}
+
+	newAccess, err := u.token.CreateToken(user.UserID, user.Email, "access", 15*time.Minute)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create access token: %w", err)
+	}
+
+	newRefresh, err := u.token.CreateToken(user.UserID, user.Email, "refresh", 7*24*time.Hour)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create refresh token: %w", err)
 	}
 
 	newSession := &domain.AuthSession{
