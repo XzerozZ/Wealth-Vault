@@ -23,6 +23,14 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *domain.User) erro
 	return nil
 }
 
+func (r *UserRepository) GetUser(ctx context.Context, id string) (*domain.User, error) {
+	var user domain.User
+	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (r *UserRepository) UpdateUser(ctx context.Context, user *domain.User, mask []string) (*domain.User, error) {
 	tx := r.db.WithContext(ctx).Model(user).Where("id = ?", user.ID)
 	if len(mask) > 0 {

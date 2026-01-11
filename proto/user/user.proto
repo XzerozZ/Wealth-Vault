@@ -7,8 +7,8 @@ import "google/protobuf/field_mask.proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-  rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
-  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc GetUser(GetUserByIDRequest) returns (UserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
 }
 
 message User {
@@ -33,11 +33,7 @@ message CreateUserResponse {
   string id = 1;
 }
 
-message GetUserByEmailRequest {
-  string email = 1;
-}
-
-message GetUserByEmailResponse {
+message GetUserByIDRequest {
   string id = 1;
 }
 
@@ -47,7 +43,7 @@ message UpdateUserRequest {
   google.protobuf.FieldMask update_mask = 3;   
 }
 
-message UpdateUserResponse {
+message UserResponse {
   bool success = 1;
   User user = 2;
 }

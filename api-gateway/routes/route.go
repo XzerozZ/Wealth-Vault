@@ -21,5 +21,6 @@ func Setup(
 	auth.Post("/login", authHandler.Login)
 	auth.Post("/refresh", authHandler.RefreshToken)
 
+	api.Get("/user", middleware.JWTMiddleware(jwt), userHandler.GetUser)
 	api.Patch("/user", middleware.JWTMiddleware(jwt), userHandler.UpdateUser)
 }
