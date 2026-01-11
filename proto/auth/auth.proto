@@ -4,7 +4,9 @@ option go_package = "wealth-vault/pkg/pb";
 
 service AuthService {
   rpc Register (AuthRequest) returns (AuthResponse);
-  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+  rpc Login (AuthRequest) returns (AuthResponse);
+
+  rpc RefreshToken (RefreshTokenRequest) returns (AuthResponse);
 }
 
 message AuthRequest {
@@ -18,11 +20,6 @@ message AuthResponse {
   string user_id = 3;
 }
 
-message ValidateTokenRequest {
-  string token = 1;
-}
-
-message ValidateTokenResponse {
-  bool valid = 1;
-  string user_id = 2;
+message RefreshTokenRequest {
+  string refresh_token = 1;
 }

@@ -4,7 +4,7 @@ import (
 	"log"
 	"net"
 	config "wealth-vault/user-service/configs"
-	userHandler "wealth-vault/user-service/internal/handler/grpc"
+	userHandler "wealth-vault/user-service/internal/delivery/grpc"
 	userRepo "wealth-vault/user-service/internal/repository"
 	userUsecase "wealth-vault/user-service/internal/usecase"
 	"wealth-vault/user-service/pkg/database"

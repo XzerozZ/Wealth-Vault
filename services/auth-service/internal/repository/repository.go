@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"errors"
+	"time"
 	"wealth-vault/auth-service/internal/domain"
 
 	"gorm.io/gorm"
@@ -26,9 +26,14 @@ func (r *AuthRepository) Register(ctx context.Context, auth *domain.AuthAccount)
 func (r *AuthRepository) FindByEmail(ctx context.Context, email string) (*domain.AuthAccount, error) {
 	var auth domain.AuthAccount
 	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&auth).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
+		return nil, err
+	}
+	return &auth, nil
+}
+
+func (r *AuthRepository) FindByID(ctx context.Context, userid string) (*domain.AuthAccount, error) {
+	var auth domain.AuthAccount
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userid).First(&auth).Error; err != nil {
 		return nil, err
 	}
 	return &auth, nil
@@ -57,6 +62,18 @@ func (r *AuthRepository) RevokeSession(ctx context.Context, refreshToken string)
 		Model(&domain.AuthSession{}).
 		Where("refresh_token = ?", refreshToken).
 		Update("revoked", true).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *AuthRepository) DeleteExpiredSessions(ctx context.Context) error {
+	fourteenDaysAgo := time.Now().AddDate(0, 0, -14)
+	err := r.db.WithContext(ctx).
+		Where("refresh_expires_at < ?", time.Now()).
+		Or("revoked = ? AND updated_at < ?", true, fourteenDaysAgo).
+		Delete(&domain.AuthSession{}).Error
 	if err != nil {
 		return err
 	}

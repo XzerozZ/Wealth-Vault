@@ -2,9 +2,26 @@ syntax = "proto3";
 
 option go_package = "wealth-vault/pkg/pb";
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (GetUserByEmailResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string firstname = 3;
+  string lastname = 4;
+  string username = 5;
+  string profile = 6;
+  string phonenumber = 7;
+  string birthday = 8;
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
 }
 
 message CreateUserRequest {
@@ -22,4 +39,15 @@ message GetUserByEmailRequest {
 
 message GetUserByEmailResponse {
   string id = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;          
+  User user = 2;
+  google.protobuf.FieldMask update_mask = 3;   
+}
+
+message UpdateUserResponse {
+  bool success = 1;
+  User user = 2;
 }
