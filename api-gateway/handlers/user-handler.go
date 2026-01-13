@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+	"fmt"
+	"path/filepath"
 	"time"
 
 	"wealth-vault/api-gateway/internal/domain"
@@ -14,11 +16,15 @@ import (
 )
 
 type UserHandler struct {
-	client pb.UserServiceClient
+	client  pb.UserServiceClient
+	storage *utils.StorageClient
 }
 
-func NewUserHandler(c pb.UserServiceClient) *UserHandler {
-	return &UserHandler{client: c}
+func NewUserHandler(c pb.UserServiceClient, s *utils.StorageClient) *UserHandler {
+	return &UserHandler{
+		client:  c,
+		storage: s,
+	}
 }
 
 func (h *UserHandler) GetUser(c *fiber.Ctx) error {
@@ -65,6 +71,37 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{
 			"error": "Invalid form data",
 		})
+	}
+
+	fileHeader, err := c.FormFile("profile_image")
+	if err == nil {
+
+		fileData, err := fileHeader.Open()
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Cannot open file"})
+		}
+		defer fileData.Close()
+
+		ext := filepath.Ext(fileHeader.Filename)
+		newFileName := fmt.Sprintf("avatars/%s-%d%s", userID, time.Now().Unix(), ext)
+		contentType := fileHeader.Header.Get("Content-Type")
+
+		url, err := h.storage.UploadStream(fileData, newFileName, contentType)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Upload failed: " + err.Error()})
+		}
+
+		req.Profile = url
+		hasProfile := false
+		for _, p := range paths {
+			if p == "profile" {
+				hasProfile = true
+				break
+			}
+		}
+		if !hasProfile {
+			paths = append(paths, "profile")
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

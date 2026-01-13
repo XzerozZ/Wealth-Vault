@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"wealth-vault/api-gateway/config"
+	"wealth-vault/api-gateway/configs"
 	"wealth-vault/api-gateway/handlers"
 	"wealth-vault/api-gateway/internal/middleware"
 
@@ -10,7 +10,7 @@ import (
 
 func Setup(
 	app *fiber.App,
-	jwt config.JWT,
+	jwt configs.JWT,
 	userHandler *handlers.UserHandler,
 	authHandler *handlers.AuthHandler,
 ) {
