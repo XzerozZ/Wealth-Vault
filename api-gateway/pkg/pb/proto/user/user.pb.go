@@ -235,72 +235,28 @@ func (x *CreateUserResponse) GetId() string {
 	return ""
 }
 
-type GetUserByEmailRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetUserByEmailRequest) Reset() {
-	*x = GetUserByEmailRequest{}
-	mi := &file_proto_user_user_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetUserByEmailRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetUserByEmailRequest) ProtoMessage() {}
-
-func (x *GetUserByEmailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_user_user_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetUserByEmailRequest.ProtoReflect.Descriptor instead.
-func (*GetUserByEmailRequest) Descriptor() ([]byte, []int) {
-	return file_proto_user_user_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetUserByEmailRequest) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-type GetUserByEmailResponse struct {
+type GetUserByIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetUserByEmailResponse) Reset() {
-	*x = GetUserByEmailResponse{}
-	mi := &file_proto_user_user_proto_msgTypes[4]
+func (x *GetUserByIDRequest) Reset() {
+	*x = GetUserByIDRequest{}
+	mi := &file_proto_user_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetUserByEmailResponse) String() string {
+func (x *GetUserByIDRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetUserByEmailResponse) ProtoMessage() {}
+func (*GetUserByIDRequest) ProtoMessage() {}
 
-func (x *GetUserByEmailResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_user_user_proto_msgTypes[4]
+func (x *GetUserByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -311,12 +267,12 @@ func (x *GetUserByEmailResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetUserByEmailResponse.ProtoReflect.Descriptor instead.
-func (*GetUserByEmailResponse) Descriptor() ([]byte, []int) {
-	return file_proto_user_user_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use GetUserByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetUserByIDRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_user_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetUserByEmailResponse) GetId() string {
+func (x *GetUserByIDRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
@@ -334,7 +290,7 @@ type UpdateUserRequest struct {
 
 func (x *UpdateUserRequest) Reset() {
 	*x = UpdateUserRequest{}
-	mi := &file_proto_user_user_proto_msgTypes[5]
+	mi := &file_proto_user_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -346,7 +302,7 @@ func (x *UpdateUserRequest) String() string {
 func (*UpdateUserRequest) ProtoMessage() {}
 
 func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_user_user_proto_msgTypes[5]
+	mi := &file_proto_user_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,7 +315,7 @@ func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return file_proto_user_user_proto_rawDescGZIP(), []int{5}
+	return file_proto_user_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UpdateUserRequest) GetId() string {
@@ -383,7 +339,7 @@ func (x *UpdateUserRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
-type UpdateUserResponse struct {
+type UserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	User          *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
@@ -391,21 +347,21 @@ type UpdateUserResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpdateUserResponse) Reset() {
-	*x = UpdateUserResponse{}
-	mi := &file_proto_user_user_proto_msgTypes[6]
+func (x *UserResponse) Reset() {
+	*x = UserResponse{}
+	mi := &file_proto_user_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateUserResponse) String() string {
+func (x *UserResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateUserResponse) ProtoMessage() {}
+func (*UserResponse) ProtoMessage() {}
 
-func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_user_user_proto_msgTypes[6]
+func (x *UserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -416,19 +372,19 @@ func (x *UpdateUserResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateUserResponse.ProtoReflect.Descriptor instead.
-func (*UpdateUserResponse) Descriptor() ([]byte, []int) {
-	return file_proto_user_user_proto_rawDescGZIP(), []int{6}
+// Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
+func (*UserResponse) Descriptor() ([]byte, []int) {
+	return file_proto_user_user_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *UpdateUserResponse) GetSuccess() bool {
+func (x *UserResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
 }
 
-func (x *UpdateUserResponse) GetUser() *User {
+func (x *UserResponse) GetUser() *User {
 	if x != nil {
 		return x.User
 	}
@@ -458,25 +414,23 @@ const file_proto_user_user_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\"$\n" +
 	"\x12CreateUserResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"-\n" +
-	"\x15GetUserByEmailRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\"(\n" +
-	"\x16GetUserByEmailResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"$\n" +
+	"\x12GetUserByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"{\n" +
 	"\x11UpdateUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
 	"\x04user\x18\x02 \x01(\v2\x05.UserR\x04user\x12;\n" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMask\"I\n" +
-	"\x12UpdateUserResponse\x12\x18\n" +
+	"updateMask\"C\n" +
+	"\fUserResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x19\n" +
-	"\x04user\x18\x02 \x01(\v2\x05.UserR\x04user2\xbe\x01\n" +
+	"\x04user\x18\x02 \x01(\v2\x05.UserR\x04user2\xa4\x01\n" +
 	"\vUserService\x125\n" +
 	"\n" +
-	"CreateUser\x12\x12.CreateUserRequest\x1a\x13.CreateUserResponse\x12A\n" +
-	"\x0eGetUserByEmail\x12\x16.GetUserByEmailRequest\x1a\x17.GetUserByEmailResponse\x125\n" +
+	"CreateUser\x12\x12.CreateUserRequest\x1a\x13.CreateUserResponse\x12-\n" +
+	"\aGetUser\x12\x13.GetUserByIDRequest\x1a\r.UserResponse\x12/\n" +
 	"\n" +
-	"UpdateUser\x12\x12.UpdateUserRequest\x1a\x13.UpdateUserResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"UpdateUser\x12\x12.UpdateUserRequest\x1a\r.UserResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_user_user_proto_rawDescOnce sync.Once
@@ -490,30 +444,29 @@ func file_proto_user_user_proto_rawDescGZIP() []byte {
 	return file_proto_user_user_proto_rawDescData
 }
 
-var file_proto_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_user_user_proto_goTypes = []any{
-	(*User)(nil),                   // 0: User
-	(*CreateUserRequest)(nil),      // 1: CreateUserRequest
-	(*CreateUserResponse)(nil),     // 2: CreateUserResponse
-	(*GetUserByEmailRequest)(nil),  // 3: GetUserByEmailRequest
-	(*GetUserByEmailResponse)(nil), // 4: GetUserByEmailResponse
-	(*UpdateUserRequest)(nil),      // 5: UpdateUserRequest
-	(*UpdateUserResponse)(nil),     // 6: UpdateUserResponse
-	(*timestamppb.Timestamp)(nil),  // 7: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),  // 8: google.protobuf.FieldMask
+	(*User)(nil),                  // 0: User
+	(*CreateUserRequest)(nil),     // 1: CreateUserRequest
+	(*CreateUserResponse)(nil),    // 2: CreateUserResponse
+	(*GetUserByIDRequest)(nil),    // 3: GetUserByIDRequest
+	(*UpdateUserRequest)(nil),     // 4: UpdateUserRequest
+	(*UserResponse)(nil),          // 5: UserResponse
+	(*timestamppb.Timestamp)(nil), // 6: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil), // 7: google.protobuf.FieldMask
 }
 var file_proto_user_user_proto_depIdxs = []int32{
-	7, // 0: User.created_at:type_name -> google.protobuf.Timestamp
-	7, // 1: User.updated_at:type_name -> google.protobuf.Timestamp
+	6, // 0: User.created_at:type_name -> google.protobuf.Timestamp
+	6, // 1: User.updated_at:type_name -> google.protobuf.Timestamp
 	0, // 2: UpdateUserRequest.user:type_name -> User
-	8, // 3: UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0, // 4: UpdateUserResponse.user:type_name -> User
+	7, // 3: UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0, // 4: UserResponse.user:type_name -> User
 	1, // 5: UserService.CreateUser:input_type -> CreateUserRequest
-	3, // 6: UserService.GetUserByEmail:input_type -> GetUserByEmailRequest
-	5, // 7: UserService.UpdateUser:input_type -> UpdateUserRequest
+	3, // 6: UserService.GetUser:input_type -> GetUserByIDRequest
+	4, // 7: UserService.UpdateUser:input_type -> UpdateUserRequest
 	2, // 8: UserService.CreateUser:output_type -> CreateUserResponse
-	4, // 9: UserService.GetUserByEmail:output_type -> GetUserByEmailResponse
-	6, // 10: UserService.UpdateUser:output_type -> UpdateUserResponse
+	5, // 9: UserService.GetUser:output_type -> UserResponse
+	5, // 10: UserService.UpdateUser:output_type -> UserResponse
 	8, // [8:11] is the sub-list for method output_type
 	5, // [5:8] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name
@@ -532,7 +485,7 @@ func file_proto_user_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_user_user_proto_rawDesc), len(file_proto_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

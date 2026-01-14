@@ -8,6 +8,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type UserGRPCHandler struct {
@@ -33,7 +34,30 @@ func (h *UserGRPCHandler) CreateUser(ctx context.Context, req *userpb.CreateUser
 	}, nil
 }
 
-func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) (*userpb.UpdateUserResponse, error) {
+func (h *UserGRPCHandler) GetUser(ctx context.Context, req *userpb.GetUserByIDRequest) (*userpb.UserResponse, error) {
+	user, err := h.usecase.GetUser(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &userpb.UserResponse{
+		Success: true,
+		User: &userpb.User{
+			Id:          user.ID,
+			Email:       user.Email,
+			Firstname:   user.Firstname,
+			Lastname:    user.Lastname,
+			Username:    user.Username,
+			Profile:     user.Profile,
+			Phonenumber: user.Phonenumber,
+			Birthday:    user.Birthday.Format("2006-01-02"),
+			CreatedAt:   timestamppb.New(user.CreatedAt),
+			UpdatedAt:   timestamppb.New(user.UpdatedAt),
+		},
+	}, nil
+}
+
+func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) (*userpb.UserResponse, error) {
 	if req.GetId() == "" {
 		return nil, status.Error(codes.InvalidArgument, "user id is required")
 	}
@@ -64,7 +88,7 @@ func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUser
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &userpb.UpdateUserResponse{
+	return &userpb.UserResponse{
 		Success: true,
 		User: &userpb.User{
 			Id:          user.ID,
@@ -75,6 +99,8 @@ func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUser
 			Profile:     user.Profile,
 			Phonenumber: user.Phonenumber,
 			Birthday:    user.Birthday.Format("2006-01-02"),
+			CreatedAt:   timestamppb.New(user.CreatedAt),
+			UpdatedAt:   timestamppb.New(user.UpdatedAt),
 		},
 	}, nil
 }

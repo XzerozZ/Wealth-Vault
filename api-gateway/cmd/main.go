@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	"wealth-vault/api-gateway/config"
+	"wealth-vault/api-gateway/configs"
 	"wealth-vault/api-gateway/internal/bootstrap"
 )
 
 func main() {
-	cfg := config.LoadConfigs()
+	cfg := configs.LoadConfigs()
 
 	app := bootstrap.InitApp(cfg)
 

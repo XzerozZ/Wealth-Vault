@@ -1,4 +1,4 @@
-package config
+package configs
 
 import (
 	"log"
@@ -10,6 +10,7 @@ import (
 type Configs struct {
 	APP         APP
 	JWT         JWT
+	SUPA        SUPA
 	UserService User
 	AuthService Auth
 }
@@ -20,6 +21,12 @@ type APP struct {
 
 type JWT struct {
 	Secret string
+}
+
+type SUPA struct {
+	Key    string
+	URL    string
+	Bucket string
 }
 
 type User struct {
@@ -51,15 +58,20 @@ func LoadConfigs() *Configs {
 			Port: requireEnv("APP_PORT"),
 		},
 		JWT: JWT{
-			Secret: os.Getenv("JWT_SECRET"),
+			Secret: requireEnv("JWT_SECRET"),
+		},
+		SUPA: SUPA{
+			Key:    requireEnv("SUPABASE_KEY"),
+			URL:    requireEnv("SUPABASE_URL"),
+			Bucket: requireEnv("BUCKET_NAME"),
 		},
 		UserService: User{
-			Host: requireEnv("User_HOST"),
-			Port: requireEnv("User_PORT"),
+			Host: requireEnv("USER_HOST"),
+			Port: requireEnv("USER_PORT"),
 		},
 		AuthService: Auth{
-			Host: requireEnv("Auth_HOST"),
-			Port: requireEnv("Auth_PORT"),
+			Host: requireEnv("AUTH_HOST"),
+			Port: requireEnv("AUTH_PORT"),
 		},
 	}
 }

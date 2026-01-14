@@ -26,6 +26,15 @@ func (u *UserUsecase) CreateUser(ctx context.Context, user *domain.User) (string
 	return user.ID, nil
 }
 
+func (u *UserUsecase) GetUser(ctx context.Context, id string) (*domain.User, error) {
+	user, err := u.userRepo.GetUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (u *UserUsecase) UpdateUser(ctx context.Context, input *domain.UpdateUserInput) (*domain.User, error) {
 	updateData := &domain.User{
 		ID:          input.ID,

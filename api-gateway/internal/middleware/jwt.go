@@ -3,13 +3,13 @@ package middleware
 import (
 	"errors"
 	"strings"
-	"wealth-vault/api-gateway/config"
+	"wealth-vault/api-gateway/configs"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func JWTMiddleware(config config.JWT) fiber.Handler {
+func JWTMiddleware(config configs.JWT) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		authHeader := ctx.Get("Authorization")
 		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
