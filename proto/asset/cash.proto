@@ -16,6 +16,13 @@ message Cash {
   string created_by = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
+  repeated FileInfo files = 8;
+}
+
+message FileInfo {
+  string id = 1;
+  string url = 2;
+  string file_type = 3;
 }
 
 // ------Request------
@@ -24,13 +31,14 @@ message CreateCashRequest {
   double amount = 2;
   string description = 3;
   string created_by = 4;
+  repeated FileInfo files = 5;
 }
 
 message GetCashRequest {
   string user_id = 1;
 }
 
-message GetCashByIDRequest {
+message CashByIDRequest {
   string user_id = 1;
   string id = 2;
 }
@@ -39,6 +47,8 @@ message UpdateCashRequest {
   string id = 1;          
   Cash cash = 2;
   google.protobuf.FieldMask update_mask = 3;  
+  repeated FileInfo new_files = 4;
+  repeated string delete_file_ids = 5;
 }
 
 // ------Response------

@@ -24,19 +24,21 @@ var File_proto_asset_asset_proto protoreflect.FileDescriptor
 
 const file_proto_asset_asset_proto_rawDesc = "" +
 	"\n" +
-	"\x17proto/asset/asset.proto\x12\x05asset\x1a\x16proto/asset/cash.proto2\x89\x02\n" +
+	"\x17proto/asset/asset.proto\x12\x05asset\x1a\x16proto/asset/cash.proto2\xc1\x02\n" +
 	"\fAssetService\x12A\n" +
 	"\n" +
 	"CreateCash\x12\x18.asset.CreateCashRequest\x1a\x19.asset.CreateCashResponse\x12:\n" +
-	"\aGetCash\x12\x15.asset.GetCashRequest\x1a\x18.asset.CashArrayResponse\x12=\n" +
-	"\vGetCashByID\x12\x19.asset.GetCashByIDRequest\x1a\x13.asset.CashResponse\x12;\n" +
+	"\aGetCash\x12\x15.asset.GetCashRequest\x1a\x18.asset.CashArrayResponse\x12:\n" +
+	"\vGetCashByID\x12\x16.asset.CashByIDRequest\x1a\x13.asset.CashResponse\x12;\n" +
 	"\n" +
-	"UpdateCash\x12\x18.asset.UpdateCashRequest\x1a\x13.asset.CashResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"UpdateCash\x12\x18.asset.UpdateCashRequest\x1a\x13.asset.CashResponse\x129\n" +
+	"\n" +
+	"DeleteCash\x12\x16.asset.CashByIDRequest\x1a\x13.asset.CashResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var file_proto_asset_asset_proto_goTypes = []any{
 	(*CreateCashRequest)(nil),  // 0: asset.CreateCashRequest
 	(*GetCashRequest)(nil),     // 1: asset.GetCashRequest
-	(*GetCashByIDRequest)(nil), // 2: asset.GetCashByIDRequest
+	(*CashByIDRequest)(nil),    // 2: asset.CashByIDRequest
 	(*UpdateCashRequest)(nil),  // 3: asset.UpdateCashRequest
 	(*CreateCashResponse)(nil), // 4: asset.CreateCashResponse
 	(*CashArrayResponse)(nil),  // 5: asset.CashArrayResponse
@@ -45,14 +47,16 @@ var file_proto_asset_asset_proto_goTypes = []any{
 var file_proto_asset_asset_proto_depIdxs = []int32{
 	0, // 0: asset.AssetService.CreateCash:input_type -> asset.CreateCashRequest
 	1, // 1: asset.AssetService.GetCash:input_type -> asset.GetCashRequest
-	2, // 2: asset.AssetService.GetCashByID:input_type -> asset.GetCashByIDRequest
+	2, // 2: asset.AssetService.GetCashByID:input_type -> asset.CashByIDRequest
 	3, // 3: asset.AssetService.UpdateCash:input_type -> asset.UpdateCashRequest
-	4, // 4: asset.AssetService.CreateCash:output_type -> asset.CreateCashResponse
-	5, // 5: asset.AssetService.GetCash:output_type -> asset.CashArrayResponse
-	6, // 6: asset.AssetService.GetCashByID:output_type -> asset.CashResponse
-	6, // 7: asset.AssetService.UpdateCash:output_type -> asset.CashResponse
-	4, // [4:8] is the sub-list for method output_type
-	0, // [0:4] is the sub-list for method input_type
+	2, // 4: asset.AssetService.DeleteCash:input_type -> asset.CashByIDRequest
+	4, // 5: asset.AssetService.CreateCash:output_type -> asset.CreateCashResponse
+	5, // 6: asset.AssetService.GetCash:output_type -> asset.CashArrayResponse
+	6, // 7: asset.AssetService.GetCashByID:output_type -> asset.CashResponse
+	6, // 8: asset.AssetService.UpdateCash:output_type -> asset.CashResponse
+	6, // 9: asset.AssetService.DeleteCash:output_type -> asset.CashResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

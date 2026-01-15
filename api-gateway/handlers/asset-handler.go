@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"time"
 	"wealth-vault/api-gateway/internal/domain"
 	"wealth-vault/api-gateway/internal/mapper"
@@ -10,15 +11,20 @@ import (
 	"wealth-vault/api-gateway/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type AssetHandler struct {
-	client pb.AssetServiceClient
+	client  pb.AssetServiceClient
+	storage *utils.StorageClient
 }
 
-func NewAssetHandler(c pb.AssetServiceClient) *AssetHandler {
-	return &AssetHandler{client: c}
+func NewAssetHandler(c pb.AssetServiceClient, s *utils.StorageClient) *AssetHandler {
+	return &AssetHandler{
+		client:  c,
+		storage: s,
+	}
 }
 
 func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
@@ -34,10 +40,54 @@ func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	if body.Amount == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Amount are required",
+		})
+	}
+
 	amount, err := utils.Parseamount(body.Amount)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return nil
+		return c.Status(400).JSON(fiber.Map{
+			"error": "Invalid amount",
+		})
+	}
+
+	var pbFiles []*pb.FileInfo
+	form, err := c.MultipartForm()
+	if err == nil && form != nil {
+		files := form.File["files"]
+
+		if len(files) > 0 {
+			pbFiles = make([]*pb.FileInfo, len(files))
+			var g errgroup.Group
+
+			for i, fileHeader := range files {
+				index := i
+				f := fileHeader
+				g.Go(func() error {
+					fileData, err := f.Open()
+					if err != nil {
+						return err
+					}
+					defer fileData.Close()
+
+					ext := filepath.Ext(f.Filename)
+					newFileName := fmt.Sprintf("cash/%s-%d-%d%s", userID, time.Now().UnixNano(), index, ext)
+
+					url, err := h.storage.UploadStream(fileData, newFileName, f.Header.Get("Content-Type"))
+					if err != nil {
+						return err
+					}
+
+					pbFiles[index] = &pb.FileInfo{Url: url, FileType: f.Header.Get("Content-Type")}
+					return nil
+				})
+			}
+			if err := g.Wait(); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+			}
+		}
 	}
 
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
@@ -48,6 +98,7 @@ func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
 		Amount:      amount,
 		Description: body.Description,
 		CreatedBy:   userID,
+		Files:       pbFiles,
 	})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
@@ -97,7 +148,7 @@ func (h *AssetHandler) GetCashByID(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.GetCashByID(ctx, &pb.GetCashByIDRequest{
+	res, err := h.client.GetCashByID(ctx, &pb.CashByIDRequest{
 		UserId: userID,
 		Id:     id,
 	})
@@ -108,7 +159,7 @@ func (h *AssetHandler) GetCashByID(c *fiber.Ctx) error {
 	cashInfo := mapper.ToCashDomain(res.Cash)
 
 	return c.JSON(fiber.Map{
-		"status": "get userInfo success",
+		"status": "get cashInfo success",
 		"data":   cashInfo,
 	})
 }
@@ -142,6 +193,35 @@ func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
 		}
 	}
 
+	var newPbFiles []*pb.FileInfo
+
+	form, err := c.MultipartForm()
+	if err == nil && form != nil && len(form.File["files"]) > 0 {
+		files := form.File["files"]
+		newPbFiles = make([]*pb.FileInfo, len(files))
+		var g errgroup.Group
+		for i, fileHeader := range files {
+			index := i
+			f := fileHeader
+			g.Go(func() (err error) {
+				fileData, _ := f.Open()
+				defer fileData.Close()
+
+				newFileName := fmt.Sprintf("cash/%s-%d-%d%s", userID, time.Now().UnixNano(), index, filepath.Ext(f.Filename))
+				url, err := h.storage.UploadStream(fileData, newFileName, f.Header.Get("Content-Type"))
+				if err != nil {
+					return err
+				}
+
+				newPbFiles[index] = &pb.FileInfo{Url: url, FileType: f.Header.Get("Content-Type")}
+				return nil
+			})
+		}
+		if err := g.Wait(); err != nil {
+			return c.Status(500).JSON(fiber.Map{"error": "Upload failed"})
+		}
+	}
+
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
@@ -156,6 +236,8 @@ func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: paths,
 		},
+		NewFiles:      newPbFiles,
+		DeleteFileIds: req.DeleteFileIDs,
 	})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
@@ -166,5 +248,31 @@ func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"status": "update success",
 		"data":   cashInfo,
+	})
+}
+
+func (h *AssetHandler) DeleteCash(c *fiber.Ctx) error {
+	id := c.Params("id")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.DeleteCash(ctx, &pb.CashByIDRequest{
+		UserId: userID,
+		Id:     id,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"status": "delete success",
+		"data":   res,
 	})
 }

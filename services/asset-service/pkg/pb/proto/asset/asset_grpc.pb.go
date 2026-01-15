@@ -23,6 +23,7 @@ const (
 	AssetService_GetCash_FullMethodName     = "/asset.AssetService/GetCash"
 	AssetService_GetCashByID_FullMethodName = "/asset.AssetService/GetCashByID"
 	AssetService_UpdateCash_FullMethodName  = "/asset.AssetService/UpdateCash"
+	AssetService_DeleteCash_FullMethodName  = "/asset.AssetService/DeleteCash"
 )
 
 // AssetServiceClient is the client API for AssetService service.
@@ -31,8 +32,9 @@ const (
 type AssetServiceClient interface {
 	CreateCash(ctx context.Context, in *CreateCashRequest, opts ...grpc.CallOption) (*CreateCashResponse, error)
 	GetCash(ctx context.Context, in *GetCashRequest, opts ...grpc.CallOption) (*CashArrayResponse, error)
-	GetCashByID(ctx context.Context, in *GetCashByIDRequest, opts ...grpc.CallOption) (*CashResponse, error)
+	GetCashByID(ctx context.Context, in *CashByIDRequest, opts ...grpc.CallOption) (*CashResponse, error)
 	UpdateCash(ctx context.Context, in *UpdateCashRequest, opts ...grpc.CallOption) (*CashResponse, error)
+	DeleteCash(ctx context.Context, in *CashByIDRequest, opts ...grpc.CallOption) (*CashResponse, error)
 }
 
 type assetServiceClient struct {
@@ -63,7 +65,7 @@ func (c *assetServiceClient) GetCash(ctx context.Context, in *GetCashRequest, op
 	return out, nil
 }
 
-func (c *assetServiceClient) GetCashByID(ctx context.Context, in *GetCashByIDRequest, opts ...grpc.CallOption) (*CashResponse, error) {
+func (c *assetServiceClient) GetCashByID(ctx context.Context, in *CashByIDRequest, opts ...grpc.CallOption) (*CashResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CashResponse)
 	err := c.cc.Invoke(ctx, AssetService_GetCashByID_FullMethodName, in, out, cOpts...)
@@ -83,14 +85,25 @@ func (c *assetServiceClient) UpdateCash(ctx context.Context, in *UpdateCashReque
 	return out, nil
 }
 
+func (c *assetServiceClient) DeleteCash(ctx context.Context, in *CashByIDRequest, opts ...grpc.CallOption) (*CashResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CashResponse)
+	err := c.cc.Invoke(ctx, AssetService_DeleteCash_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AssetServiceServer is the server API for AssetService service.
 // All implementations must embed UnimplementedAssetServiceServer
 // for forward compatibility.
 type AssetServiceServer interface {
 	CreateCash(context.Context, *CreateCashRequest) (*CreateCashResponse, error)
 	GetCash(context.Context, *GetCashRequest) (*CashArrayResponse, error)
-	GetCashByID(context.Context, *GetCashByIDRequest) (*CashResponse, error)
+	GetCashByID(context.Context, *CashByIDRequest) (*CashResponse, error)
 	UpdateCash(context.Context, *UpdateCashRequest) (*CashResponse, error)
+	DeleteCash(context.Context, *CashByIDRequest) (*CashResponse, error)
 	mustEmbedUnimplementedAssetServiceServer()
 }
 
@@ -107,11 +120,14 @@ func (UnimplementedAssetServiceServer) CreateCash(context.Context, *CreateCashRe
 func (UnimplementedAssetServiceServer) GetCash(context.Context, *GetCashRequest) (*CashArrayResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCash not implemented")
 }
-func (UnimplementedAssetServiceServer) GetCashByID(context.Context, *GetCashByIDRequest) (*CashResponse, error) {
+func (UnimplementedAssetServiceServer) GetCashByID(context.Context, *CashByIDRequest) (*CashResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCashByID not implemented")
 }
 func (UnimplementedAssetServiceServer) UpdateCash(context.Context, *UpdateCashRequest) (*CashResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateCash not implemented")
+}
+func (UnimplementedAssetServiceServer) DeleteCash(context.Context, *CashByIDRequest) (*CashResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteCash not implemented")
 }
 func (UnimplementedAssetServiceServer) mustEmbedUnimplementedAssetServiceServer() {}
 func (UnimplementedAssetServiceServer) testEmbeddedByValue()                      {}
@@ -171,7 +187,7 @@ func _AssetService_GetCash_Handler(srv interface{}, ctx context.Context, dec fun
 }
 
 func _AssetService_GetCashByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCashByIDRequest)
+	in := new(CashByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -183,7 +199,7 @@ func _AssetService_GetCashByID_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: AssetService_GetCashByID_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AssetServiceServer).GetCashByID(ctx, req.(*GetCashByIDRequest))
+		return srv.(AssetServiceServer).GetCashByID(ctx, req.(*CashByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -202,6 +218,24 @@ func _AssetService_UpdateCash_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AssetServiceServer).UpdateCash(ctx, req.(*UpdateCashRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_DeleteCash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CashByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).DeleteCash(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_DeleteCash_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).DeleteCash(ctx, req.(*CashByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -228,6 +262,10 @@ var AssetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateCash",
 			Handler:    _AssetService_UpdateCash_Handler,
+		},
+		{
+			MethodName: "DeleteCash",
+			Handler:    _AssetService_DeleteCash_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -10,6 +10,18 @@ func ToCashDomain(p *pb.Cash) *domain.Cash {
 		return nil
 	}
 
+	var domainFiles []domain.FileInfo
+	if len(p.Files) > 0 {
+		domainFiles = make([]domain.FileInfo, len(p.Files))
+		for i, f := range p.Files {
+			domainFiles[i] = domain.FileInfo{
+				ID:       f.Id,
+				URL:      f.Url,
+				FileType: f.FileType,
+			}
+		}
+	}
+
 	return &domain.Cash{
 		ID:          p.Id,
 		Name:        p.Name,
@@ -18,6 +30,7 @@ func ToCashDomain(p *pb.Cash) *domain.Cash {
 		CreatedBy:   p.CreatedBy,
 		CreatedAt:   p.CreatedAt.AsTime(),
 		UpdatedAt:   p.UpdatedAt.AsTime(),
+		Files:       domainFiles,
 	}
 }
 

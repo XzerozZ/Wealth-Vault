@@ -4,9 +4,9 @@ import (
 	"log"
 	"net"
 	"wealth-vault/asset-service/configs"
-	assetHandler "wealth-vault/asset-service/internal/delivery/grpc"
-	assetRepo "wealth-vault/asset-service/internal/repository"
-	assetUsecase "wealth-vault/asset-service/internal/usecase"
+	handler "wealth-vault/asset-service/internal/delivery/grpc"
+	repo "wealth-vault/asset-service/internal/repository"
+	usecase "wealth-vault/asset-service/internal/usecase"
 	"wealth-vault/asset-service/pkg/database"
 	assetpb "wealth-vault/asset-service/pkg/pb/proto/asset"
 
@@ -21,9 +21,10 @@ func main() {
 		log.Fatal("Failed to initialize database")
 	}
 
-	repo := assetRepo.NewAssetRepository(db)
-	uc := assetUsecase.NewAssetUsecase(repo)
-	handler := assetHandler.NewAssetGRPCHandler(uc)
+	assetRepo := repo.NewCashRepository(db)
+	fileRepo := repo.NewFileRepository(db)
+	uc := usecase.NewCashUsecase(assetRepo, fileRepo)
+	handler := handler.NewCashGRPCHandler(uc)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {

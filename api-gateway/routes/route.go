@@ -29,4 +29,5 @@ func Setup(
 	api.Get("/cash", middleware.JWTMiddleware(jwt), assetHandler.GetCash)
 	api.Get("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.GetCashByID)
 	api.Patch("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.UpdateCash)
+	api.Delete("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.DeleteCash)
 }

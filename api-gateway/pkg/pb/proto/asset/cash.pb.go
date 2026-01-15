@@ -33,6 +33,7 @@ type Cash struct {
 	CreatedBy     string                 `protobuf:"bytes,5,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Files         []*FileInfo            `protobuf:"bytes,8,rep,name=files,proto3" json:"files,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -116,6 +117,73 @@ func (x *Cash) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *Cash) GetFiles() []*FileInfo {
+	if x != nil {
+		return x.Files
+	}
+	return nil
+}
+
+type FileInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	FileType      string                 `protobuf:"bytes,3,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileInfo) Reset() {
+	*x = FileInfo{}
+	mi := &file_proto_asset_cash_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileInfo) ProtoMessage() {}
+
+func (x *FileInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_cash_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
+func (*FileInfo) Descriptor() ([]byte, []int) {
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *FileInfo) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *FileInfo) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *FileInfo) GetFileType() string {
+	if x != nil {
+		return x.FileType
+	}
+	return ""
+}
+
 // ------Request------
 type CreateCashRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -123,13 +191,14 @@ type CreateCashRequest struct {
 	Amount        float64                `protobuf:"fixed64,2,opt,name=amount,proto3" json:"amount,omitempty"`
 	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	CreatedBy     string                 `protobuf:"bytes,4,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
+	Files         []*FileInfo            `protobuf:"bytes,5,rep,name=files,proto3" json:"files,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateCashRequest) Reset() {
 	*x = CreateCashRequest{}
-	mi := &file_proto_asset_cash_proto_msgTypes[1]
+	mi := &file_proto_asset_cash_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -141,7 +210,7 @@ func (x *CreateCashRequest) String() string {
 func (*CreateCashRequest) ProtoMessage() {}
 
 func (x *CreateCashRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_cash_proto_msgTypes[1]
+	mi := &file_proto_asset_cash_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -154,7 +223,7 @@ func (x *CreateCashRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateCashRequest.ProtoReflect.Descriptor instead.
 func (*CreateCashRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_cash_proto_rawDescGZIP(), []int{1}
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateCashRequest) GetName() string {
@@ -185,6 +254,13 @@ func (x *CreateCashRequest) GetCreatedBy() string {
 	return ""
 }
 
+func (x *CreateCashRequest) GetFiles() []*FileInfo {
+	if x != nil {
+		return x.Files
+	}
+	return nil
+}
+
 type GetCashRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -194,7 +270,7 @@ type GetCashRequest struct {
 
 func (x *GetCashRequest) Reset() {
 	*x = GetCashRequest{}
-	mi := &file_proto_asset_cash_proto_msgTypes[2]
+	mi := &file_proto_asset_cash_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -206,7 +282,7 @@ func (x *GetCashRequest) String() string {
 func (*GetCashRequest) ProtoMessage() {}
 
 func (x *GetCashRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_cash_proto_msgTypes[2]
+	mi := &file_proto_asset_cash_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -219,7 +295,7 @@ func (x *GetCashRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCashRequest.ProtoReflect.Descriptor instead.
 func (*GetCashRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_cash_proto_rawDescGZIP(), []int{2}
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetCashRequest) GetUserId() string {
@@ -229,7 +305,7 @@ func (x *GetCashRequest) GetUserId() string {
 	return ""
 }
 
-type GetCashByIDRequest struct {
+type CashByIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
@@ -237,21 +313,21 @@ type GetCashByIDRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetCashByIDRequest) Reset() {
-	*x = GetCashByIDRequest{}
-	mi := &file_proto_asset_cash_proto_msgTypes[3]
+func (x *CashByIDRequest) Reset() {
+	*x = CashByIDRequest{}
+	mi := &file_proto_asset_cash_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetCashByIDRequest) String() string {
+func (x *CashByIDRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetCashByIDRequest) ProtoMessage() {}
+func (*CashByIDRequest) ProtoMessage() {}
 
-func (x *GetCashByIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_cash_proto_msgTypes[3]
+func (x *CashByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_cash_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -262,19 +338,19 @@ func (x *GetCashByIDRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetCashByIDRequest.ProtoReflect.Descriptor instead.
-func (*GetCashByIDRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_cash_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use CashByIDRequest.ProtoReflect.Descriptor instead.
+func (*CashByIDRequest) Descriptor() ([]byte, []int) {
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetCashByIDRequest) GetUserId() string {
+func (x *CashByIDRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *GetCashByIDRequest) GetId() string {
+func (x *CashByIDRequest) GetId() string {
 	if x != nil {
 		return x.Id
 	}
@@ -286,13 +362,15 @@ type UpdateCashRequest struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Cash          *Cash                  `protobuf:"bytes,2,opt,name=cash,proto3" json:"cash,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	NewFiles      []*FileInfo            `protobuf:"bytes,4,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
+	DeleteFileIds []string               `protobuf:"bytes,5,rep,name=delete_file_ids,json=deleteFileIds,proto3" json:"delete_file_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdateCashRequest) Reset() {
 	*x = UpdateCashRequest{}
-	mi := &file_proto_asset_cash_proto_msgTypes[4]
+	mi := &file_proto_asset_cash_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -304,7 +382,7 @@ func (x *UpdateCashRequest) String() string {
 func (*UpdateCashRequest) ProtoMessage() {}
 
 func (x *UpdateCashRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_cash_proto_msgTypes[4]
+	mi := &file_proto_asset_cash_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -317,7 +395,7 @@ func (x *UpdateCashRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCashRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCashRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_cash_proto_rawDescGZIP(), []int{4}
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UpdateCashRequest) GetId() string {
@@ -341,6 +419,20 @@ func (x *UpdateCashRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+func (x *UpdateCashRequest) GetNewFiles() []*FileInfo {
+	if x != nil {
+		return x.NewFiles
+	}
+	return nil
+}
+
+func (x *UpdateCashRequest) GetDeleteFileIds() []string {
+	if x != nil {
+		return x.DeleteFileIds
+	}
+	return nil
+}
+
 // ------Response------
 type CreateCashResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -352,7 +444,7 @@ type CreateCashResponse struct {
 
 func (x *CreateCashResponse) Reset() {
 	*x = CreateCashResponse{}
-	mi := &file_proto_asset_cash_proto_msgTypes[5]
+	mi := &file_proto_asset_cash_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -364,7 +456,7 @@ func (x *CreateCashResponse) String() string {
 func (*CreateCashResponse) ProtoMessage() {}
 
 func (x *CreateCashResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_cash_proto_msgTypes[5]
+	mi := &file_proto_asset_cash_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -377,7 +469,7 @@ func (x *CreateCashResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateCashResponse.ProtoReflect.Descriptor instead.
 func (*CreateCashResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_cash_proto_rawDescGZIP(), []int{5}
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreateCashResponse) GetSuccess() bool {
@@ -404,7 +496,7 @@ type CashArrayResponse struct {
 
 func (x *CashArrayResponse) Reset() {
 	*x = CashArrayResponse{}
-	mi := &file_proto_asset_cash_proto_msgTypes[6]
+	mi := &file_proto_asset_cash_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -416,7 +508,7 @@ func (x *CashArrayResponse) String() string {
 func (*CashArrayResponse) ProtoMessage() {}
 
 func (x *CashArrayResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_cash_proto_msgTypes[6]
+	mi := &file_proto_asset_cash_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -429,7 +521,7 @@ func (x *CashArrayResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CashArrayResponse.ProtoReflect.Descriptor instead.
 func (*CashArrayResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_cash_proto_rawDescGZIP(), []int{6}
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *CashArrayResponse) GetSuccess() bool {
@@ -456,7 +548,7 @@ type CashResponse struct {
 
 func (x *CashResponse) Reset() {
 	*x = CashResponse{}
-	mi := &file_proto_asset_cash_proto_msgTypes[7]
+	mi := &file_proto_asset_cash_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -468,7 +560,7 @@ func (x *CashResponse) String() string {
 func (*CashResponse) ProtoMessage() {}
 
 func (x *CashResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_cash_proto_msgTypes[7]
+	mi := &file_proto_asset_cash_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -481,7 +573,7 @@ func (x *CashResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CashResponse.ProtoReflect.Descriptor instead.
 func (*CashResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_cash_proto_rawDescGZIP(), []int{7}
+	return file_proto_asset_cash_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CashResponse) GetSuccess() bool {
@@ -502,7 +594,7 @@ var File_proto_asset_cash_proto protoreflect.FileDescriptor
 
 const file_proto_asset_cash_proto_rawDesc = "" +
 	"\n" +
-	"\x16proto/asset/cash.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\"\xf9\x01\n" +
+	"\x16proto/asset/cash.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\"\xa0\x02\n" +
 	"\x04Cash\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
@@ -513,23 +605,31 @@ const file_proto_asset_cash_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x80\x01\n" +
+	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12%\n" +
+	"\x05files\x18\b \x03(\v2\x0f.asset.FileInfoR\x05files\"I\n" +
+	"\bFileInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\x12\x1b\n" +
+	"\tfile_type\x18\x03 \x01(\tR\bfileType\"\xa7\x01\n" +
 	"\x11CreateCashRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06amount\x18\x02 \x01(\x01R\x06amount\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1d\n" +
 	"\n" +
-	"created_by\x18\x04 \x01(\tR\tcreatedBy\")\n" +
+	"created_by\x18\x04 \x01(\tR\tcreatedBy\x12%\n" +
+	"\x05files\x18\x05 \x03(\v2\x0f.asset.FileInfoR\x05files\")\n" +
 	"\x0eGetCashRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"=\n" +
-	"\x12GetCashByIDRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\":\n" +
+	"\x0fCashByIDRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\"\x81\x01\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"\xd7\x01\n" +
 	"\x11UpdateCashRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\x04cash\x18\x02 \x01(\v2\v.asset.CashR\x04cash\x12;\n" +
 	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMask\"G\n" +
+	"updateMask\x12,\n" +
+	"\tnew_files\x18\x04 \x03(\v2\x0f.asset.FileInfoR\bnewFiles\x12&\n" +
+	"\x0fdelete_file_ids\x18\x05 \x03(\tR\rdeleteFileIds\"G\n" +
 	"\x12CreateCashResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x17\n" +
 	"\acash_id\x18\x02 \x01(\tR\x06cashId\"N\n" +
@@ -552,31 +652,35 @@ func file_proto_asset_cash_proto_rawDescGZIP() []byte {
 	return file_proto_asset_cash_proto_rawDescData
 }
 
-var file_proto_asset_cash_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_proto_asset_cash_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_asset_cash_proto_goTypes = []any{
 	(*Cash)(nil),                  // 0: asset.Cash
-	(*CreateCashRequest)(nil),     // 1: asset.CreateCashRequest
-	(*GetCashRequest)(nil),        // 2: asset.GetCashRequest
-	(*GetCashByIDRequest)(nil),    // 3: asset.GetCashByIDRequest
-	(*UpdateCashRequest)(nil),     // 4: asset.UpdateCashRequest
-	(*CreateCashResponse)(nil),    // 5: asset.CreateCashResponse
-	(*CashArrayResponse)(nil),     // 6: asset.CashArrayResponse
-	(*CashResponse)(nil),          // 7: asset.CashResponse
-	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil), // 9: google.protobuf.FieldMask
+	(*FileInfo)(nil),              // 1: asset.FileInfo
+	(*CreateCashRequest)(nil),     // 2: asset.CreateCashRequest
+	(*GetCashRequest)(nil),        // 3: asset.GetCashRequest
+	(*CashByIDRequest)(nil),       // 4: asset.CashByIDRequest
+	(*UpdateCashRequest)(nil),     // 5: asset.UpdateCashRequest
+	(*CreateCashResponse)(nil),    // 6: asset.CreateCashResponse
+	(*CashArrayResponse)(nil),     // 7: asset.CashArrayResponse
+	(*CashResponse)(nil),          // 8: asset.CashResponse
+	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil), // 10: google.protobuf.FieldMask
 }
 var file_proto_asset_cash_proto_depIdxs = []int32{
-	8, // 0: asset.Cash.created_at:type_name -> google.protobuf.Timestamp
-	8, // 1: asset.Cash.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 2: asset.UpdateCashRequest.cash:type_name -> asset.Cash
-	9, // 3: asset.UpdateCashRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0, // 4: asset.CashArrayResponse.cash:type_name -> asset.Cash
-	0, // 5: asset.CashResponse.cash:type_name -> asset.Cash
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	9,  // 0: asset.Cash.created_at:type_name -> google.protobuf.Timestamp
+	9,  // 1: asset.Cash.updated_at:type_name -> google.protobuf.Timestamp
+	1,  // 2: asset.Cash.files:type_name -> asset.FileInfo
+	1,  // 3: asset.CreateCashRequest.files:type_name -> asset.FileInfo
+	0,  // 4: asset.UpdateCashRequest.cash:type_name -> asset.Cash
+	10, // 5: asset.UpdateCashRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 6: asset.UpdateCashRequest.new_files:type_name -> asset.FileInfo
+	0,  // 7: asset.CashArrayResponse.cash:type_name -> asset.Cash
+	0,  // 8: asset.CashResponse.cash:type_name -> asset.Cash
+	9,  // [9:9] is the sub-list for method output_type
+	9,  // [9:9] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_cash_proto_init() }
@@ -590,7 +694,7 @@ func file_proto_asset_cash_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_asset_cash_proto_rawDesc), len(file_proto_asset_cash_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

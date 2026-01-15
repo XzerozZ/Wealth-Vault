@@ -9,6 +9,7 @@ import "proto/asset/cash.proto";
 service AssetService {
   rpc CreateCash (CreateCashRequest) returns (CreateCashResponse);
   rpc GetCash (GetCashRequest) returns (CashArrayResponse);
-  rpc GetCashByID (GetCashByIDRequest) returns (CashResponse);
+  rpc GetCashByID (CashByIDRequest) returns (CashResponse);
   rpc UpdateCash (UpdateCashRequest) returns (CashResponse);
+  rpc DeleteCash (CashByIDRequest) returns (CashResponse);
 }
