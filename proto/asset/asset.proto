@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "proto/asset/cash.proto";
+
+service AssetService {
+  rpc CreateCash (CreateCashRequest) returns (CreateCashResponse);
+  rpc GetCash (GetCashRequest) returns (CashArrayResponse);
+  rpc GetCashByID (GetCashByIDRequest) returns (CashResponse);
+  rpc UpdateCash (UpdateCashRequest) returns (CashResponse);
+}

@@ -56,6 +56,7 @@ func (h *AuthGRPCHandler) Login(ctx context.Context, req *pb.AuthRequest) (*pb.A
 	}
 
 	return &pb.AuthResponse{
+		Success:      true,
 		UserId:       output.UserID,
 		AccessToken:  output.AccessToken,
 		RefreshToken: output.RefreshToken,
@@ -69,6 +70,7 @@ func (h *AuthGRPCHandler) RefreshToken(ctx context.Context, req *pb.RefreshToken
 	}
 
 	return &pb.AuthResponse{
+		Success:      true,
 		UserId:       output.UserID,
 		AccessToken:  output.AccessToken,
 		RefreshToken: output.RefreshToken,

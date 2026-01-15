@@ -51,6 +51,19 @@ services:
     ports:
       - "50052:50052"
 
+  asset-service:
+    build:
+      context: ./services/asset-service  
+      dockerfile: dockerfile 
+    container_name: asset-service
+    restart: always
+    depends_on:
+      - postgres
+    env_file:
+      - ./services/asset-service/.asset.env
+    ports:
+      - "50053:50053"
+
   api-gateway:
     build:
       context: ./api-gateway              
@@ -60,6 +73,7 @@ services:
     depends_on:
       - user-service
       - auth-service
+      - asset-service
     env_file:
       - ./api-gateway/.env
     ports:

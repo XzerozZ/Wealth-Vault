@@ -27,12 +27,16 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 		log.Fatal("auth service:", err)
 	}
 
+	assetClient, err := grpcclient.NewAssetClient(cfg.AssetService.Host, cfg.AssetService.Port)
+	if err != nil {
+		log.Fatal("asset service:", err)
+	}
 	// ---------- handlers ----------
 	userHandler := handlers.NewUserHandler(userClient, supabaseClient)
 	authHandler := handlers.NewAuthHandler(authClient)
-
+	assetHandler := handlers.NewAssetHandler(assetClient)
 	// ---------- routes ----------
-	routes.Setup(app, cfg.JWT, userHandler, authHandler)
+	routes.Setup(app, cfg.JWT, userHandler, authHandler, assetHandler)
 
 	return app
 }

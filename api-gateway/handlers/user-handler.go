@@ -35,7 +35,7 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 		})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
 	res, err := h.client.GetUser(ctx, &pb.GetUserByIDRequest{
@@ -45,7 +45,7 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	userInfo := mapper.ToUserEntity(res.User)
+	userInfo := mapper.ToUserDomain(res.User)
 
 	return c.JSON(fiber.Map{
 		"status": "get userInfo success",
@@ -104,7 +104,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		}
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
 	res, err := h.client.UpdateUser(ctx, &pb.UpdateUserRequest{
@@ -125,7 +125,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	userInfo := mapper.ToUserEntity(res.User)
+	userInfo := mapper.ToUserDomain(res.User)
 
 	return c.JSON(fiber.Map{
 		"status": "update success",

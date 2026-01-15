@@ -11,3 +11,12 @@ type Cash struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+type UpdateCashInput struct {
+	ID          string
+	Name        string
+	Value       float64
+	Description string
+	UserID      string
+	UpdateMask  []string
+}

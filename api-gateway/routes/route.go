@@ -13,6 +13,7 @@ func Setup(
 	jwt configs.JWT,
 	userHandler *handlers.UserHandler,
 	authHandler *handlers.AuthHandler,
+	assetHandler *handlers.AssetHandler,
 ) {
 	api := app.Group("/api")
 
@@ -23,4 +24,9 @@ func Setup(
 
 	api.Get("/user", middleware.JWTMiddleware(jwt), userHandler.GetUser)
 	api.Patch("/user", middleware.JWTMiddleware(jwt), userHandler.UpdateUser)
+
+	api.Post("/cash", middleware.JWTMiddleware(jwt), assetHandler.CreateCash)
+	api.Get("/cash", middleware.JWTMiddleware(jwt), assetHandler.GetCash)
+	api.Get("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.GetCashByID)
+	api.Patch("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.UpdateCash)
 }

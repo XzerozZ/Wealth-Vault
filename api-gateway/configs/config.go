@@ -8,11 +8,12 @@ import (
 )
 
 type Configs struct {
-	APP         APP
-	JWT         JWT
-	SUPA        SUPA
-	UserService User
-	AuthService Auth
+	APP          APP
+	JWT          JWT
+	SUPA         SUPA
+	UserService  User
+	AuthService  Auth
+	AssetService Asset
 }
 
 type APP struct {
@@ -35,6 +36,11 @@ type User struct {
 }
 
 type Auth struct {
+	Host string
+	Port string
+}
+
+type Asset struct {
 	Host string
 	Port string
 }
@@ -72,6 +78,10 @@ func LoadConfigs() *Configs {
 		AuthService: Auth{
 			Host: requireEnv("AUTH_HOST"),
 			Port: requireEnv("AUTH_PORT"),
+		},
+		AssetService: Asset{
+			Host: requireEnv("ASSET_HOST"),
+			Port: requireEnv("ASSET_PORT"),
 		},
 	}
 }

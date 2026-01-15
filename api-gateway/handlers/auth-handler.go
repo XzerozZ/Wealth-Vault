@@ -24,7 +24,7 @@ func (h *AuthHandler) RegisterLocal(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
 	res, err := h.client.Register(ctx, &pb.AuthRequest{
@@ -35,7 +35,10 @@ func (h *AuthHandler) RegisterLocal(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.JSON(res)
+	return c.JSON(fiber.Map{
+		"status": "register success",
+		"data":   res,
+	})
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
@@ -44,7 +47,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
 	res, err := h.client.Login(ctx, &pb.AuthRequest{
@@ -55,7 +58,10 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.JSON(res)
+	return c.JSON(fiber.Map{
+		"status": "login success",
+		"data":   res,
+	})
 }
 
 func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
@@ -64,7 +70,7 @@ func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
 	res, err := h.client.RefreshToken(ctx, &pb.RefreshTokenRequest{
@@ -74,5 +80,8 @@ func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	return c.JSON(res)
+	return c.JSON(fiber.Map{
+		"status": "refresh token success",
+		"data":   res,
+	})
 }
