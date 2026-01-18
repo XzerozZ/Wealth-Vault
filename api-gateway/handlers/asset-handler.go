@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 	"wealth-vault/api-gateway/internal/domain"
 	"wealth-vault/api-gateway/internal/mapper"
@@ -27,7 +28,7 @@ func NewAssetHandler(c pb.AssetServiceClient, s *utils.StorageClient) *AssetHand
 	}
 }
 
-func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
+func (h *AssetHandler) CreateAsset(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -35,24 +36,23 @@ func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
 		})
 	}
 
-	var body domain.CreateCash
-	if err := c.BodyParser(&body); err != nil {
+	req := new(domain.CreateAssetRequest)
+	if err := c.BodyParser(req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	if body.Amount == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Amount are required",
-		})
+	var amount float64
+	var err error
+	if req.Amount != "" {
+		amount, err = utils.Parseamount(req.Amount)
+		if err != nil {
+			return err
+		}
 	}
 
-	amount, err := utils.Parseamount(body.Amount)
-	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
-			"error": "Invalid amount",
-		})
-	}
-
+	inputType := strings.ToUpper(strings.TrimSpace(req.Type))
+	var assetTypeEnum pb.AssetType = pb.AssetType(mapper.SafeMapEnum(pb.AssetType_value, inputType, "ASSET_TYPE_"))
+	folderName := utils.GetFolderName(assetTypeEnum)
 	var pbFiles []*pb.FileInfo
 	form, err := c.MultipartForm()
 	if err == nil && form != nil {
@@ -73,7 +73,7 @@ func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
 					defer fileData.Close()
 
 					ext := filepath.Ext(f.Filename)
-					newFileName := fmt.Sprintf("cash/%s-%d-%d%s", userID, time.Now().UnixNano(), index, ext)
+					newFileName := fmt.Sprintf("%s/%s-%d-%d%s", folderName, userID, time.Now().UnixNano(), index, ext)
 
 					url, err := h.storage.UploadStream(fileData, newFileName, f.Header.Get("Content-Type"))
 					if err != nil {
@@ -90,16 +90,31 @@ func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
 		}
 	}
 
+	grpcReq := &pb.CreateAssetRequest{
+		UserId:               userID,
+		Type:                 assetTypeEnum,
+		Name:                 req.Name,
+		Amount:               amount,
+		Description:          req.Description,
+		IsIncludedInNetWorth: req.IsIncludedInNetWorth,
+		NewFiles:             pbFiles,
+	}
+
+	switch assetTypeEnum {
+	case pb.AssetType_ASSET_TYPE_BANK:
+		grpcReq.Detail = &pb.CreateAssetRequest_BankDetail{
+			BankDetail: mapper.MapBankToProto(c),
+		}
+	case pb.AssetType_ASSET_TYPE_INVESTMENT:
+		grpcReq.Detail = &pb.CreateAssetRequest_InvestmentDetail{
+			InvestmentDetail: mapper.MapInvestmentToProto(c),
+		}
+	}
+
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.CreateCash(ctx, &pb.CreateCashRequest{
-		Name:        body.Name,
-		Amount:      amount,
-		Description: body.Description,
-		CreatedBy:   userID,
-		Files:       pbFiles,
-	})
+	res, err := h.client.CreateAsset(ctx, grpcReq)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -110,7 +125,7 @@ func (h *AssetHandler) CreateCash(c *fiber.Ctx) error {
 	})
 }
 
-func (h *AssetHandler) GetCash(c *fiber.Ctx) error {
+func (h *AssetHandler) GetAsset(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -121,22 +136,22 @@ func (h *AssetHandler) GetCash(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.GetCash(ctx, &pb.GetCashRequest{
+	res, err := h.client.GetAsset(ctx, &pb.GetAssetRequest{
 		UserId: userID,
 	})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	cashInfo := mapper.ToCashList(res.Cash)
+	assetInfo := mapper.ToAssetList(res.Asset)
 
 	return c.JSON(fiber.Map{
-		"status": "get userInfo success",
-		"data":   cashInfo,
+		"status": "get Asset Info success",
+		"data":   assetInfo,
 	})
 }
 
-func (h *AssetHandler) GetCashByID(c *fiber.Ctx) error {
+func (h *AssetHandler) GetAssetByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
@@ -148,7 +163,7 @@ func (h *AssetHandler) GetCashByID(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.GetCashByID(ctx, &pb.CashByIDRequest{
+	res, err := h.client.GetAssetByID(ctx, &pb.GetAssetByIDRequest{
 		UserId: userID,
 		Id:     id,
 	})
@@ -156,15 +171,15 @@ func (h *AssetHandler) GetCashByID(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	cashInfo := mapper.ToCashDomain(res.Cash)
+	assetInfo := mapper.ToAssetDomain(res.Asset)
 
 	return c.JSON(fiber.Map{
-		"status": "get cashInfo success",
-		"data":   cashInfo,
+		"status": "get Asset Info success",
+		"data":   assetInfo,
 	})
 }
 
-func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
+func (h *AssetHandler) UpdateAsset(c *fiber.Ctx) error {
 	id := c.Params("id")
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
@@ -173,18 +188,20 @@ func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
 		})
 	}
 
-	var req domain.UpdateCashRequest
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
-	}
-
-	paths, err := utils.GetFieldMaskPaths(c, &req)
+	req := new(domain.UpdateAssetRequest)
+	paths, err := utils.GetFieldMaskPaths(c, req)
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid form data",
 		})
 	}
 
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	inputType := strings.ToUpper(strings.TrimSpace(req.Type))
+	var assetTypeEnum pb.AssetType = pb.AssetType(mapper.SafeMapEnum(pb.AssetType_value, inputType, "ASSET_TYPE_"))
 	var amount float64
 	if req.Amount != "" {
 		amount, err = utils.Parseamount(req.Amount)
@@ -194,8 +211,8 @@ func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
 	}
 
 	var newPbFiles []*pb.FileInfo
-
 	form, err := c.MultipartForm()
+	folderName := utils.GetFolderName(assetTypeEnum)
 	if err == nil && form != nil && len(form.File["files"]) > 0 {
 		files := form.File["files"]
 		newPbFiles = make([]*pb.FileInfo, len(files))
@@ -207,7 +224,8 @@ func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
 				fileData, _ := f.Open()
 				defer fileData.Close()
 
-				newFileName := fmt.Sprintf("cash/%s-%d-%d%s", userID, time.Now().UnixNano(), index, filepath.Ext(f.Filename))
+				ext := filepath.Ext(f.Filename)
+				newFileName := fmt.Sprintf("%s/%s-%d-%d%s", folderName, userID, time.Now().UnixNano(), index, ext)
 				url, err := h.storage.UploadStream(fileData, newFileName, f.Header.Get("Content-Type"))
 				if err != nil {
 					return err
@@ -222,36 +240,56 @@ func (h *AssetHandler) UpdateCash(c *fiber.Ctx) error {
 		}
 	}
 
-	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
-	defer cancel()
-
-	res, err := h.client.UpdateCash(ctx, &pb.UpdateCashRequest{
-		Id: id,
-		Cash: &pb.Cash{
-			Name:        req.Name,
-			Amount:      amount,
-			Description: req.Description,
-			CreatedBy:   userID,
-		},
+	grpcReq := &pb.UpdateAssetRequest{
+		Id:          id,
+		UserId:      userID,
+		Name:        req.Name,
+		Amount:      amount,
+		Description: req.Description,
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: paths,
 		},
 		NewFiles:      newPbFiles,
 		DeleteFileIds: req.DeleteFileIDs,
-	})
+	}
+
+	detailWrapper := mapper.BuildUpdateDetail(c, assetTypeEnum)
+	if detailWrapper != nil {
+		switch v := detailWrapper.(type) {
+		case *pb.UpdateAssetRequest_BankDetail:
+			grpcReq.Detail = v
+
+			paths = append(paths, "detail")
+			grpcReq.UpdateMask.Paths = utils.Unique(paths)
+
+		case *pb.UpdateAssetRequest_InvestmentDetail:
+			grpcReq.Detail = v
+
+			paths = append(paths, "detail")
+			grpcReq.UpdateMask.Paths = utils.Unique(paths)
+		}
+
+	}
+
+	fmt.Println(req.Description)
+	fmt.Println(paths)
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.UpdateAsset(ctx, grpcReq)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	cashInfo := mapper.ToCashDomain(res.Cash)
+	assetInfo := mapper.ToAssetDomain(res.Asset)
 
 	return c.JSON(fiber.Map{
 		"status": "update success",
-		"data":   cashInfo,
+		"data":   assetInfo,
 	})
 }
 
-func (h *AssetHandler) DeleteCash(c *fiber.Ctx) error {
+func (h *AssetHandler) DeleteAsset(c *fiber.Ctx) error {
 	id := c.Params("id")
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
@@ -263,7 +301,7 @@ func (h *AssetHandler) DeleteCash(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.DeleteCash(ctx, &pb.CashByIDRequest{
+	res, err := h.client.DeleteAsset(ctx, &pb.DeleteAssetRequest{
 		UserId: userID,
 		Id:     id,
 	})

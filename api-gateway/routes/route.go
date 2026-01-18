@@ -25,9 +25,9 @@ func Setup(
 	api.Get("/user", middleware.JWTMiddleware(jwt), userHandler.GetUser)
 	api.Patch("/user", middleware.JWTMiddleware(jwt), userHandler.UpdateUser)
 
-	api.Post("/cash", middleware.JWTMiddleware(jwt), assetHandler.CreateCash)
-	api.Get("/cash", middleware.JWTMiddleware(jwt), assetHandler.GetCash)
-	api.Get("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.GetCashByID)
-	api.Patch("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.UpdateCash)
-	api.Delete("/cash/:id", middleware.JWTMiddleware(jwt), assetHandler.DeleteCash)
+	api.Post("/asset", middleware.JWTMiddleware(jwt), assetHandler.CreateAsset)
+	api.Get("/asset", middleware.JWTMiddleware(jwt), assetHandler.GetAsset)
+	api.Get("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.GetAssetByID)
+	api.Patch("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.UpdateAsset)
+	api.Delete("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.DeleteAsset)
 }

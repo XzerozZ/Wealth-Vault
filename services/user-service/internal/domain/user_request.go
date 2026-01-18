@@ -1,7 +1,9 @@
 package domain
 
+import "github.com/google/uuid"
+
 type UpdateUserInput struct {
-	ID          string
+	ID          uuid.UUID
 	Firstname   string
 	Lastname    string
 	Username    string

@@ -9,6 +9,7 @@ import (
 	usecase "wealth-vault/asset-service/internal/usecase"
 	"wealth-vault/asset-service/pkg/database"
 	assetpb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	storageclient "wealth-vault/asset-service/pkg/utils"
 
 	"google.golang.org/grpc"
 )
@@ -21,10 +22,14 @@ func main() {
 		log.Fatal("Failed to initialize database")
 	}
 
-	assetRepo := repo.NewCashRepository(db)
+	supabaseClient, err := storageclient.NewStorageClient(cfg.SUPA.URL, cfg.SUPA.Key, cfg.SUPA.Bucket)
+	// ------ Repository------
+	assetRepo := repo.NewAssetRepository(db)
 	fileRepo := repo.NewFileRepository(db)
-	uc := usecase.NewCashUsecase(assetRepo, fileRepo)
-	handler := handler.NewCashGRPCHandler(uc)
+	// ------ Usecase------
+	uc := usecase.NewAssetUsecase(assetRepo, fileRepo, supabaseClient)
+	// ------Handler------
+	handler := handler.NewAssetGRPCHandler(uc)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {

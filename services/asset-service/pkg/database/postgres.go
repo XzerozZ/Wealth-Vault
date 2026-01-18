@@ -29,7 +29,7 @@ func InitDB(config configs.PostgreSQL) {
 	}
 
 	_ = db.AutoMigrate(
-		&domain.Cash{},
+		&domain.Asset{},
 		&domain.FileAssociate{},
 	)
 

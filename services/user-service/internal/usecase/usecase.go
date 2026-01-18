@@ -17,10 +17,9 @@ func NewUserUsecase(r repo.UserRepository) UserUsecase {
 	return UserUsecase{userRepo: r}
 }
 
-func (u *UserUsecase) CreateUser(ctx context.Context, user *domain.User) (string, error) {
-	user.ID = uuid.NewString()
+func (u *UserUsecase) CreateUser(ctx context.Context, user *domain.User) (uuid.UUID, error) {
 	if err := u.userRepo.CreateUser(ctx, user); err != nil {
-		return "", err
+		return uuid.Nil, err
 	}
 
 	return user.ID, nil
