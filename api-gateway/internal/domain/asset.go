@@ -33,20 +33,19 @@ type InvestmentDetail struct {
 }
 
 type RealEstateDetail struct {
-	PropertyType int      `json:"property_type"`
-	DeedNumber   string   `json:"deed_number"`
-	AreaSqm      float64  `json:"area_sqm"`
-	Location     Location `json:"location"`
+	PropertyType   int      `json:"property_type"`
+	DeedNumber     string   `json:"deed_number"`
+	AreaSqm        float64  `json:"area_sqm"`
+	Location       Location `json:"location"`
+	LinkedAssetIDs []string `json:"linked_asset_ids"`
 }
 
 type Location struct {
-	Address     string  `json:"address"`
-	SubDistrict string  `json:"sub_district"`
-	District    string  `json:"district"`
-	Province    string  `json:"province"`
-	PostalCode  string  `json:"postal_code"`
-	Latitude    float64 `json:"latitude"`
-	Longitude   float64 `json:"longitude"`
+	Address     string `json:"address"`
+	SubDistrict string `json:"sub_district"`
+	District    string `json:"district"`
+	Province    string `json:"province"`
+	PostalCode  string `json:"postal_code"`
 }
 
 type InsuranceDetail struct {
@@ -57,14 +56,14 @@ type InsuranceDetail struct {
 	CoverageAmount float64   `json:"coverage_amount"`
 	Premium        float64   `json:"premium"`
 	ExpireDate     time.Time `json:"expire_date"`
-	LinkedAssetID  string    `json:"linked_asset_id,omitempty"`
+	LinkedAssetID  string    `json:"linked_asset_id"`
 }
 
 type CreateAssetRequest struct {
 	Type                 string               `json:"type" form:"type"`
 	Name                 string               `json:"name" form:"name"`
 	Amount               string               `json:"amount" form:"amount"`
-	IsIncludedInNetWorth bool                 `json:"is_included_in_net_worth" form:"is_included_in_net_worth"`
+	IsIncludedInNetWorth string               `json:"is_included_in_net_worth" form:"is_included_in_net_worth"`
 	Description          string               `json:"desc"    form:"description"    mask:"description"`
 	BankDetail           *BankDetailDTO       `json:"bank_detail" form:"bank_detail"`
 	InvestmentDetail     *InvestmentDetailDTO `json:"investment_detail" form:"investment_detail"`
@@ -99,10 +98,11 @@ type InvestmentDetailDTO struct {
 }
 
 type RealEstateDetailDTO struct {
-	PropertyType string       `json:"property_type"`
-	DeedNumber   string       `json:"deed_number"`
-	AreaSqm      float64      `json:"area_sqm"`
-	Location     *LocationDTO `json:"location"`
+	PropertyType  string       `json:"property_type"`
+	DeedNumber    string       `json:"deed_number"`
+	AreaSqm       float64      `json:"area_sqm"`
+	Location      *LocationDTO `json:"location"`
+	LinkedAssetID []string     `json:"linked_asset_id,omitempty"`
 }
 
 type InsuranceDetailDTO struct {

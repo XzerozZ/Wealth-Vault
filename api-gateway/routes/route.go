@@ -14,6 +14,7 @@ func Setup(
 	userHandler *handlers.UserHandler,
 	authHandler *handlers.AuthHandler,
 	assetHandler *handlers.AssetHandler,
+	liaHandler *handlers.LiabilityHandler,
 ) {
 	api := app.Group("/api")
 
@@ -30,4 +31,10 @@ func Setup(
 	api.Get("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.GetAssetByID)
 	api.Patch("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.UpdateAsset)
 	api.Delete("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.DeleteAsset)
+
+	api.Post("/lia", middleware.JWTMiddleware(jwt), liaHandler.CreateLiability)
+	api.Get("/lia", middleware.JWTMiddleware(jwt), liaHandler.GetLiability)
+	api.Get("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.GetLiabilityByID)
+	api.Patch("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.UpdateLiability)
+	api.Delete("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.DeleteLiability)
 }

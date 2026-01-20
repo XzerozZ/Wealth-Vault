@@ -23,7 +23,7 @@ type Asset struct {
 	Type                 AssetType `gorm:"type:varchar(50);not null;index"`
 	Name                 string    `gorm:"not null"`
 	Amount               float64   `gorm:"not null;default:0"`
-	IsIncludedInNetWorth bool      `gorm:"default:true;not null"`
+	IsIncludedInNetWorth *bool     `gorm:"default:true;not null"`
 	Description          string
 	Details              datatypes.JSON `gorm:"type:jsonb"`
 	CreatedAt            time.Time

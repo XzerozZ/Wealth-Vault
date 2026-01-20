@@ -16,19 +16,19 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
-type AssetHandler struct {
+type LiabilityHandler struct {
 	client  pb.AssetServiceClient
 	storage *utils.StorageClient
 }
 
-func NewAssetHandler(c pb.AssetServiceClient, s *utils.StorageClient) *AssetHandler {
-	return &AssetHandler{
+func NewLiabilityHandler(c pb.AssetServiceClient, s *utils.StorageClient) *LiabilityHandler {
+	return &LiabilityHandler{
 		client:  c,
 		storage: s,
 	}
 }
 
-func (h *AssetHandler) CreateAsset(c *fiber.Ctx) error {
+func (h *LiabilityHandler) CreateLiability(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -36,23 +36,48 @@ func (h *AssetHandler) CreateAsset(c *fiber.Ctx) error {
 		})
 	}
 
-	req := new(domain.CreateAssetRequest)
+	req := new(domain.CreateLiabilityRequest)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	var amount float64
+	var principal float64
 	var err error
-	if req.Amount != "" {
-		amount, err = utils.Parseamount(req.Amount)
+	if req.Principal != "" {
+		principal, err = utils.Parseamount(req.Principal)
 		if err != nil {
 			return err
 		}
 	}
 
+	var interest float64
+	if req.InterestRate != "" {
+		interest, err = utils.Parseamount(req.InterestRate)
+		if err != nil {
+			return err
+		}
+	}
+
+	var startAtTime, endAtTime *time.Time
+	if req.StartAt != "" {
+		t, err := time.Parse("2006-01-02", req.StartAt)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid start_at format (use YYYY-MM-DD)"})
+		}
+		startAtTime = &t
+	}
+
+	if req.EndAt != "" {
+		t, err := time.Parse("2006-01-02", req.EndAt)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid end_at format (use YYYY-MM-DD)"})
+		}
+		endAtTime = &t
+	}
+
 	inputType := strings.ToUpper(strings.TrimSpace(req.Type))
-	var assetTypeEnum pb.AssetType = pb.AssetType(mapper.SafeMapEnum(pb.AssetType_value, inputType, "ASSET_TYPE_"))
-	folderName := utils.GetFolderName(assetTypeEnum)
+	var assetTypeEnum pb.LiabilityType = pb.LiabilityType(mapper.SafeMapEnum(pb.LiabilityType_value, inputType, "LIABILITY_TYPE_"))
+	folderName := utils.GetFolderLiaName(assetTypeEnum)
 	var pbFiles []*pb.FileInfo
 	form, err := c.MultipartForm()
 	if err == nil && form != nil {
@@ -90,48 +115,34 @@ func (h *AssetHandler) CreateAsset(c *fiber.Ctx) error {
 		}
 	}
 
-	grpcReq := &pb.CreateAssetRequest{
-		UserId:      userID,
-		Type:        assetTypeEnum,
-		Name:        req.Name,
-		Amount:      amount,
-		Description: req.Description,
-		NewFiles:    pbFiles,
-	}
-
-	detailWrapper := mapper.BuildCreateDetail(c, assetTypeEnum)
-	if detailWrapper != nil {
-		switch v := detailWrapper.(type) {
-		case *pb.CreateAssetRequest_BankDetail:
-			grpcReq.Detail = v
-			grpcReq.IsIncludedInNetWorth = true
-		case *pb.CreateAssetRequest_InvestmentDetail:
-			grpcReq.Detail = v
-			grpcReq.IsIncludedInNetWorth = true
-		case *pb.CreateAssetRequest_RealEstateDetail:
-			grpcReq.Detail = v
-			grpcReq.IsIncludedInNetWorth = true
-		case *pb.CreateAssetRequest_InsuranceDetail:
-			grpcReq.Detail = v
-			grpcReq.IsIncludedInNetWorth = false
-		}
+	grpcReq := &pb.CreateLiabilityRequest{
+		UserId:       userID,
+		Type:         assetTypeEnum,
+		Name:         req.Name,
+		Creditor:     req.Creditor,
+		Principal:    principal,
+		InterestRate: interest,
+		Description:  req.Description,
+		StartAt:      utils.ToProtoTime(startAtTime),
+		EndAt:        utils.ToProtoTime(endAtTime),
+		NewFiles:     pbFiles,
 	}
 
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.CreateAsset(ctx, grpcReq)
+	res, err := h.client.CreateLiability(ctx, grpcReq)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	return c.JSON(fiber.Map{
-		"status": "create asset success",
+		"status": "create liability success",
 		"data":   res,
 	})
 }
 
-func (h *AssetHandler) GetAsset(c *fiber.Ctx) error {
+func (h *LiabilityHandler) GetLiability(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -142,22 +153,22 @@ func (h *AssetHandler) GetAsset(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.GetAsset(ctx, &pb.GetAssetRequest{
+	res, err := h.client.GetLiability(ctx, &pb.GetLiabilityRequest{
 		UserId: userID,
 	})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	assetInfo := mapper.ToAssetList(res.Asset)
+	LiabilityInfo := mapper.ToLiabilityList(res.Liability)
 
 	return c.JSON(fiber.Map{
-		"status": "get Asset Info success",
-		"data":   assetInfo,
+		"status": "get Liability Info success",
+		"data":   LiabilityInfo,
 	})
 }
 
-func (h *AssetHandler) GetAssetByID(c *fiber.Ctx) error {
+func (h *LiabilityHandler) GetLiabilityByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
@@ -169,7 +180,7 @@ func (h *AssetHandler) GetAssetByID(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.GetAssetByID(ctx, &pb.GetAssetByIDRequest{
+	res, err := h.client.GetLiabilityByID(ctx, &pb.GetLiabilityByIDRequest{
 		UserId: userID,
 		Id:     id,
 	})
@@ -177,15 +188,15 @@ func (h *AssetHandler) GetAssetByID(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	assetInfo := mapper.ToAssetDomain(res.Asset)
+	liabilityInfo := mapper.ToLiabilityDomain(res.Liability)
 
 	return c.JSON(fiber.Map{
-		"status": "get Asset Info success",
-		"data":   assetInfo,
+		"status": "get Liability Info success",
+		"data":   liabilityInfo,
 	})
 }
 
-func (h *AssetHandler) UpdateAsset(c *fiber.Ctx) error {
+func (h *LiabilityHandler) UpdateLiability(c *fiber.Ctx) error {
 	id := c.Params("id")
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
@@ -194,7 +205,7 @@ func (h *AssetHandler) UpdateAsset(c *fiber.Ctx) error {
 		})
 	}
 
-	req := new(domain.UpdateAssetRequest)
+	req := new(domain.UpdateLiabilityRequest)
 	paths, err := utils.GetFieldMaskPaths(c, req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -207,18 +218,43 @@ func (h *AssetHandler) UpdateAsset(c *fiber.Ctx) error {
 	}
 
 	inputType := strings.ToUpper(strings.TrimSpace(req.Type))
-	var assetTypeEnum pb.AssetType = pb.AssetType(mapper.SafeMapEnum(pb.AssetType_value, inputType, "ASSET_TYPE_"))
-	var amount float64
-	if req.Amount != "" {
-		amount, err = utils.Parseamount(req.Amount)
+	var assetTypeEnum pb.LiabilityType = pb.LiabilityType(mapper.SafeMapEnum(pb.LiabilityType_value, inputType, "LIABILITY_TYPE_"))
+	var principal float64
+	if req.Principal != "" {
+		principal, err = utils.Parseamount(req.Principal)
 		if err != nil {
 			return err
 		}
 	}
 
+	var interest float64
+	if req.InterestRate != "" {
+		interest, err = utils.Parseamount(req.InterestRate)
+		if err != nil {
+			return err
+		}
+	}
+
+	var startAtTime, endAtTime *time.Time
+	if req.StartAt != "" {
+		t, err := time.Parse("2006-01-02", req.StartAt)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid start_at format (use YYYY-MM-DD)"})
+		}
+		startAtTime = &t
+	}
+
+	if req.EndAt != "" {
+		t, err := time.Parse("2006-01-02", req.EndAt)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid end_at format (use YYYY-MM-DD)"})
+		}
+		endAtTime = &t
+	}
+
 	var newPbFiles []*pb.FileInfo
 	form, err := c.MultipartForm()
-	folderName := utils.GetFolderName(assetTypeEnum)
+	folderName := utils.GetFolderLiaName(assetTypeEnum)
 	if err == nil && form != nil && len(form.File["files"]) > 0 {
 		files := form.File["files"]
 		newPbFiles = make([]*pb.FileInfo, len(files))
@@ -246,66 +282,40 @@ func (h *AssetHandler) UpdateAsset(c *fiber.Ctx) error {
 		}
 	}
 
-	grpcReq := &pb.UpdateAssetRequest{
-		Id:          id,
-		UserId:      userID,
-		Name:        req.Name,
-		Amount:      amount,
-		Description: req.Description,
+	grpcReq := &pb.UpdateLiabilityRequest{
+		Id:           id,
+		UserId:       userID,
+		Name:         req.Name,
+		Creditor:     req.Creditor,
+		Principal:    principal,
+		InterestRate: interest,
+		Description:  req.Description,
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: paths,
 		},
+		StartAt:       utils.ToProtoTime(startAtTime),
+		EndAt:         utils.ToProtoTime(endAtTime),
 		NewFiles:      newPbFiles,
 		DeleteFileIds: req.DeleteFileIDs,
-	}
-
-	detailWrapper := mapper.BuildUpdateDetail(c, assetTypeEnum)
-	if detailWrapper != nil {
-		switch v := detailWrapper.(type) {
-		case *pb.UpdateAssetRequest_BankDetail:
-			grpcReq.Detail = v
-
-			paths = append(paths, "detail")
-			grpcReq.UpdateMask.Paths = utils.Unique(paths)
-
-		case *pb.UpdateAssetRequest_InvestmentDetail:
-			grpcReq.Detail = v
-
-			paths = append(paths, "detail")
-			grpcReq.UpdateMask.Paths = utils.Unique(paths)
-
-		case *pb.UpdateAssetRequest_RealEstateDetail:
-			grpcReq.Detail = v
-
-			paths = append(paths, "detail")
-			grpcReq.UpdateMask.Paths = utils.Unique(paths)
-
-		case *pb.UpdateAssetRequest_InsuranceDetail:
-			grpcReq.Detail = v
-
-			paths = append(paths, "detail")
-			grpcReq.UpdateMask.Paths = utils.Unique(paths)
-		}
-
 	}
 
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.UpdateAsset(ctx, grpcReq)
+	res, err := h.client.UpdateLiability(ctx, grpcReq)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	assetInfo := mapper.ToAssetDomain(res.Asset)
+	liabilityInfo := mapper.ToLiabilityDomain(res.Liability)
 
 	return c.JSON(fiber.Map{
 		"status": "update success",
-		"data":   assetInfo,
+		"data":   liabilityInfo,
 	})
 }
 
-func (h *AssetHandler) DeleteAsset(c *fiber.Ctx) error {
+func (h *LiabilityHandler) DeleteLiability(c *fiber.Ctx) error {
 	id := c.Params("id")
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
@@ -317,7 +327,7 @@ func (h *AssetHandler) DeleteAsset(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
-	res, err := h.client.DeleteAsset(ctx, &pb.DeleteAssetRequest{
+	res, err := h.client.DeleteLiability(ctx, &pb.DeleteLiabilityRequest{
 		UserId: userID,
 		Id:     id,
 	})

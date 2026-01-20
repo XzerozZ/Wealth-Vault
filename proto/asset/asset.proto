@@ -38,6 +38,7 @@ message RealEstateDetail {
   string deed_number = 2;            
   double area_sqm = 3;     
   Location location = 4;  
+  repeated string linked_asset_ids = 5;
 }
 
 message InsuranceDetail {
@@ -69,22 +70,6 @@ message Asset {
     RealEstateDetail real_estate_detail = 13;
     InsuranceDetail insurance_detail = 14;
   }
-}
-
-message Liability {
-  string id = 1;
-  string name = 2;
-  string creditor = 3;
-  LiabilityType type = 4;
-  double principal = 5;      
-  double interest_rate = 6;
-  google.protobuf.Timestamp start_at = 7;
-  google.protobuf.Timestamp end_at = 8;
-  string description = 9;
-  string created_by = 10;
-  repeated FileInfo files = 11;
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp updated_at = 13;
 }
 
 // ------Request/Response------
@@ -164,3 +149,4 @@ message DeleteAssetRequest {
 message DeleteAssetResponse {
   bool success = 1;
 }
+

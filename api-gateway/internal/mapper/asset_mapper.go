@@ -3,10 +3,12 @@ package mapper
 import (
 	"strconv"
 	"strings"
+	"time"
 	"wealth-vault/api-gateway/internal/domain"
 	pb "wealth-vault/api-gateway/pkg/pb/proto/asset"
 
 	"github.com/gofiber/fiber/v2"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func SafeMapEnum(valueMap map[string]int32, key string, prefix string) int32 {
@@ -103,10 +105,11 @@ func ExtractDetail(p *pb.Asset) interface{} {
 			}
 		}
 		return domain.RealEstateDetail{
-			PropertyType: int(v.RealEstateDetail.PropertyType),
-			DeedNumber:   v.RealEstateDetail.DeedNumber,
-			AreaSqm:      v.RealEstateDetail.AreaSqm,
-			Location:     loc,
+			PropertyType:   int(v.RealEstateDetail.PropertyType),
+			DeedNumber:     v.RealEstateDetail.DeedNumber,
+			AreaSqm:        v.RealEstateDetail.AreaSqm,
+			Location:       loc,
+			LinkedAssetIDs: v.RealEstateDetail.LinkedAssetIds,
 		}
 
 	case *pb.Asset_InsuranceDetail:
@@ -117,6 +120,8 @@ func ExtractDetail(p *pb.Asset) interface{} {
 			PlanName:       v.InsuranceDetail.PlanName,
 			CoverageAmount: v.InsuranceDetail.CoverageAmount,
 			Premium:        v.InsuranceDetail.Premium,
+			ExpireDate:     v.InsuranceDetail.ExpireDate.AsTime(),
+			LinkedAssetID:  v.InsuranceDetail.LinkedAssetId,
 		}
 
 	default:
@@ -130,10 +135,22 @@ func BuildCreateDetail(c *fiber.Ctx, assetType pb.AssetType) interface{} {
 		return &pb.CreateAssetRequest_BankDetail{
 			BankDetail: MapBankToProto(c),
 		}
+
 	case pb.AssetType_ASSET_TYPE_INVESTMENT:
 		return &pb.CreateAssetRequest_InvestmentDetail{
 			InvestmentDetail: MapInvestmentToProto(c),
 		}
+
+	case pb.AssetType_ASSET_TYPE_REAL_ESTATE:
+		return &pb.CreateAssetRequest_RealEstateDetail{
+			RealEstateDetail: MapRealEstateToProto(c),
+		}
+
+	case pb.AssetType_ASSET_TYPE_INSURANCE:
+		return &pb.CreateAssetRequest_InsuranceDetail{
+			InsuranceDetail: MapInsuranceToProto(c),
+		}
+
 	default:
 		return nil
 	}
@@ -151,6 +168,20 @@ func BuildUpdateDetail(c *fiber.Ctx, assetType pb.AssetType) interface{} {
 		if c.FormValue("investment_detail_symbol") != "" {
 			return &pb.UpdateAssetRequest_InvestmentDetail{
 				InvestmentDetail: MapInvestmentToProto(c),
+			}
+		}
+
+	case pb.AssetType_ASSET_TYPE_REAL_ESTATE:
+		if c.FormValue("location_detail_address") != "" || c.FormValue("real_estate_detail_area_sqm") != "" {
+			return &pb.UpdateAssetRequest_RealEstateDetail{
+				RealEstateDetail: MapRealEstateToProto(c),
+			}
+		}
+
+	case pb.AssetType_ASSET_TYPE_INSURANCE:
+		if c.FormValue("insurance_detail_policy_number") != "" {
+			return &pb.UpdateAssetRequest_InsuranceDetail{
+				InsuranceDetail: MapInsuranceToProto(c),
 			}
 		}
 	}
@@ -179,32 +210,57 @@ func MapInvestmentToProto(c *fiber.Ctx) *pb.InvestmentDetail {
 	}
 }
 
-func MapRealEstateToProto(d *domain.RealEstateDetailDTO) *pb.RealEstateDetail {
+func MapRealEstateToProto(c *fiber.Ctx) *pb.RealEstateDetail {
 	var loc *pb.Location
-	if d.Location != nil {
+	if c.FormValue("location_detail_address") != "" {
 		loc = &pb.Location{
-			Address:     d.Location.Address,
-			SubDistrict: d.Location.SubDistrict,
-			District:    d.Location.District,
-			Province:    d.Location.Province,
-			PostalCode:  d.Location.PostalCode,
+			Address:     c.FormValue("location_detail_address"),
+			SubDistrict: c.FormValue("location_detail_sub_district"),
+			District:    c.FormValue("location_detail_district"),
+			Province:    c.FormValue("location_detail_province"),
+			PostalCode:  c.FormValue("location_detail_postal_code"),
 		}
 	}
+
+	form, err := c.MultipartForm()
+	var linkedIDs []string
+	if err == nil && form.Value != nil {
+		if values, ok := form.Value["real_estate_detail_linked_asset_ids"]; ok {
+			linkedIDs = values
+		}
+	}
+
+	area, _ := strconv.ParseFloat(c.FormValue("real_estate_detail_area_sqm"), 64)
+
 	return &pb.RealEstateDetail{
-		PropertyType: pb.RealEstateType(pb.RealEstateType_value[d.PropertyType]),
-		DeedNumber:   d.DeedNumber,
-		AreaSqm:      d.AreaSqm,
-		Location:     loc,
+		PropertyType:   pb.RealEstateType(SafeMapEnum(pb.RealEstateType_value, c.FormValue("real_estate_detail__type"), "REAL_ESTATE_TYPE_")),
+		DeedNumber:     c.FormValue("real_estate_detail_deed_number"),
+		AreaSqm:        area,
+		Location:       loc,
+		LinkedAssetIds: linkedIDs,
 	}
 }
 
-func MapInsuranceToProto(d *domain.InsuranceDetailDTO) *pb.InsuranceDetail {
+func MapInsuranceToProto(c *fiber.Ctx) *pb.InsuranceDetail {
+	coverage, _ := strconv.ParseFloat(c.FormValue("insurance_detail_coverage_amount"), 64)
+	premium, _ := strconv.ParseFloat(c.FormValue("insurance_detail_premium"), 64)
+
+	dateStr := c.FormValue("insurance_detail_expire_date")
+	var expireDatePb *timestamppb.Timestamp
+	if dateStr != "" {
+		if t, err := time.Parse("2006-01-02", dateStr); err == nil {
+			expireDatePb = timestamppb.New(t)
+		}
+	}
+
 	return &pb.InsuranceDetail{
-		PolicyNumber:   d.PolicyNumber,
-		CompanyName:    d.CompanyName,
-		PlanName:       d.PlanName,
-		CoverageAmount: d.CoverageAmount,
-		Premium:        d.Premium,
-		SubType:        pb.InsuranceType(pb.InsuranceType_value[d.SubType]),
+		PolicyNumber:   c.FormValue("insurance_detail_policy_number"),
+		CompanyName:    c.FormValue("insurance_detail_company_name"),
+		PlanName:       c.FormValue("insurance_detail_plan_name"),
+		CoverageAmount: coverage,
+		Premium:        premium,
+		ExpireDate:     expireDatePb,
+		SubType:        pb.InsuranceType(SafeMapEnum(pb.InsuranceType_value, c.FormValue("insurance_detail_insurance_type"), "INSURANCE_TYPE_")),
+		LinkedAssetId:  c.FormValue("insurance_detail_linked_asset_id"),
 	}
 }

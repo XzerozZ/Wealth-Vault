@@ -3,34 +3,45 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
+	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 	"wealth-vault/asset-service/pkg/utils"
 
 	"github.com/google/uuid"
-	"gorm.io/datatypes"
 )
 
-type AssetUsecase struct {
-	assetRepo repo.AssetRepository
-	fileRepo  repo.FileRepository
-	storage   *utils.StorageClient
+type LiabilityUsecase struct {
+	liaRepo  repo.LiabilityRepository
+	fileRepo repo.FileRepository
+	storage  *utils.StorageClient
 }
 
-func NewAssetUsecase(r repo.AssetRepository, fr repo.FileRepository, s *utils.StorageClient) AssetUsecase {
-	return AssetUsecase{
-		assetRepo: r,
-		fileRepo:  fr,
-		storage:   s,
+func NewLiabilityUsecase(r repo.LiabilityRepository, fr repo.FileRepository, s *utils.StorageClient) LiabilityUsecase {
+	return LiabilityUsecase{
+		liaRepo:  r,
+		fileRepo: fr,
+		storage:  s,
 	}
 }
 
-func (u *AssetUsecase) CreateAsset(ctx context.Context, req *pb.CreateAssetRequest) (*pb.CreateAssetResponse, error) {
+func (u *LiabilityUsecase) CreateLiability(ctx context.Context, req *pb.CreateLiabilityRequest) (*pb.CreateLiabilityResponse, error) {
 	userID, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
+	}
+
+	var startAt *time.Time
+	if req.StartAt != nil {
+		t := req.StartAt.AsTime()
+		startAt = &t
+	}
+
+	var endAt *time.Time
+	if req.EndAt != nil {
+		t := req.EndAt.AsTime()
+		endAt = &t
 	}
 
 	var domainFiles []domain.FileAssociate
@@ -44,56 +55,52 @@ func (u *AssetUsecase) CreateAsset(ctx context.Context, req *pb.CreateAssetReque
 		}
 	}
 
-	asset := &domain.Asset{
-		UserID:               userID,
-		Name:                 req.Name,
-		Amount:               req.Amount,
-		Type:                 domain.AssetType(req.Type.String()),
-		IsIncludedInNetWorth: &req.IsIncludedInNetWorth,
-		Description:          req.Description,
-		Files:                domainFiles,
+	liability := &domain.Liability{
+		UserID:       userID,
+		Type:         domain.LiabilityType(req.Type.String()),
+		Name:         req.Name,
+		Creditor:     req.Creditor,
+		Principal:    req.Principal,
+		InterestRate: req.InterestRate,
+		Description:  req.Description,
+		StartAt:      startAt,
+		EndAt:        endAt,
+		Files:        domainFiles,
 	}
 
-	fmt.Println(req.IsIncludedInNetWorth)
-	jsonBytes, err := utils.MapProtoDetailToJSON(req.Detail)
-	if err != nil {
-		return nil, errors.New("invalid detail data")
-	}
-
-	asset.Details = datatypes.JSON(jsonBytes)
-	if err := u.assetRepo.CreateAsset(ctx, asset); err != nil {
+	if err := u.liaRepo.CreateLiability(ctx, liability); err != nil {
 		return nil, err
 	}
 
-	return &pb.CreateAssetResponse{
+	return &pb.CreateLiabilityResponse{
 		Success: true,
-		Id:      asset.ID.String(),
+		Id:      liability.ID.String(),
 	}, nil
 }
 
-func (u *AssetUsecase) GetAsset(ctx context.Context, req *pb.GetAssetRequest) (*pb.AssetArrayResponse, error) {
+func (u *LiabilityUsecase) GetLiability(ctx context.Context, req *pb.GetLiabilityRequest) (*pb.LiabilityArrayResponse, error) {
 	uid, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
 	}
 
-	assets, err := u.assetRepo.GetAsset(ctx, uid)
+	lias, err := u.liaRepo.GetLiability(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	var AssetList []*pb.Asset
-	for _, item := range assets {
-		AssetList = append(AssetList, utils.ToAssetProto(item))
+	var LiaList []*pb.Liability
+	for _, item := range lias {
+		LiaList = append(LiaList, utils.ToLiabilityProto(item))
 	}
 
-	return &pb.AssetArrayResponse{
-		Success: true,
-		Asset:   AssetList,
+	return &pb.LiabilityArrayResponse{
+		Success:   true,
+		Liability: LiaList,
 	}, nil
 }
 
-func (u *AssetUsecase) GetAssetByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.AssetResponse, error) {
+func (u *LiabilityUsecase) GetLiabilityByID(ctx context.Context, req *pb.GetLiabilityByIDRequest) (*pb.LiabilityResponse, error) {
 	id, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, errors.New("invalid asset id")
@@ -104,18 +111,18 @@ func (u *AssetUsecase) GetAssetByID(ctx context.Context, req *pb.GetAssetByIDReq
 		return nil, errors.New("invalid user id")
 	}
 
-	asset, err := u.assetRepo.GetAssetByID(ctx, id, uid)
+	lia, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.AssetResponse{
-		Success: true,
-		Asset:   utils.ToAssetProto(asset),
+	return &pb.LiabilityResponse{
+		Success:   true,
+		Liability: utils.ToLiabilityProto(lia),
 	}, nil
 }
 
-func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetRequest) (*pb.AssetResponse, error) {
+func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLiabilityRequest) (*pb.LiabilityResponse, error) {
 	id, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, errors.New("invalid asset id")
@@ -126,7 +133,7 @@ func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetReque
 		return nil, errors.New("invalid user id")
 	}
 
-	asset, err := u.assetRepo.GetAssetByID(ctx, id, uid)
+	lia, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
 	if err != nil {
 		return nil, err
 	}
@@ -147,25 +154,40 @@ func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetReque
 	}
 
 	if has("name") {
-		asset.Name = req.Name
+		lia.Name = req.Name
 		updateMask = append(updateMask, "Name")
 	}
-	if has("amount") {
-		asset.Amount = req.Amount
-		updateMask = append(updateMask, "Amount")
+
+	if has("creditor") {
+		lia.Creditor = req.Creditor
+		updateMask = append(updateMask, "Creditor")
 	}
+
+	if has("principal") {
+		lia.Principal = req.Principal
+		updateMask = append(updateMask, "Principal")
+	}
+
+	if has("interest_rate") {
+		lia.InterestRate = req.InterestRate
+		updateMask = append(updateMask, "InterestRate")
+	}
+
 	if has("description") {
-		asset.Description = req.Description
+		lia.Description = req.Description
 		updateMask = append(updateMask, "Description")
 	}
-	if has("detail") && req.Detail != nil {
-		jsonBytes, err := utils.MapProtoDetailToJSON(req.Detail)
-		if err != nil {
-			return nil, err
-		}
 
-		asset.Details = datatypes.JSON(jsonBytes)
-		updateMask = append(updateMask, "Details")
+	if has("started_at") && req.StartAt != nil {
+		t := req.StartAt.AsTime()
+		lia.StartAt = &t
+		updateMask = append(updateMask, "StartAt")
+	}
+
+	if has("ended_at") && req.EndAt != nil {
+		t := req.EndAt.AsTime()
+		lia.EndAt = &t
+		updateMask = append(updateMask, "EndAt")
 	}
 
 	if len(req.DeleteFileIds) > 0 {
@@ -204,8 +226,8 @@ func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetReque
 			filesToCreate = append(filesToCreate, domain.FileAssociate{
 				ID:         uuid.New(),
 				EntityID:   id,
-				EntityType: "asset",
-				UserID:     asset.UserID,
+				EntityType: "liability",
+				UserID:     lia.UserID,
 				Link:       f.Url,
 				FileType:   f.FileType,
 			})
@@ -216,18 +238,18 @@ func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetReque
 		}
 	}
 
-	updatedAsset, err := u.assetRepo.UpdateAsset(ctx, asset, updateMask)
+	updatedLia, err := u.liaRepo.UpdateLiability(ctx, lia, updateMask)
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.AssetResponse{
-		Success: true,
-		Asset:   utils.ToAssetProto(updatedAsset),
+	return &pb.LiabilityResponse{
+		Success:   true,
+		Liability: utils.ToLiabilityProto(updatedLia),
 	}, nil
 }
 
-func (u *AssetUsecase) DeleteAsset(ctx context.Context, req *pb.DeleteAssetRequest) (*pb.DeleteAssetResponse, error) {
+func (u *LiabilityUsecase) DeleteLiability(ctx context.Context, req *pb.DeleteLiabilityRequest) (*pb.DeleteLiabilityResponse, error) {
 	id, err := uuid.Parse(req.Id)
 	if err != nil {
 		return nil, errors.New("invalid asset id")
@@ -238,12 +260,12 @@ func (u *AssetUsecase) DeleteAsset(ctx context.Context, req *pb.DeleteAssetReque
 		return nil, errors.New("invalid user id")
 	}
 
-	existingCash, err := u.assetRepo.GetAssetByID(ctx, id, uid)
+	existingCash, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := u.assetRepo.DeleteAsset(ctx, id, uid); err != nil {
+	if err := u.liaRepo.DeleteLiability(ctx, id, uid); err != nil {
 		return nil, err
 	}
 
@@ -256,7 +278,7 @@ func (u *AssetUsecase) DeleteAsset(ctx context.Context, req *pb.DeleteAssetReque
 		utils.DeleteFilesAsync(u.storage, fileURLs)
 	}
 
-	return &pb.DeleteAssetResponse{
+	return &pb.DeleteLiabilityResponse{
 		Success: true,
 	}, nil
 }

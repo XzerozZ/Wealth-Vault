@@ -5,7 +5,7 @@ import (
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 )
 
-type CashUsecase interface {
+type AssetUsecase interface {
 	CreateAsset(ctx context.Context, req *pb.CreateAssetRequest) (*pb.CreateAssetResponse, error)
 	GetAsset(ctx context.Context, req *pb.GetAssetRequest) (*pb.AssetArrayResponse, error)
 	GetAssetByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.AssetResponse, error)

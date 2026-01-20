@@ -60,7 +60,7 @@ func ToAssetProto(d *domain.Asset) *pb.Asset {
 		Id:                   d.ID.String(),
 		Name:                 d.Name,
 		Amount:               d.Amount,
-		IsIncludedInNetWorth: d.IsIncludedInNetWorth,
+		IsIncludedInNetWorth: *d.IsIncludedInNetWorth,
 		Type:                 assetTypeEnum,
 		Description:          d.Description,
 		CreatedBy:            d.UserID.String(),
@@ -112,10 +112,11 @@ func ToAssetProto(d *domain.Asset) *pb.Asset {
 				}
 				res.Detail = &pb.Asset_RealEstateDetail{
 					RealEstateDetail: &pb.RealEstateDetail{
-						PropertyType: pb.RealEstateType(info.PropertyType),
-						DeedNumber:   info.DeedNumber,
-						AreaSqm:      info.AreaSqm,
-						Location:     loc,
+						PropertyType:   pb.RealEstateType(info.PropertyType),
+						DeedNumber:     info.DeedNumber,
+						AreaSqm:        info.AreaSqm,
+						Location:       loc,
+						LinkedAssetIds: info.LinkedAssetIDs,
 					},
 				}
 			}
@@ -137,6 +138,38 @@ func ToAssetProto(d *domain.Asset) *pb.Asset {
 				}
 			}
 		}
+	}
+
+	return res
+}
+
+func ToLiabilityProto(d *domain.Liability) *pb.Liability {
+	rawType := strings.ToUpper(strings.TrimSpace(string(d.Type)))
+	var liabilityTypeEnum pb.LiabilityType
+	if v, ok := pb.LiabilityType_value[rawType]; ok {
+		liabilityTypeEnum = pb.LiabilityType(v)
+	} else {
+		if v, ok := pb.LiabilityType_value["LIABILITY_TYPE_"+rawType]; ok {
+			liabilityTypeEnum = pb.LiabilityType(v)
+		} else {
+			liabilityTypeEnum = pb.LiabilityType_LIABILITY_TYPE_UNSPECIFIED
+		}
+	}
+
+	res := &pb.Liability{
+		Id:           d.ID.String(),
+		Name:         d.Name,
+		Principal:    d.Principal,
+		InterestRate: d.InterestRate,
+		Creditor:     d.Creditor,
+		Type:         liabilityTypeEnum,
+		Description:  d.Description,
+		CreatedBy:    d.UserID.String(),
+		StartAt:      timestamppb.New(*d.StartAt),
+		EndAt:        timestamppb.New(*d.EndAt),
+		CreatedAt:    timestamppb.New(d.CreatedAt),
+		UpdatedAt:    timestamppb.New(d.UpdatedAt),
+		Files:        ToPbFiles(d.Files),
 	}
 
 	return res

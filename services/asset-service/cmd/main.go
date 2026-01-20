@@ -26,10 +26,13 @@ func main() {
 	// ------ Repository------
 	assetRepo := repo.NewAssetRepository(db)
 	fileRepo := repo.NewFileRepository(db)
+	liaRepo := repo.NewLiabilityRepository(db)
+
 	// ------ Usecase------
-	uc := usecase.NewAssetUsecase(assetRepo, fileRepo, supabaseClient)
+	assetUC := usecase.NewAssetUsecase(assetRepo, fileRepo, supabaseClient)
+	liaUC := usecase.NewLiabilityUsecase(liaRepo, fileRepo, supabaseClient)
 	// ------Handler------
-	handler := handler.NewAssetGRPCHandler(uc)
+	assetHandler := handler.NewAssetGRPCHandler(assetUC, liaUC)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {
@@ -37,7 +40,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	assetpb.RegisterAssetServiceServer(grpcServer, handler)
+	assetpb.RegisterAssetServiceServer(grpcServer, assetHandler)
 
 	log.Printf("🚀 Asset Service (gRPC) running on :%s", cfg.GRPC.Port)
 	log.Fatal(grpcServer.Serve(lis))

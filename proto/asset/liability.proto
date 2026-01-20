@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/asset/enum.proto";
+import "proto/asset/file.proto";
+
+// ------Detail Messages------
+
+message Liability {
+  string id = 1;
+  string name = 2;
+  string creditor = 3;
+  LiabilityType type = 4;
+  double principal = 5;      
+  double interest_rate = 6;
+   bool is_included_in_net_worth = 7;
+  google.protobuf.Timestamp start_at = 8;
+  google.protobuf.Timestamp end_at = 9;
+  string description = 10;
+  string created_by = 11;
+  repeated FileInfo files = 12;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+}
+
+// ------Request/Response------
+
+message CreateLiabilityRequest { 
+  string user_id = 1;
+  string name = 2;
+  string creditor = 3;
+  LiabilityType type = 4;
+  double principal = 5;      
+  double interest_rate = 6;
+  google.protobuf.Timestamp start_at = 7;
+  google.protobuf.Timestamp end_at = 8;
+  string description = 9;
+  repeated FileInfo new_files = 10;
+}
+
+message GetLiabilityRequest {
+  string user_id = 1; 
+}
+
+message GetLiabilityByIDRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message UpdateLiabilityRequest{
+  string id = 1; 
+  string user_id = 2;
+  string name = 3;
+  string creditor = 4;
+  LiabilityType type = 5; 
+  string description = 6;
+  double principal = 7;
+  double interest_rate  = 8;
+  google.protobuf.Timestamp start_at= 9;
+  google.protobuf.Timestamp end_at = 10;
+  repeated FileInfo new_files = 11;
+  repeated string delete_file_ids = 12;
+  google.protobuf.FieldMask update_mask = 13;
+}
+
+message CreateLiabilityResponse {
+  bool success = 1;
+  string id = 2;
+}
+
+message LiabilityArrayResponse { 
+  bool success = 1;
+  repeated Liability liability = 2;
+}
+
+message LiabilityResponse { 
+  bool success = 1;
+  Liability liability = 2; 
+}
+
+message DeleteLiabilityRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message DeleteLiabilityResponse {
+  bool success = 1;
+}

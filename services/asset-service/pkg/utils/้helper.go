@@ -101,10 +101,11 @@ func MapRealEstateToJSON(src *pb.RealEstateDetail) ([]byte, error) {
 		}
 	}
 	d := domain.RealEstateDetail{
-		PropertyType: int(src.PropertyType),
-		DeedNumber:   src.DeedNumber,
-		AreaSqm:      src.AreaSqm,
-		Location:     loc,
+		PropertyType:   int(src.PropertyType),
+		DeedNumber:     src.DeedNumber,
+		AreaSqm:        src.AreaSqm,
+		Location:       loc,
+		LinkedAssetIDs: src.LinkedAssetIds,
 	}
 
 	return json.Marshal(d)

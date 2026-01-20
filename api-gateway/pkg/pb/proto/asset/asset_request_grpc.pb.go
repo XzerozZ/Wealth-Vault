@@ -19,12 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AssetService_CreateAsset_FullMethodName  = "/asset.AssetService/CreateAsset"
-	AssetService_UpdateAsset_FullMethodName  = "/asset.AssetService/UpdateAsset"
-	AssetService_GetAsset_FullMethodName     = "/asset.AssetService/GetAsset"
-	AssetService_GetAssetByID_FullMethodName = "/asset.AssetService/GetAssetByID"
-	AssetService_DeleteAsset_FullMethodName  = "/asset.AssetService/DeleteAsset"
-	AssetService_GetNetWorth_FullMethodName  = "/asset.AssetService/GetNetWorth"
+	AssetService_CreateAsset_FullMethodName      = "/asset.AssetService/CreateAsset"
+	AssetService_UpdateAsset_FullMethodName      = "/asset.AssetService/UpdateAsset"
+	AssetService_GetAsset_FullMethodName         = "/asset.AssetService/GetAsset"
+	AssetService_GetAssetByID_FullMethodName     = "/asset.AssetService/GetAssetByID"
+	AssetService_DeleteAsset_FullMethodName      = "/asset.AssetService/DeleteAsset"
+	AssetService_CreateLiability_FullMethodName  = "/asset.AssetService/CreateLiability"
+	AssetService_GetLiability_FullMethodName     = "/asset.AssetService/GetLiability"
+	AssetService_GetLiabilityByID_FullMethodName = "/asset.AssetService/GetLiabilityByID"
+	AssetService_UpdateLiability_FullMethodName  = "/asset.AssetService/UpdateLiability"
+	AssetService_DeleteLiability_FullMethodName  = "/asset.AssetService/DeleteLiability"
+	AssetService_GetNetWorth_FullMethodName      = "/asset.AssetService/GetNetWorth"
 )
 
 // AssetServiceClient is the client API for AssetService service.
@@ -36,6 +41,11 @@ type AssetServiceClient interface {
 	GetAsset(ctx context.Context, in *GetAssetRequest, opts ...grpc.CallOption) (*AssetArrayResponse, error)
 	GetAssetByID(ctx context.Context, in *GetAssetByIDRequest, opts ...grpc.CallOption) (*AssetResponse, error)
 	DeleteAsset(ctx context.Context, in *DeleteAssetRequest, opts ...grpc.CallOption) (*DeleteAssetResponse, error)
+	CreateLiability(ctx context.Context, in *CreateLiabilityRequest, opts ...grpc.CallOption) (*CreateLiabilityResponse, error)
+	GetLiability(ctx context.Context, in *GetLiabilityRequest, opts ...grpc.CallOption) (*LiabilityArrayResponse, error)
+	GetLiabilityByID(ctx context.Context, in *GetLiabilityByIDRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
+	UpdateLiability(ctx context.Context, in *UpdateLiabilityRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
+	DeleteLiability(ctx context.Context, in *DeleteLiabilityRequest, opts ...grpc.CallOption) (*DeleteLiabilityResponse, error)
 	// Dashboard / Wealth
 	GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error)
 }
@@ -98,6 +108,56 @@ func (c *assetServiceClient) DeleteAsset(ctx context.Context, in *DeleteAssetReq
 	return out, nil
 }
 
+func (c *assetServiceClient) CreateLiability(ctx context.Context, in *CreateLiabilityRequest, opts ...grpc.CallOption) (*CreateLiabilityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateLiabilityResponse)
+	err := c.cc.Invoke(ctx, AssetService_CreateLiability_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetLiability(ctx context.Context, in *GetLiabilityRequest, opts ...grpc.CallOption) (*LiabilityArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LiabilityArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetLiability_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetLiabilityByID(ctx context.Context, in *GetLiabilityByIDRequest, opts ...grpc.CallOption) (*LiabilityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LiabilityResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetLiabilityByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) UpdateLiability(ctx context.Context, in *UpdateLiabilityRequest, opts ...grpc.CallOption) (*LiabilityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LiabilityResponse)
+	err := c.cc.Invoke(ctx, AssetService_UpdateLiability_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) DeleteLiability(ctx context.Context, in *DeleteLiabilityRequest, opts ...grpc.CallOption) (*DeleteLiabilityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteLiabilityResponse)
+	err := c.cc.Invoke(ctx, AssetService_DeleteLiability_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *assetServiceClient) GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetNetWorthResponse)
@@ -117,6 +177,11 @@ type AssetServiceServer interface {
 	GetAsset(context.Context, *GetAssetRequest) (*AssetArrayResponse, error)
 	GetAssetByID(context.Context, *GetAssetByIDRequest) (*AssetResponse, error)
 	DeleteAsset(context.Context, *DeleteAssetRequest) (*DeleteAssetResponse, error)
+	CreateLiability(context.Context, *CreateLiabilityRequest) (*CreateLiabilityResponse, error)
+	GetLiability(context.Context, *GetLiabilityRequest) (*LiabilityArrayResponse, error)
+	GetLiabilityByID(context.Context, *GetLiabilityByIDRequest) (*LiabilityResponse, error)
+	UpdateLiability(context.Context, *UpdateLiabilityRequest) (*LiabilityResponse, error)
+	DeleteLiability(context.Context, *DeleteLiabilityRequest) (*DeleteLiabilityResponse, error)
 	// Dashboard / Wealth
 	GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error)
 	mustEmbedUnimplementedAssetServiceServer()
@@ -143,6 +208,21 @@ func (UnimplementedAssetServiceServer) GetAssetByID(context.Context, *GetAssetBy
 }
 func (UnimplementedAssetServiceServer) DeleteAsset(context.Context, *DeleteAssetRequest) (*DeleteAssetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteAsset not implemented")
+}
+func (UnimplementedAssetServiceServer) CreateLiability(context.Context, *CreateLiabilityRequest) (*CreateLiabilityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateLiability not implemented")
+}
+func (UnimplementedAssetServiceServer) GetLiability(context.Context, *GetLiabilityRequest) (*LiabilityArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLiability not implemented")
+}
+func (UnimplementedAssetServiceServer) GetLiabilityByID(context.Context, *GetLiabilityByIDRequest) (*LiabilityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLiabilityByID not implemented")
+}
+func (UnimplementedAssetServiceServer) UpdateLiability(context.Context, *UpdateLiabilityRequest) (*LiabilityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateLiability not implemented")
+}
+func (UnimplementedAssetServiceServer) DeleteLiability(context.Context, *DeleteLiabilityRequest) (*DeleteLiabilityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteLiability not implemented")
 }
 func (UnimplementedAssetServiceServer) GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNetWorth not implemented")
@@ -258,6 +338,96 @@ func _AssetService_DeleteAsset_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AssetService_CreateLiability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateLiabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).CreateLiability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_CreateLiability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).CreateLiability(ctx, req.(*CreateLiabilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetLiability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLiabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetLiability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetLiability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetLiability(ctx, req.(*GetLiabilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetLiabilityByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLiabilityByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetLiabilityByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetLiabilityByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetLiabilityByID(ctx, req.(*GetLiabilityByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_UpdateLiability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateLiabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).UpdateLiability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_UpdateLiability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).UpdateLiability(ctx, req.(*UpdateLiabilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_DeleteLiability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteLiabilityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).DeleteLiability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_DeleteLiability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).DeleteLiability(ctx, req.(*DeleteLiabilityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AssetService_GetNetWorth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetNetWorthRequest)
 	if err := dec(in); err != nil {
@@ -302,6 +472,26 @@ var AssetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAsset",
 			Handler:    _AssetService_DeleteAsset_Handler,
+		},
+		{
+			MethodName: "CreateLiability",
+			Handler:    _AssetService_CreateLiability_Handler,
+		},
+		{
+			MethodName: "GetLiability",
+			Handler:    _AssetService_GetLiability_Handler,
+		},
+		{
+			MethodName: "GetLiabilityByID",
+			Handler:    _AssetService_GetLiabilityByID_Handler,
+		},
+		{
+			MethodName: "UpdateLiability",
+			Handler:    _AssetService_UpdateLiability_Handler,
+		},
+		{
+			MethodName: "DeleteLiability",
+			Handler:    _AssetService_DeleteLiability_Handler,
 		},
 		{
 			MethodName: "GetNetWorth",

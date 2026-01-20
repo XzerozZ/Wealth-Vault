@@ -25,10 +25,11 @@ type Location struct {
 }
 
 type RealEstateDetail struct {
-	PropertyType int      `json:"property_type"`
-	DeedNumber   string   `json:"deed_number"`
-	AreaSqm      float64  `json:"area_sqm"`
-	Location     Location `json:"location"`
+	PropertyType   int      `json:"property_type"`
+	DeedNumber     string   `json:"deed_number"`
+	AreaSqm        float64  `json:"area_sqm"`
+	Location       Location `json:"location"`
+	LinkedAssetIDs []string `json:"linked_asset_ids"`
 }
 
 type InsuranceDetail struct {

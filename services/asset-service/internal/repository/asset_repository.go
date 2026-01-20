@@ -18,7 +18,8 @@ func NewAssetRepository(db *gorm.DB) *AssetRepository {
 }
 
 func (r *AssetRepository) CreateAsset(ctx context.Context, asset *domain.Asset) error {
-	if err := r.db.WithContext(ctx).Debug().Create(&asset).Error; err != nil {
+	fmt.Println(asset.IsIncludedInNetWorth)
+	if err := r.db.WithContext(ctx).Create(&asset).Error; err != nil {
 		return err
 	}
 	return nil
@@ -26,7 +27,7 @@ func (r *AssetRepository) CreateAsset(ctx context.Context, asset *domain.Asset) 
 
 func (r *AssetRepository) GetAsset(ctx context.Context, uid uuid.UUID) ([]*domain.Asset, error) {
 	var assets []*domain.Asset
-	if err := r.db.WithContext(ctx).Debug().Where("user_id = ?", uid).Find(&assets).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("user_id = ?", uid).Find(&assets).Error; err != nil {
 		return nil, err
 	}
 
@@ -39,7 +40,6 @@ func (r *AssetRepository) GetAssetByID(ctx context.Context, id uuid.UUID, uid uu
 		return nil, err
 	}
 
-	fmt.Println(asset)
 	return &asset, nil
 }
 
