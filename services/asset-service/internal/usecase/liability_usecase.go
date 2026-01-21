@@ -8,6 +8,7 @@ import (
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 	"wealth-vault/asset-service/pkg/utils"
+	helper "wealth-vault/asset-service/pkg/utils/helper"
 
 	"github.com/google/uuid"
 )
@@ -101,14 +102,9 @@ func (u *LiabilityUsecase) GetLiability(ctx context.Context, req *pb.GetLiabilit
 }
 
 func (u *LiabilityUsecase) GetLiabilityByID(ctx context.Context, req *pb.GetLiabilityByIDRequest) (*pb.LiabilityResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid asset id")
-	}
-
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	lia, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
@@ -123,14 +119,9 @@ func (u *LiabilityUsecase) GetLiabilityByID(ctx context.Context, req *pb.GetLiab
 }
 
 func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLiabilityRequest) (*pb.LiabilityResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid asset id")
-	}
-
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	lia, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
@@ -138,104 +129,22 @@ func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLi
 		return nil, err
 	}
 
-	var updateMask []string
-	has := func(target string) bool {
-		if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
-			return true
-		}
-
-		for _, p := range req.UpdateMask.Paths {
-			if p == target {
-				return true
-			}
-		}
-
-		return false
+	updateMask, err := helper.ApplyUpdateFields(req, lia)
+	if err != nil {
+		return nil, err
 	}
 
-	if has("name") {
-		lia.Name = req.Name
-		updateMask = append(updateMask, "Name")
+	syncParams := domain.FileSyncParams{
+		UserID:        uid,
+		EntityID:      id,
+		EntityType:    "liability",
+		NewFiles:      req.NewFiles,
+		DeleteFileIDs: req.DeleteFileIds,
 	}
 
-	if has("creditor") {
-		lia.Creditor = req.Creditor
-		updateMask = append(updateMask, "Creditor")
-	}
-
-	if has("principal") {
-		lia.Principal = req.Principal
-		updateMask = append(updateMask, "Principal")
-	}
-
-	if has("interest_rate") {
-		lia.InterestRate = req.InterestRate
-		updateMask = append(updateMask, "InterestRate")
-	}
-
-	if has("description") {
-		lia.Description = req.Description
-		updateMask = append(updateMask, "Description")
-	}
-
-	if has("started_at") && req.StartAt != nil {
-		t := req.StartAt.AsTime()
-		lia.StartAt = &t
-		updateMask = append(updateMask, "StartAt")
-	}
-
-	if has("ended_at") && req.EndAt != nil {
-		t := req.EndAt.AsTime()
-		lia.EndAt = &t
-		updateMask = append(updateMask, "EndAt")
-	}
-
-	if len(req.DeleteFileIds) > 0 {
-		var fileUUIDs []uuid.UUID
-		for _, idStr := range req.DeleteFileIds {
-			parsedID, err := uuid.Parse(idStr)
-			if err == nil {
-				fileUUIDs = append(fileUUIDs, parsedID)
-			}
-		}
-
-		filesToDelete, err := u.fileRepo.GetFilesByIDs(ctx, fileUUIDs)
-		if err == nil {
-			var validURLs []string
-			for _, f := range filesToDelete {
-				if f.UserID == uid {
-					validURLs = append(validURLs, f.Link)
-				}
-			}
-
-			if len(validURLs) > 0 {
-				utils.DeleteFilesAsync(u.storage, validURLs)
-			}
-		}
-
-		err = u.fileRepo.DeleteFiles(ctx, req.DeleteFileIds, id, uid)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if len(req.NewFiles) > 0 {
-		var filesToCreate []domain.FileAssociate
-
-		for _, f := range req.NewFiles {
-			filesToCreate = append(filesToCreate, domain.FileAssociate{
-				ID:         uuid.New(),
-				EntityID:   id,
-				EntityType: "liability",
-				UserID:     lia.UserID,
-				Link:       f.Url,
-				FileType:   f.FileType,
-			})
-		}
-
-		if err := u.fileRepo.CreateFiles(ctx, filesToCreate); err != nil {
-			return nil, err
-		}
+	err = helper.SyncEntityFiles(ctx, u.fileRepo, u.storage, syncParams)
+	if err != nil {
+		return nil, err
 	}
 
 	updatedLia, err := u.liaRepo.UpdateLiability(ctx, lia, updateMask)
@@ -250,14 +159,9 @@ func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLi
 }
 
 func (u *LiabilityUsecase) DeleteLiability(ctx context.Context, req *pb.DeleteLiabilityRequest) (*pb.DeleteLiabilityResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid asset id")
-	}
-
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	existingCash, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
@@ -275,7 +179,7 @@ func (u *LiabilityUsecase) DeleteLiability(ctx context.Context, req *pb.DeleteLi
 			fileURLs[i] = f.Link
 		}
 
-		utils.DeleteFilesAsync(u.storage, fileURLs)
+		helper.DeleteFilesAsync(u.storage, fileURLs)
 	}
 
 	return &pb.DeleteLiabilityResponse{

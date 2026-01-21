@@ -1,7 +1,10 @@
 package domain
 
 import (
+	"context"
 	"time"
+
+	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 
 	"github.com/google/uuid"
 )
@@ -15,4 +18,13 @@ type FileAssociate struct {
 	UserID     uuid.UUID `json:"u_id"  gorm:"type:uuid;not null"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+type FileSyncParams struct {
+	Ctx           context.Context
+	UserID        uuid.UUID
+	EntityID      uuid.UUID
+	EntityType    string
+	NewFiles      []*pb.FileInfo
+	DeleteFileIDs []string
 }

@@ -3,11 +3,11 @@ package usecase
 import (
 	"context"
 	"errors"
-	"fmt"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 	"wealth-vault/asset-service/pkg/utils"
+	helper "wealth-vault/asset-service/pkg/utils/helper"
 
 	"github.com/google/uuid"
 	"gorm.io/datatypes"
@@ -54,8 +54,7 @@ func (u *AssetUsecase) CreateAsset(ctx context.Context, req *pb.CreateAssetReque
 		Files:                domainFiles,
 	}
 
-	fmt.Println(req.IsIncludedInNetWorth)
-	jsonBytes, err := utils.MapProtoDetailToJSON(req.Detail)
+	jsonBytes, err := helper.MapProtoDetailToJSON(req.Detail)
 	if err != nil {
 		return nil, errors.New("invalid detail data")
 	}
@@ -94,14 +93,9 @@ func (u *AssetUsecase) GetAsset(ctx context.Context, req *pb.GetAssetRequest) (*
 }
 
 func (u *AssetUsecase) GetAssetByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.AssetResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid asset id")
-	}
-
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	asset, err := u.assetRepo.GetAssetByID(ctx, id, uid)
@@ -116,14 +110,9 @@ func (u *AssetUsecase) GetAssetByID(ctx context.Context, req *pb.GetAssetByIDReq
 }
 
 func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetRequest) (*pb.AssetResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid asset id")
-	}
-
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	asset, err := u.assetRepo.GetAssetByID(ctx, id, uid)
@@ -131,89 +120,22 @@ func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetReque
 		return nil, err
 	}
 
-	var updateMask []string
-	has := func(target string) bool {
-		if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
-			return true
-		}
-
-		for _, p := range req.UpdateMask.Paths {
-			if p == target {
-				return true
-			}
-		}
-
-		return false
+	updateMask, err := helper.ApplyUpdateAssetFields(req, asset)
+	if err != nil {
+		return nil, err
 	}
 
-	if has("name") {
-		asset.Name = req.Name
-		updateMask = append(updateMask, "Name")
-	}
-	if has("amount") {
-		asset.Amount = req.Amount
-		updateMask = append(updateMask, "Amount")
-	}
-	if has("description") {
-		asset.Description = req.Description
-		updateMask = append(updateMask, "Description")
-	}
-	if has("detail") && req.Detail != nil {
-		jsonBytes, err := utils.MapProtoDetailToJSON(req.Detail)
-		if err != nil {
-			return nil, err
-		}
-
-		asset.Details = datatypes.JSON(jsonBytes)
-		updateMask = append(updateMask, "Details")
+	syncParams := domain.FileSyncParams{
+		UserID:        uid,
+		EntityID:      id,
+		EntityType:    "asset",
+		NewFiles:      req.NewFiles,
+		DeleteFileIDs: req.DeleteFileIds,
 	}
 
-	if len(req.DeleteFileIds) > 0 {
-		var fileUUIDs []uuid.UUID
-		for _, idStr := range req.DeleteFileIds {
-			parsedID, err := uuid.Parse(idStr)
-			if err == nil {
-				fileUUIDs = append(fileUUIDs, parsedID)
-			}
-		}
-
-		filesToDelete, err := u.fileRepo.GetFilesByIDs(ctx, fileUUIDs)
-		if err == nil {
-			var validURLs []string
-			for _, f := range filesToDelete {
-				if f.UserID == uid {
-					validURLs = append(validURLs, f.Link)
-				}
-			}
-
-			if len(validURLs) > 0 {
-				utils.DeleteFilesAsync(u.storage, validURLs)
-			}
-		}
-
-		err = u.fileRepo.DeleteFiles(ctx, req.DeleteFileIds, id, uid)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if len(req.NewFiles) > 0 {
-		var filesToCreate []domain.FileAssociate
-
-		for _, f := range req.NewFiles {
-			filesToCreate = append(filesToCreate, domain.FileAssociate{
-				ID:         uuid.New(),
-				EntityID:   id,
-				EntityType: "asset",
-				UserID:     asset.UserID,
-				Link:       f.Url,
-				FileType:   f.FileType,
-			})
-		}
-
-		if err := u.fileRepo.CreateFiles(ctx, filesToCreate); err != nil {
-			return nil, err
-		}
+	err = helper.SyncEntityFiles(ctx, u.fileRepo, u.storage, syncParams)
+	if err != nil {
+		return nil, err
 	}
 
 	updatedAsset, err := u.assetRepo.UpdateAsset(ctx, asset, updateMask)
@@ -228,14 +150,9 @@ func (u *AssetUsecase) UpdateAsset(ctx context.Context, req *pb.UpdateAssetReque
 }
 
 func (u *AssetUsecase) DeleteAsset(ctx context.Context, req *pb.DeleteAssetRequest) (*pb.DeleteAssetResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid asset id")
-	}
-
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	existingCash, err := u.assetRepo.GetAssetByID(ctx, id, uid)
@@ -253,7 +170,7 @@ func (u *AssetUsecase) DeleteAsset(ctx context.Context, req *pb.DeleteAssetReque
 			fileURLs[i] = f.Link
 		}
 
-		utils.DeleteFilesAsync(u.storage, fileURLs)
+		helper.DeleteFilesAsync(u.storage, fileURLs)
 	}
 
 	return &pb.DeleteAssetResponse{

@@ -22,7 +22,6 @@ type User struct {
 type FriendList struct {
 	UserID   string `json:"user" gorm:"primaryKey;not null"`
 	FriendID string `json:"friend" gorm:"primaryKey;not null"`
-
-	User   User `gorm:"foreignKey:UserID"`
-	Friend User `gorm:"foreignKey:FriendID"`
+	User     User   `gorm:"foreignKey:UserID"`
+	Friend   User   `gorm:"foreignKey:FriendID"`
 }
