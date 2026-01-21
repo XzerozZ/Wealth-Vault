@@ -6,6 +6,7 @@ import (
 	"wealth-vault/user-service/internal/usecase"
 	userpb "wealth-vault/user-service/pkg/pb/proto/user"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -30,7 +31,7 @@ func (h *UserGRPCHandler) CreateUser(ctx context.Context, req *userpb.CreateUser
 	}
 
 	return &userpb.CreateUserResponse{
-		Id: id,
+		Id: id.String(),
 	}, nil
 }
 
@@ -43,7 +44,7 @@ func (h *UserGRPCHandler) GetUser(ctx context.Context, req *userpb.GetUserByIDRe
 	return &userpb.UserResponse{
 		Success: true,
 		User: &userpb.User{
-			Id:          user.ID,
+			Id:          user.ID.String(),
 			Email:       user.Email,
 			Firstname:   user.Firstname,
 			Lastname:    user.Lastname,
@@ -72,8 +73,13 @@ func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUser
 		mask = req.GetUpdateMask().GetPaths()
 	}
 
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid uuid format")
+	}
+
 	input := &domain.UpdateUserInput{
-		ID:          req.Id,
+		ID:          id,
 		Firstname:   reqUser.GetFirstname(),
 		Lastname:    reqUser.GetLastname(),
 		Username:    reqUser.GetUsername(),
@@ -91,7 +97,7 @@ func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUser
 	return &userpb.UserResponse{
 		Success: true,
 		User: &userpb.User{
-			Id:          user.ID,
+			Id:          user.ID.String(),
 			Email:       user.Email,
 			Firstname:   user.Firstname,
 			Lastname:    user.Lastname,

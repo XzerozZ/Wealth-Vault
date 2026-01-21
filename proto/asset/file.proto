@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+message FileInfo {
+  string id = 1;
+  string url = 2;
+  string file_type = 3;
+}

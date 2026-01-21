@@ -2,25 +2,26 @@ package domain
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type User struct {
-	ID          string    `json:"user_id" gorm:"primaryKey"`
-	Email       string    `json:"email" gorm:"not null;uniqueIndex"`
-	Firstname   string    `json:"first_name"`
-	Lastname    string    `json:"last_name"`
-	Username    string    `json:"username" gorm:"not null"`
-	Profile     string    `json:"profile"`
-	Phonenumber string    `json:"phone_number"`
-	Birthday    time.Time `json:"birthday" gorm:"type:date"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	ID          uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	Email       string    `gorm:"not null;uniqueIndex"`
+	Firstname   string
+	Lastname    string
+	Username    string `gorm:"not null"`
+	Profile     string
+	Phonenumber string
+	Birthday    time.Time `gorm:"type:date"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type FriendList struct {
 	UserID   string `json:"user" gorm:"primaryKey;not null"`
 	FriendID string `json:"friend" gorm:"primaryKey;not null"`
-
-	User   User `gorm:"foreignKey:UserID"`
-	Friend User `gorm:"foreignKey:FriendID"`
+	User     User   `gorm:"foreignKey:UserID"`
+	Friend   User   `gorm:"foreignKey:FriendID"`
 }

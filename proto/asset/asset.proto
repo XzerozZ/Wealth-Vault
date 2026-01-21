@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/asset/enum.proto";
+import "proto/asset/file.proto";
+
+// ------Detail Messages------
+
+message BankDetail {
+  string bank_name = 1;
+  string account_number = 2;
+  BankAccountType account_type = 3;
+}
+
+message InvestmentDetail {
+  InvestmentType sub_type = 1;      
+  string symbol = 2;               
+  string broker_name = 3;
+  double quantity = 4;
+  double cost_price = 5;  
+}
+
+message Location {
+  string address = 1;      
+  string sub_district = 2; 
+  string district = 3;    
+  string province = 4;     
+  string postal_code = 5;  
+}
+
+message RealEstateDetail {
+  RealEstateType property_type = 1;  
+  string deed_number = 2;            
+  double area_sqm = 3;     
+  Location location = 4;  
+  repeated string linked_asset_ids = 5;
+}
+
+message InsuranceDetail {
+  InsuranceType sub_type = 1;
+  string policy_number = 2;
+  string company_name = 3;
+  string plan_name = 4;
+  double coverage_amount = 5;
+  double premium = 6;
+  google.protobuf.Timestamp expire_date = 7;
+  string linked_asset_id = 8;
+}
+
+
+message Asset {
+  string id = 1;
+  string name = 2;
+  double amount = 3; 
+  AssetType type = 4;
+  string description = 5;
+  bool is_included_in_net_worth = 6;
+  string created_by = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  repeated FileInfo files = 10;
+  oneof detail {
+    BankDetail bank_detail = 11;
+    InvestmentDetail investment_detail = 12;
+    RealEstateDetail real_estate_detail = 13;
+    InsuranceDetail insurance_detail = 14;
+  }
+}
+
+// ------Request/Response------
+message CreateAssetRequest { 
+  string user_id = 1;
+  string name = 2;
+  double amount = 3;
+  AssetType type = 4;
+  bool is_included_in_net_worth = 5;
+  string description = 6;
+  oneof detail {
+    BankDetail bank_detail = 7;
+    InvestmentDetail investment_detail = 8;
+    RealEstateDetail real_estate_detail = 9;
+    InsuranceDetail insurance_detail = 10;
+  }
+  repeated FileInfo new_files = 11;
+}
+
+message UpdateAssetRequest {
+  string id = 1; 
+  string user_id = 2;
+  string name = 3;
+  double amount = 4;
+  AssetType type = 5; 
+  string description = 6;
+  oneof detail {
+    BankDetail bank_detail = 7;
+    InvestmentDetail investment_detail = 8;
+    RealEstateDetail real_estate_detail = 9;
+    InsuranceDetail insurance_detail = 10;
+  }
+  repeated FileInfo new_files = 11;
+  repeated string delete_file_ids = 12;
+  google.protobuf.FieldMask update_mask = 13;
+}
+
+message GetAssetRequest {
+  string user_id = 1; 
+}
+
+message GetAssetByIDRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message CreateAssetResponse {
+  bool success = 1;
+  string id = 2;
+}
+
+message AssetArrayResponse { 
+  bool success = 1;
+  repeated Asset asset = 2; 
+}
+
+message AssetResponse { 
+  bool success = 1;
+  Asset asset = 2; 
+}
+
+message GetNetWorthRequest { 
+  string user_id = 1; 
+}
+
+message GetNetWorthResponse { 
+    double total_assets = 1; 
+    double total_liabilities = 2; 
+    double net_worth = 3; 
+}
+
+message DeleteAssetRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message DeleteAssetResponse {
+  bool success = 1;
+}
+

@@ -5,7 +5,7 @@ import (
 	pb "wealth-vault/api-gateway/pkg/pb/proto/user"
 )
 
-func ToUserEntity(p *pb.User) *domain.User {
+func ToUserDomain(p *pb.User) *domain.User {
 	if p == nil {
 		return nil
 	}

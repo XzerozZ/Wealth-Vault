@@ -10,10 +10,17 @@ import (
 type Configs struct {
 	GRPC       GRPC
 	PostgreSQL PostgreSQL
+	SUPA       SUPA
 }
 
 type GRPC struct {
 	Port string
+}
+
+type SUPA struct {
+	Key    string
+	URL    string
+	Bucket string
 }
 
 type PostgreSQL struct {
@@ -48,6 +55,11 @@ func LoadConfigs() *Configs {
 			Username: requireEnv("DB_USER"),
 			Password: requireEnv("DB_PASSWORD"),
 			Database: requireEnv("DB_NAME"),
+		},
+		SUPA: SUPA{
+			Key:    requireEnv("SUPABASE_KEY"),
+			URL:    requireEnv("SUPABASE_URL"),
+			Bucket: requireEnv("BUCKET_NAME"),
 		},
 	}
 }

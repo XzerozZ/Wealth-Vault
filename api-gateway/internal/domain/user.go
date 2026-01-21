@@ -16,8 +16,8 @@ type User struct {
 }
 
 type UpdateRequest struct {
-	Firstname   string `json:"first_name"   form:"first_name"   mask:"first_name"`
-	Lastname    string `json:"last_name"    form:"last_name"    mask:"last_name"`
+	Firstname   string `json:"firstname"    form:"firstname"    mask:"firstname"`
+	Lastname    string `json:"lastname"     form:"lastname"     mask:"lastname"`
 	Username    string `json:"username"     form:"username"     mask:"username"`
 	Profile     string `json:"profile"      form:"profile"      mask:"profile"`
 	Phonenumber string `json:"phonenumber"  form:"phonenumber"  mask:"phonenumber"`

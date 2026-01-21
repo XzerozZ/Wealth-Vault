@@ -29,7 +29,9 @@ func InitDB(config configs.PostgreSQL) {
 	}
 
 	_ = db.AutoMigrate(
-		&domain.Cash{},
+		&domain.Asset{},
+		&domain.Liability{},
+		&domain.FileAssociate{},
 	)
 
 	log.Println("Database connection established successfully!")

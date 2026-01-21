@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "proto/asset/asset.proto";
+import "proto/asset/liability.proto";
+
+service AssetService {
+  rpc CreateAsset(CreateAssetRequest) returns (CreateAssetResponse);
+  rpc UpdateAsset(UpdateAssetRequest) returns (AssetResponse);
+  rpc GetAsset(GetAssetRequest) returns (AssetArrayResponse);
+  rpc GetAssetByID(GetAssetByIDRequest) returns (AssetResponse);
+  rpc DeleteAsset(DeleteAssetRequest) returns (DeleteAssetResponse);
+
+  rpc CreateLiability(CreateLiabilityRequest) returns (CreateLiabilityResponse);
+  rpc GetLiability(GetLiabilityRequest) returns (LiabilityArrayResponse);
+  rpc GetLiabilityByID(GetLiabilityByIDRequest) returns (LiabilityResponse);
+  rpc UpdateLiability(UpdateLiabilityRequest) returns (LiabilityResponse);
+  rpc DeleteLiability(DeleteLiabilityRequest) returns (DeleteLiabilityResponse);
+  // Dashboard / Wealth
+  rpc GetNetWorth(GetNetWorthRequest) returns (GetNetWorthResponse);
+}

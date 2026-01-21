@@ -15,9 +15,10 @@ message AuthRequest {
 }
 
 message AuthResponse {
-  string access_token = 1;
-  string refresh_token = 2;
-  string user_id = 3;
+  bool success = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  string user_id = 4;
 }
 
 message RefreshTokenRequest {
