@@ -2,11 +2,11 @@ package usecase
 
 import (
 	"context"
-	"wealth-vault/user-service/internal/domain"
+	pb "wealth-vault/user-service/pkg/pb/proto/user"
 )
 
 type UserUsecase interface {
-	CreateUser(ctx context.Context, user *domain.User) (string, error)
-	GetUser(ctx context.Context, id string) (*domain.User, error)
-	UpdateUser(ctx context.Context, input *domain.UpdateUserInput) (*domain.User, error)
+	CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error)
+	GetUser(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.UserResponse, error)
+	UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error)
 }

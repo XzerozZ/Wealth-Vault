@@ -2,59 +2,83 @@ package usecase
 
 import (
 	"context"
-	"time"
+	"errors"
 	"wealth-vault/user-service/internal/domain"
 	repo "wealth-vault/user-service/internal/repository/interface"
+	pb "wealth-vault/user-service/pkg/pb/proto/user"
+	"wealth-vault/user-service/pkg/utils"
+	helper "wealth-vault/user-service/pkg/utils/helper"
 
 	"github.com/google/uuid"
 )
 
 type UserUsecase struct {
 	userRepo repo.UserRepository
+	storage  *utils.StorageClient
 }
 
-func NewUserUsecase(r repo.UserRepository) UserUsecase {
-	return UserUsecase{userRepo: r}
+func NewUserUsecase(r repo.UserRepository, s *utils.StorageClient) UserUsecase {
+	return UserUsecase{
+		userRepo: r,
+		storage:  s,
+	}
 }
 
-func (u *UserUsecase) CreateUser(ctx context.Context, user *domain.User) (uuid.UUID, error) {
-	if err := u.userRepo.CreateUser(ctx, user); err != nil {
-		return uuid.Nil, err
+func (u *UserUsecase) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+	user := &domain.User{
+		Email:    req.Email,
+		Username: req.Username,
 	}
 
-	return user.ID, nil
+	if err := u.userRepo.CreateUser(ctx, user); err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateUserResponse{
+		Id: user.ID.String(),
+	}, nil
 }
 
-func (u *UserUsecase) GetUser(ctx context.Context, id string) (*domain.User, error) {
+func (u *UserUsecase) GetUser(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.UserResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
 	user, err := u.userRepo.GetUser(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return &pb.UserResponse{
+		Success: true,
+		User:    utils.ToUserProto(user),
+	}, nil
 }
 
-func (u *UserUsecase) UpdateUser(ctx context.Context, input *domain.UpdateUserInput) (*domain.User, error) {
-	updateData := &domain.User{
-		ID:          input.ID,
-		Firstname:   input.Firstname,
-		Lastname:    input.Lastname,
-		Username:    input.Username,
-		Profile:     input.Profile,
-		Phonenumber: input.Phonenumber,
+func (u *UserUsecase) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, errors.New("invalid user id")
 	}
 
-	if input.BirthdayStr != "" {
-		parsedTime, err := time.Parse("2006-01-02", input.BirthdayStr)
-		if err == nil {
-			updateData.Birthday = parsedTime
-		}
-	}
-
-	updatedUser, err := u.userRepo.UpdateUser(ctx, updateData, input.UpdateMask)
+	user, err := u.userRepo.GetUser(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return updatedUser, nil
+	updateMask, err := helper.ApplyUpdateUserFields(req, u.storage, user)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedUser, err := u.userRepo.UpdateUser(ctx, user, updateMask)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.UserResponse{
+		Success: true,
+		User:    utils.ToUserProto(updatedUser),
+	}, nil
 }

@@ -9,6 +9,7 @@ import (
 	userUsecase "wealth-vault/user-service/internal/usecase"
 	"wealth-vault/user-service/pkg/database"
 	userpb "wealth-vault/user-service/pkg/pb/proto/user"
+	storageclient "wealth-vault/user-service/pkg/utils"
 
 	"google.golang.org/grpc"
 )
@@ -21,8 +22,9 @@ func main() {
 		log.Fatal("Failed to initialize database")
 	}
 
+	supabaseClient, err := storageclient.NewStorageClient(cfg.SUPA.URL, cfg.SUPA.Key, cfg.SUPA.Bucket)
 	repo := userRepo.NewUserRepository(db)
-	uc := userUsecase.NewUserUsecase(repo)
+	uc := userUsecase.NewUserUsecase(repo, supabaseClient)
 	handler := userHandler.NewUserGRPCHandler(uc)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)

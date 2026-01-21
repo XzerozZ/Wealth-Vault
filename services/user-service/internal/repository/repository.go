@@ -4,6 +4,7 @@ import (
 	"context"
 	"wealth-vault/user-service/internal/domain"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +24,7 @@ func (r *UserRepository) CreateUser(ctx context.Context, user *domain.User) erro
 	return nil
 }
 
-func (r *UserRepository) GetUser(ctx context.Context, id string) (*domain.User, error) {
+func (r *UserRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	var user domain.User
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err

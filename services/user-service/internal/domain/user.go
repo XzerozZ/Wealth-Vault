@@ -14,7 +14,7 @@ type User struct {
 	Username    string `gorm:"not null"`
 	Profile     string
 	Phonenumber string
-	Birthday    time.Time `gorm:"type:date"`
+	Birthday    *time.Time `gorm:"type:date"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

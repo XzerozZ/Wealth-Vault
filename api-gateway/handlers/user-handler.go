@@ -73,6 +73,15 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		})
 	}
 
+	var birthDate *time.Time
+	if req.Birthday != "" {
+		t, err := time.Parse("2006-01-02", req.Birthday)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid start_at format (use YYYY-MM-DD)"})
+		}
+		birthDate = &t
+	}
+
 	fileHeader, err := c.FormFile("profile_image")
 	if err == nil {
 
@@ -108,15 +117,13 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	defer cancel()
 
 	res, err := h.client.UpdateUser(ctx, &pb.UpdateUserRequest{
-		Id: userID,
-		User: &pb.User{
-			Firstname:   req.Firstname,
-			Lastname:    req.Lastname,
-			Username:    req.Username,
-			Profile:     req.Profile,
-			Phonenumber: req.Phonenumber,
-			Birthday:    req.Birthday,
-		},
+		Id:          userID,
+		Firstname:   req.Firstname,
+		Lastname:    req.Lastname,
+		Username:    req.Username,
+		Profile:     req.Profile,
+		Phonenumber: req.Phonenumber,
+		Birthday:    utils.ToProtoTime(birthDate),
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: paths,
 		},

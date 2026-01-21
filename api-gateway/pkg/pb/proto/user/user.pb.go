@@ -32,7 +32,7 @@ type User struct {
 	Username      string                 `protobuf:"bytes,5,opt,name=username,proto3" json:"username,omitempty"`
 	Profile       string                 `protobuf:"bytes,6,opt,name=profile,proto3" json:"profile,omitempty"`
 	Phonenumber   string                 `protobuf:"bytes,7,opt,name=phonenumber,proto3" json:"phonenumber,omitempty"`
-	Birthday      string                 `protobuf:"bytes,8,opt,name=birthday,proto3" json:"birthday,omitempty"`
+	Birthday      *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=birthday,proto3" json:"birthday,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -118,11 +118,11 @@ func (x *User) GetPhonenumber() string {
 	return ""
 }
 
-func (x *User) GetBirthday() string {
+func (x *User) GetBirthday() *timestamppb.Timestamp {
 	if x != nil {
 		return x.Birthday
 	}
-	return ""
+	return nil
 }
 
 func (x *User) GetCreatedAt() *timestamppb.Timestamp {
@@ -282,8 +282,13 @@ func (x *GetUserByIDRequest) GetId() string {
 type UpdateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	User          *User                  `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`
-	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	Firstname     string                 `protobuf:"bytes,2,opt,name=firstname,proto3" json:"firstname,omitempty"`
+	Lastname      string                 `protobuf:"bytes,3,opt,name=lastname,proto3" json:"lastname,omitempty"`
+	Username      string                 `protobuf:"bytes,4,opt,name=username,proto3" json:"username,omitempty"`
+	Profile       string                 `protobuf:"bytes,5,opt,name=profile,proto3" json:"profile,omitempty"`
+	Phonenumber   string                 `protobuf:"bytes,6,opt,name=phonenumber,proto3" json:"phonenumber,omitempty"`
+	Birthday      *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=birthday,proto3" json:"birthday,omitempty"`
+	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,8,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -325,9 +330,44 @@ func (x *UpdateUserRequest) GetId() string {
 	return ""
 }
 
-func (x *UpdateUserRequest) GetUser() *User {
+func (x *UpdateUserRequest) GetFirstname() string {
 	if x != nil {
-		return x.User
+		return x.Firstname
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetLastname() string {
+	if x != nil {
+		return x.Lastname
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetProfile() string {
+	if x != nil {
+		return x.Profile
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetPhonenumber() string {
+	if x != nil {
+		return x.Phonenumber
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetBirthday() *timestamppb.Timestamp {
+	if x != nil {
+		return x.Birthday
 	}
 	return nil
 }
@@ -395,7 +435,7 @@ var File_proto_user_user_proto protoreflect.FileDescriptor
 
 const file_proto_user_user_proto_rawDesc = "" +
 	"\n" +
-	"\x15proto/user/user.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\"\xd0\x02\n" +
+	"\x15proto/user/user.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\"\xec\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1c\n" +
@@ -403,8 +443,8 @@ const file_proto_user_user_proto_rawDesc = "" +
 	"\blastname\x18\x04 \x01(\tR\blastname\x12\x1a\n" +
 	"\busername\x18\x05 \x01(\tR\busername\x12\x18\n" +
 	"\aprofile\x18\x06 \x01(\tR\aprofile\x12 \n" +
-	"\vphonenumber\x18\a \x01(\tR\vphonenumber\x12\x1a\n" +
-	"\bbirthday\x18\b \x01(\tR\bbirthday\x129\n" +
+	"\vphonenumber\x18\a \x01(\tR\vphonenumber\x126\n" +
+	"\bbirthday\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\bbirthday\x129\n" +
 	"\n" +
 	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
@@ -416,11 +456,16 @@ const file_proto_user_user_proto_rawDesc = "" +
 	"\x12CreateUserResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"$\n" +
 	"\x12GetUserByIDRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"{\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xaa\x02\n" +
 	"\x11UpdateUserRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n" +
-	"\x04user\x18\x02 \x01(\v2\x05.UserR\x04user\x12;\n" +
-	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
+	"\tfirstname\x18\x02 \x01(\tR\tfirstname\x12\x1a\n" +
+	"\blastname\x18\x03 \x01(\tR\blastname\x12\x1a\n" +
+	"\busername\x18\x04 \x01(\tR\busername\x12\x18\n" +
+	"\aprofile\x18\x05 \x01(\tR\aprofile\x12 \n" +
+	"\vphonenumber\x18\x06 \x01(\tR\vphonenumber\x126\n" +
+	"\bbirthday\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\bbirthday\x12;\n" +
+	"\vupdate_mask\x18\b \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\"C\n" +
 	"\fUserResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x19\n" +
@@ -456,22 +501,23 @@ var file_proto_user_user_proto_goTypes = []any{
 	(*fieldmaskpb.FieldMask)(nil), // 7: google.protobuf.FieldMask
 }
 var file_proto_user_user_proto_depIdxs = []int32{
-	6, // 0: User.created_at:type_name -> google.protobuf.Timestamp
-	6, // 1: User.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 2: UpdateUserRequest.user:type_name -> User
-	7, // 3: UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0, // 4: UserResponse.user:type_name -> User
-	1, // 5: UserService.CreateUser:input_type -> CreateUserRequest
-	3, // 6: UserService.GetUser:input_type -> GetUserByIDRequest
-	4, // 7: UserService.UpdateUser:input_type -> UpdateUserRequest
-	2, // 8: UserService.CreateUser:output_type -> CreateUserResponse
-	5, // 9: UserService.GetUser:output_type -> UserResponse
-	5, // 10: UserService.UpdateUser:output_type -> UserResponse
-	8, // [8:11] is the sub-list for method output_type
-	5, // [5:8] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	6, // 0: User.birthday:type_name -> google.protobuf.Timestamp
+	6, // 1: User.created_at:type_name -> google.protobuf.Timestamp
+	6, // 2: User.updated_at:type_name -> google.protobuf.Timestamp
+	6, // 3: UpdateUserRequest.birthday:type_name -> google.protobuf.Timestamp
+	7, // 4: UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0, // 5: UserResponse.user:type_name -> User
+	1, // 6: UserService.CreateUser:input_type -> CreateUserRequest
+	3, // 7: UserService.GetUser:input_type -> GetUserByIDRequest
+	4, // 8: UserService.UpdateUser:input_type -> UpdateUserRequest
+	2, // 9: UserService.CreateUser:output_type -> CreateUserResponse
+	5, // 10: UserService.GetUser:output_type -> UserResponse
+	5, // 11: UserService.UpdateUser:output_type -> UserResponse
+	9, // [9:12] is the sub-list for method output_type
+	6, // [6:9] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_proto_user_user_proto_init() }

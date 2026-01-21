@@ -41,7 +41,7 @@ func (h *LiabilityHandler) CreateLiability(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	var principal float64
+	var principal, interest float64
 	var err error
 	if req.Principal != "" {
 		principal, err = utils.Parseamount(req.Principal)
@@ -50,7 +50,6 @@ func (h *LiabilityHandler) CreateLiability(c *fiber.Ctx) error {
 		}
 	}
 
-	var interest float64
 	if req.InterestRate != "" {
 		interest, err = utils.Parseamount(req.InterestRate)
 		if err != nil {

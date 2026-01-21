@@ -18,7 +18,7 @@ func ToUserDomain(p *pb.User) *domain.User {
 		Lastname:    p.Lastname,
 		Phonenumber: p.Phonenumber,
 		Profile:     p.Profile,
-		Birthday:    p.Birthday,
+		Birthday:    TimeToPtr(p.Birthday.AsTime()),
 		CreatedAt:   p.CreatedAt.AsTime(),
 		UpdatedAt:   p.UpdatedAt.AsTime(),
 	}

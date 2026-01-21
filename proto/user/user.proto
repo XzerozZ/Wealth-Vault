@@ -19,7 +19,7 @@ message User {
   string username = 5;
   string profile = 6;
   string phonenumber = 7;
-  string birthday = 8;
+  google.protobuf.Timestamp birthday = 8;
   google.protobuf.Timestamp created_at = 9;
   google.protobuf.Timestamp updated_at = 10;
 }
@@ -39,8 +39,13 @@ message GetUserByIDRequest {
 
 message UpdateUserRequest {
   string id = 1;          
-  User user = 2;
-  google.protobuf.FieldMask update_mask = 3;   
+  string firstname = 2;
+  string lastname = 3;
+  string username = 4;
+  string profile = 5;
+  string phonenumber = 6;
+  google.protobuf.Timestamp birthday = 7;
+  google.protobuf.FieldMask update_mask = 8;   
 }
 
 message UserResponse {
