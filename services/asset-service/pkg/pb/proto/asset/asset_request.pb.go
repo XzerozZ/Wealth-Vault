@@ -24,14 +24,14 @@ var File_proto_asset_asset_request_proto protoreflect.FileDescriptor
 
 const file_proto_asset_asset_request_proto_rawDesc = "" +
 	"\n" +
-	"\x1fproto/asset/asset_request.proto\x12\x05asset\x1a\x17proto/asset/asset.proto\x1a\x1bproto/asset/liability.proto2\xaa\x06\n" +
-	"\fAssetService\x12D\n" +
-	"\vCreateAsset\x12\x19.asset.CreateAssetRequest\x1a\x1a.asset.CreateAssetResponse\x12>\n" +
+	"\x1fproto/asset/asset_request.proto\x12\x05asset\x1a\x17proto/asset/asset.proto\x1a\x1bproto/asset/liability.proto2\x9e\x06\n" +
+	"\fAssetService\x12>\n" +
+	"\vCreateAsset\x12\x19.asset.CreateAssetRequest\x1a\x14.asset.AssetResponse\x12>\n" +
 	"\vUpdateAsset\x12\x19.asset.UpdateAssetRequest\x1a\x14.asset.AssetResponse\x12=\n" +
 	"\bGetAsset\x12\x16.asset.GetAssetRequest\x1a\x19.asset.AssetArrayResponse\x12@\n" +
 	"\fGetAssetByID\x12\x1a.asset.GetAssetByIDRequest\x1a\x14.asset.AssetResponse\x12D\n" +
-	"\vDeleteAsset\x12\x19.asset.DeleteAssetRequest\x1a\x1a.asset.DeleteAssetResponse\x12P\n" +
-	"\x0fCreateLiability\x12\x1d.asset.CreateLiabilityRequest\x1a\x1e.asset.CreateLiabilityResponse\x12I\n" +
+	"\vDeleteAsset\x12\x19.asset.DeleteAssetRequest\x1a\x1a.asset.DeleteAssetResponse\x12J\n" +
+	"\x0fCreateLiability\x12\x1d.asset.CreateLiabilityRequest\x1a\x18.asset.LiabilityResponse\x12I\n" +
 	"\fGetLiability\x12\x1a.asset.GetLiabilityRequest\x1a\x1d.asset.LiabilityArrayResponse\x12L\n" +
 	"\x10GetLiabilityByID\x12\x1e.asset.GetLiabilityByIDRequest\x1a\x18.asset.LiabilityResponse\x12J\n" +
 	"\x0fUpdateLiability\x12\x1d.asset.UpdateLiabilityRequest\x1a\x18.asset.LiabilityResponse\x12P\n" +
@@ -50,15 +50,13 @@ var file_proto_asset_asset_request_proto_goTypes = []any{
 	(*UpdateLiabilityRequest)(nil),  // 8: asset.UpdateLiabilityRequest
 	(*DeleteLiabilityRequest)(nil),  // 9: asset.DeleteLiabilityRequest
 	(*GetNetWorthRequest)(nil),      // 10: asset.GetNetWorthRequest
-	(*CreateAssetResponse)(nil),     // 11: asset.CreateAssetResponse
-	(*AssetResponse)(nil),           // 12: asset.AssetResponse
-	(*AssetArrayResponse)(nil),      // 13: asset.AssetArrayResponse
-	(*DeleteAssetResponse)(nil),     // 14: asset.DeleteAssetResponse
-	(*CreateLiabilityResponse)(nil), // 15: asset.CreateLiabilityResponse
-	(*LiabilityArrayResponse)(nil),  // 16: asset.LiabilityArrayResponse
-	(*LiabilityResponse)(nil),       // 17: asset.LiabilityResponse
-	(*DeleteLiabilityResponse)(nil), // 18: asset.DeleteLiabilityResponse
-	(*GetNetWorthResponse)(nil),     // 19: asset.GetNetWorthResponse
+	(*AssetResponse)(nil),           // 11: asset.AssetResponse
+	(*AssetArrayResponse)(nil),      // 12: asset.AssetArrayResponse
+	(*DeleteAssetResponse)(nil),     // 13: asset.DeleteAssetResponse
+	(*LiabilityResponse)(nil),       // 14: asset.LiabilityResponse
+	(*LiabilityArrayResponse)(nil),  // 15: asset.LiabilityArrayResponse
+	(*DeleteLiabilityResponse)(nil), // 16: asset.DeleteLiabilityResponse
+	(*GetNetWorthResponse)(nil),     // 17: asset.GetNetWorthResponse
 }
 var file_proto_asset_asset_request_proto_depIdxs = []int32{
 	0,  // 0: asset.AssetService.CreateAsset:input_type -> asset.CreateAssetRequest
@@ -72,17 +70,17 @@ var file_proto_asset_asset_request_proto_depIdxs = []int32{
 	8,  // 8: asset.AssetService.UpdateLiability:input_type -> asset.UpdateLiabilityRequest
 	9,  // 9: asset.AssetService.DeleteLiability:input_type -> asset.DeleteLiabilityRequest
 	10, // 10: asset.AssetService.GetNetWorth:input_type -> asset.GetNetWorthRequest
-	11, // 11: asset.AssetService.CreateAsset:output_type -> asset.CreateAssetResponse
-	12, // 12: asset.AssetService.UpdateAsset:output_type -> asset.AssetResponse
-	13, // 13: asset.AssetService.GetAsset:output_type -> asset.AssetArrayResponse
-	12, // 14: asset.AssetService.GetAssetByID:output_type -> asset.AssetResponse
-	14, // 15: asset.AssetService.DeleteAsset:output_type -> asset.DeleteAssetResponse
-	15, // 16: asset.AssetService.CreateLiability:output_type -> asset.CreateLiabilityResponse
-	16, // 17: asset.AssetService.GetLiability:output_type -> asset.LiabilityArrayResponse
-	17, // 18: asset.AssetService.GetLiabilityByID:output_type -> asset.LiabilityResponse
-	17, // 19: asset.AssetService.UpdateLiability:output_type -> asset.LiabilityResponse
-	18, // 20: asset.AssetService.DeleteLiability:output_type -> asset.DeleteLiabilityResponse
-	19, // 21: asset.AssetService.GetNetWorth:output_type -> asset.GetNetWorthResponse
+	11, // 11: asset.AssetService.CreateAsset:output_type -> asset.AssetResponse
+	11, // 12: asset.AssetService.UpdateAsset:output_type -> asset.AssetResponse
+	12, // 13: asset.AssetService.GetAsset:output_type -> asset.AssetArrayResponse
+	11, // 14: asset.AssetService.GetAssetByID:output_type -> asset.AssetResponse
+	13, // 15: asset.AssetService.DeleteAsset:output_type -> asset.DeleteAssetResponse
+	14, // 16: asset.AssetService.CreateLiability:output_type -> asset.LiabilityResponse
+	15, // 17: asset.AssetService.GetLiability:output_type -> asset.LiabilityArrayResponse
+	14, // 18: asset.AssetService.GetLiabilityByID:output_type -> asset.LiabilityResponse
+	14, // 19: asset.AssetService.UpdateLiability:output_type -> asset.LiabilityResponse
+	16, // 20: asset.AssetService.DeleteLiability:output_type -> asset.DeleteLiabilityResponse
+	17, // 21: asset.AssetService.GetNetWorth:output_type -> asset.GetNetWorthResponse
 	11, // [11:22] is the sub-list for method output_type
 	0,  // [0:11] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name

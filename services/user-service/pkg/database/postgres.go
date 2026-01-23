@@ -32,6 +32,7 @@ func InitDB(config configs.PostgreSQL) {
 		&domain.User{},
 		&domain.FriendList{},
 		&domain.Group{},
+		&domain.GroupMember{},
 		&domain.GroupItem{},
 		&domain.GroupLog{},
 		&domain.Notification{},

@@ -15,6 +15,7 @@ func Setup(
 	authHandler *handlers.AuthHandler,
 	assetHandler *handlers.AssetHandler,
 	liaHandler *handlers.LiabilityHandler,
+	groupHandler *handlers.GroupHandler,
 ) {
 	api := app.Group("/api")
 
@@ -25,6 +26,13 @@ func Setup(
 
 	api.Get("/user", middleware.JWTMiddleware(jwt), userHandler.GetUser)
 	api.Patch("/user", middleware.JWTMiddleware(jwt), userHandler.UpdateUser)
+	api.Post("/friend/:friendID", middleware.JWTMiddleware(jwt), userHandler.AddFriend)
+	api.Get("/friend", middleware.JWTMiddleware(jwt), userHandler.GetFriendList)
+
+	api.Post("/group", middleware.JWTMiddleware(jwt), groupHandler.CreateGroup)
+	api.Get("/group/detail/:id", middleware.JWTMiddleware(jwt), groupHandler.GetGroup)
+	api.Get("/group/member/:id", middleware.JWTMiddleware(jwt), groupHandler.GetMember)
+	api.Patch("/group/:id", middleware.JWTMiddleware(jwt), groupHandler.UpdateGroup)
 
 	api.Post("/asset", middleware.JWTMiddleware(jwt), assetHandler.CreateAsset)
 	api.Get("/asset", middleware.JWTMiddleware(jwt), assetHandler.GetAsset)

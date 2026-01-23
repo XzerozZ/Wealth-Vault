@@ -4,9 +4,9 @@ import (
 	"log"
 	"net"
 	config "wealth-vault/user-service/configs"
-	userHandler "wealth-vault/user-service/internal/delivery/grpc"
-	userRepo "wealth-vault/user-service/internal/repository"
-	userUsecase "wealth-vault/user-service/internal/usecase"
+	handler "wealth-vault/user-service/internal/delivery/grpc"
+	repo "wealth-vault/user-service/internal/repository"
+	usecase "wealth-vault/user-service/internal/usecase"
 	"wealth-vault/user-service/pkg/database"
 	userpb "wealth-vault/user-service/pkg/pb/proto/user"
 	storageclient "wealth-vault/user-service/pkg/utils"
@@ -23,9 +23,11 @@ func main() {
 	}
 
 	supabaseClient, err := storageclient.NewStorageClient(cfg.SUPA.URL, cfg.SUPA.Key, cfg.SUPA.Bucket)
-	repo := userRepo.NewUserRepository(db)
-	uc := userUsecase.NewUserUsecase(repo, supabaseClient)
-	handler := userHandler.NewUserGRPCHandler(uc)
+	urepo := repo.NewUserRepository(db)
+	grepo := repo.NewGroupRepository(db)
+	uuc := usecase.NewUserUsecase(urepo, supabaseClient)
+	guc := usecase.NewGroupUsecase(grepo, supabaseClient)
+	uhandler := handler.NewUserGRPCHandler(uuc, guc)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {
@@ -33,7 +35,7 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
-	userpb.RegisterUserServiceServer(grpcServer, handler)
+	userpb.RegisterUserServiceServer(grpcServer, uhandler)
 
 	log.Printf("🚀 User Service (gRPC) running on :%s", cfg.GRPC.Port)
 	log.Fatal(grpcServer.Serve(lis))

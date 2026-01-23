@@ -523,58 +523,6 @@ func (x *UpdateLiabilityRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
-type CreateLiabilityResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Id            string                 `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateLiabilityResponse) Reset() {
-	*x = CreateLiabilityResponse{}
-	mi := &file_proto_asset_liability_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateLiabilityResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateLiabilityResponse) ProtoMessage() {}
-
-func (x *CreateLiabilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_liability_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateLiabilityResponse.ProtoReflect.Descriptor instead.
-func (*CreateLiabilityResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_liability_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *CreateLiabilityResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *CreateLiabilityResponse) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
 type LiabilityArrayResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -585,7 +533,7 @@ type LiabilityArrayResponse struct {
 
 func (x *LiabilityArrayResponse) Reset() {
 	*x = LiabilityArrayResponse{}
-	mi := &file_proto_asset_liability_proto_msgTypes[6]
+	mi := &file_proto_asset_liability_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -597,7 +545,7 @@ func (x *LiabilityArrayResponse) String() string {
 func (*LiabilityArrayResponse) ProtoMessage() {}
 
 func (x *LiabilityArrayResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_liability_proto_msgTypes[6]
+	mi := &file_proto_asset_liability_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -610,7 +558,7 @@ func (x *LiabilityArrayResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiabilityArrayResponse.ProtoReflect.Descriptor instead.
 func (*LiabilityArrayResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_liability_proto_rawDescGZIP(), []int{6}
+	return file_proto_asset_liability_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *LiabilityArrayResponse) GetSuccess() bool {
@@ -637,7 +585,7 @@ type LiabilityResponse struct {
 
 func (x *LiabilityResponse) Reset() {
 	*x = LiabilityResponse{}
-	mi := &file_proto_asset_liability_proto_msgTypes[7]
+	mi := &file_proto_asset_liability_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -649,7 +597,7 @@ func (x *LiabilityResponse) String() string {
 func (*LiabilityResponse) ProtoMessage() {}
 
 func (x *LiabilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_liability_proto_msgTypes[7]
+	mi := &file_proto_asset_liability_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -662,7 +610,7 @@ func (x *LiabilityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LiabilityResponse.ProtoReflect.Descriptor instead.
 func (*LiabilityResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_liability_proto_rawDescGZIP(), []int{7}
+	return file_proto_asset_liability_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *LiabilityResponse) GetSuccess() bool {
@@ -689,7 +637,7 @@ type DeleteLiabilityRequest struct {
 
 func (x *DeleteLiabilityRequest) Reset() {
 	*x = DeleteLiabilityRequest{}
-	mi := &file_proto_asset_liability_proto_msgTypes[8]
+	mi := &file_proto_asset_liability_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -701,7 +649,7 @@ func (x *DeleteLiabilityRequest) String() string {
 func (*DeleteLiabilityRequest) ProtoMessage() {}
 
 func (x *DeleteLiabilityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_liability_proto_msgTypes[8]
+	mi := &file_proto_asset_liability_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -714,7 +662,7 @@ func (x *DeleteLiabilityRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteLiabilityRequest.ProtoReflect.Descriptor instead.
 func (*DeleteLiabilityRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_liability_proto_rawDescGZIP(), []int{8}
+	return file_proto_asset_liability_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DeleteLiabilityRequest) GetId() string {
@@ -740,7 +688,7 @@ type DeleteLiabilityResponse struct {
 
 func (x *DeleteLiabilityResponse) Reset() {
 	*x = DeleteLiabilityResponse{}
-	mi := &file_proto_asset_liability_proto_msgTypes[9]
+	mi := &file_proto_asset_liability_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -752,7 +700,7 @@ func (x *DeleteLiabilityResponse) String() string {
 func (*DeleteLiabilityResponse) ProtoMessage() {}
 
 func (x *DeleteLiabilityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_liability_proto_msgTypes[9]
+	mi := &file_proto_asset_liability_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -765,7 +713,7 @@ func (x *DeleteLiabilityResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteLiabilityResponse.ProtoReflect.Descriptor instead.
 func (*DeleteLiabilityResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_liability_proto_rawDescGZIP(), []int{9}
+	return file_proto_asset_liability_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DeleteLiabilityResponse) GetSuccess() bool {
@@ -831,10 +779,7 @@ const file_proto_asset_liability_proto_rawDesc = "" +
 	"\tnew_files\x18\v \x03(\v2\x0f.asset.FileInfoR\bnewFiles\x12&\n" +
 	"\x0fdelete_file_ids\x18\f \x03(\tR\rdeleteFileIds\x12;\n" +
 	"\vupdate_mask\x18\r \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMask\"C\n" +
-	"\x17CreateLiabilityResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\"b\n" +
+	"updateMask\"b\n" +
 	"\x16LiabilityArrayResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12.\n" +
 	"\tliability\x18\x02 \x03(\v2\x10.asset.LiabilityR\tliability\"]\n" +
@@ -859,39 +804,38 @@ func file_proto_asset_liability_proto_rawDescGZIP() []byte {
 	return file_proto_asset_liability_proto_rawDescData
 }
 
-var file_proto_asset_liability_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_proto_asset_liability_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_asset_liability_proto_goTypes = []any{
 	(*Liability)(nil),               // 0: asset.Liability
 	(*CreateLiabilityRequest)(nil),  // 1: asset.CreateLiabilityRequest
 	(*GetLiabilityRequest)(nil),     // 2: asset.GetLiabilityRequest
 	(*GetLiabilityByIDRequest)(nil), // 3: asset.GetLiabilityByIDRequest
 	(*UpdateLiabilityRequest)(nil),  // 4: asset.UpdateLiabilityRequest
-	(*CreateLiabilityResponse)(nil), // 5: asset.CreateLiabilityResponse
-	(*LiabilityArrayResponse)(nil),  // 6: asset.LiabilityArrayResponse
-	(*LiabilityResponse)(nil),       // 7: asset.LiabilityResponse
-	(*DeleteLiabilityRequest)(nil),  // 8: asset.DeleteLiabilityRequest
-	(*DeleteLiabilityResponse)(nil), // 9: asset.DeleteLiabilityResponse
-	(LiabilityType)(0),              // 10: asset.LiabilityType
-	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
-	(*FileInfo)(nil),                // 12: asset.FileInfo
-	(*fieldmaskpb.FieldMask)(nil),   // 13: google.protobuf.FieldMask
+	(*LiabilityArrayResponse)(nil),  // 5: asset.LiabilityArrayResponse
+	(*LiabilityResponse)(nil),       // 6: asset.LiabilityResponse
+	(*DeleteLiabilityRequest)(nil),  // 7: asset.DeleteLiabilityRequest
+	(*DeleteLiabilityResponse)(nil), // 8: asset.DeleteLiabilityResponse
+	(LiabilityType)(0),              // 9: asset.LiabilityType
+	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
+	(*FileInfo)(nil),                // 11: asset.FileInfo
+	(*fieldmaskpb.FieldMask)(nil),   // 12: google.protobuf.FieldMask
 }
 var file_proto_asset_liability_proto_depIdxs = []int32{
-	10, // 0: asset.Liability.type:type_name -> asset.LiabilityType
-	11, // 1: asset.Liability.start_at:type_name -> google.protobuf.Timestamp
-	11, // 2: asset.Liability.end_at:type_name -> google.protobuf.Timestamp
-	12, // 3: asset.Liability.files:type_name -> asset.FileInfo
-	11, // 4: asset.Liability.created_at:type_name -> google.protobuf.Timestamp
-	11, // 5: asset.Liability.updated_at:type_name -> google.protobuf.Timestamp
-	10, // 6: asset.CreateLiabilityRequest.type:type_name -> asset.LiabilityType
-	11, // 7: asset.CreateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
-	11, // 8: asset.CreateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
-	12, // 9: asset.CreateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	10, // 10: asset.UpdateLiabilityRequest.type:type_name -> asset.LiabilityType
-	11, // 11: asset.UpdateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
-	11, // 12: asset.UpdateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
-	12, // 13: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	13, // 14: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
+	9,  // 0: asset.Liability.type:type_name -> asset.LiabilityType
+	10, // 1: asset.Liability.start_at:type_name -> google.protobuf.Timestamp
+	10, // 2: asset.Liability.end_at:type_name -> google.protobuf.Timestamp
+	11, // 3: asset.Liability.files:type_name -> asset.FileInfo
+	10, // 4: asset.Liability.created_at:type_name -> google.protobuf.Timestamp
+	10, // 5: asset.Liability.updated_at:type_name -> google.protobuf.Timestamp
+	9,  // 6: asset.CreateLiabilityRequest.type:type_name -> asset.LiabilityType
+	10, // 7: asset.CreateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
+	10, // 8: asset.CreateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
+	11, // 9: asset.CreateLiabilityRequest.new_files:type_name -> asset.FileInfo
+	9,  // 10: asset.UpdateLiabilityRequest.type:type_name -> asset.LiabilityType
+	10, // 11: asset.UpdateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
+	10, // 12: asset.UpdateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
+	11, // 13: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
+	12, // 14: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 15: asset.LiabilityArrayResponse.liability:type_name -> asset.Liability
 	0,  // 16: asset.LiabilityResponse.liability:type_name -> asset.Liability
 	17, // [17:17] is the sub-list for method output_type
@@ -914,7 +858,7 @@ func file_proto_asset_liability_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_asset_liability_proto_rawDesc), len(file_proto_asset_liability_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

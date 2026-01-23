@@ -1,15 +1,11 @@
 syntax = "proto3";
 
+package user;
+
 option go_package = "wealth-vault/pkg/pb";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/field_mask.proto";
-
-service UserService {
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-  rpc GetUser(GetUserByIDRequest) returns (UserResponse);
-  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
-}
 
 message User {
   string id = 1;
@@ -26,11 +22,7 @@ message User {
 
 message CreateUserRequest {
   string email = 1;
-  string username = 3;
-}
-
-message CreateUserResponse {
-  string id = 1;
+  string username = 2;
 }
 
 message GetUserByIDRequest {
@@ -51,4 +43,19 @@ message UpdateUserRequest {
 message UserResponse {
   bool success = 1;
   User user = 2;
+}
+
+message FriendRequest {
+  string id = 1; 
+  string user_id = 2;
+}
+
+message FriendResponse {
+  bool success = 1;
+}
+
+message FriendListResponse {
+  bool success = 1;
+  User user = 2;
+  repeated User friends = 3;
 }

@@ -23,3 +23,19 @@ func ToUserDomain(p *pb.User) *domain.User {
 		UpdatedAt:   p.UpdatedAt.AsTime(),
 	}
 }
+
+func ToUserList(pbList []*pb.User) []domain.User {
+	if pbList == nil {
+		return []domain.User{}
+	}
+
+	entities := make([]domain.User, 0, len(pbList))
+
+	for _, pbItem := range pbList {
+		if item := ToUserDomain(pbItem); item != nil {
+			entities = append(entities, *item)
+		}
+	}
+
+	return entities
+}

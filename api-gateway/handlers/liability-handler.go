@@ -135,9 +135,11 @@ func (h *LiabilityHandler) CreateLiability(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	liabilityInfo := mapper.ToLiabilityDomain(res.Liability)
+
 	return c.JSON(fiber.Map{
 		"status": "create liability success",
-		"data":   res,
+		"data":   liabilityInfo,
 	})
 }
 

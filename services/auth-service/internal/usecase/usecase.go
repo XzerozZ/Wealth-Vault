@@ -59,14 +59,21 @@ func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput)
 			return nil, err
 		}
 		hashedPwd = string(bytes)
+
+	}
+
+	userID, err := uuid.Parse(userRes.User.Id)
+	if err != nil {
+		return nil, errors.New("invalid user id")
 	}
 
 	newAuth := &domain.AuthAccount{
-		UserID:          userRes.Id,
-		Email:           input.Email,
-		Password:        hashedPwd,
-		Provider:        input.Provider,
-		IsEmailVerified: false,
+		UserID:            userID,
+		Email:             input.Email,
+		Password:          hashedPwd,
+		Provider:          input.Provider,
+		ProviderAccountID: input.Email,
+		IsEmailVerified:   false,
 	}
 
 	if err := u.authRepo.Register(ctx, newAuth); err != nil {
@@ -74,7 +81,7 @@ func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput)
 	}
 
 	return &domain.AuthOutput{
-		UserID:       userRes.Id,
+		UserID:       userRes.User.Id,
 		AccessToken:  "",
 		RefreshToken: "",
 	}, nil
@@ -90,18 +97,17 @@ func (u *AuthUsecase) Login(ctx context.Context, input *domain.LoginInput) (*dom
 		return nil, fmt.Errorf("invalid password")
 	}
 
-	accessToken, err := u.token.CreateToken(existingUser.UserID, existingUser.Email, "access", 15*time.Minute)
+	accessToken, err := u.token.CreateToken(existingUser.UserID.String(), existingUser.Email, "access", 15*time.Minute)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create access token: %w", err)
 	}
 
-	refreshToken, err := u.token.CreateToken(existingUser.UserID, existingUser.Email, "refresh", 7*24*time.Hour)
+	refreshToken, err := u.token.CreateToken(existingUser.UserID.String(), existingUser.Email, "refresh", 7*24*time.Hour)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create refresh token: %w", err)
 	}
 
 	session := &domain.AuthSession{
-		ID:               uuid.New().String(),
 		UserID:           existingUser.UserID,
 		AccessToken:      accessToken,
 		RefreshToken:     refreshToken,
@@ -115,7 +121,7 @@ func (u *AuthUsecase) Login(ctx context.Context, input *domain.LoginInput) (*dom
 	}
 
 	return &domain.AuthOutput{
-		UserID:       existingUser.UserID,
+		UserID:       existingUser.UserID.String(),
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
@@ -145,23 +151,22 @@ func (u *AuthUsecase) RefreshToken(ctx context.Context, refreshTokenStr string) 
 		return nil, err
 	}
 
-	user, err := u.authRepo.FindByID(ctx, session.UserID)
+	user, err := u.authRepo.FindByID(ctx, session.UserID.String())
 	if err != nil {
 		return nil, fmt.Errorf("user not found")
 	}
 
-	newAccess, err := u.token.CreateToken(user.UserID, user.Email, "access", 15*time.Minute)
+	newAccess, err := u.token.CreateToken(user.UserID.String(), user.Email, "access", 15*time.Minute)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create access token: %w", err)
 	}
 
-	newRefresh, err := u.token.CreateToken(user.UserID, user.Email, "refresh", 7*24*time.Hour)
+	newRefresh, err := u.token.CreateToken(user.UserID.String(), user.Email, "refresh", 7*24*time.Hour)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create refresh token: %w", err)
 	}
 
 	newSession := &domain.AuthSession{
-		ID:               uuid.New().String(),
 		UserID:           session.UserID,
 		AccessToken:      newAccess,
 		RefreshToken:     newRefresh,
@@ -174,7 +179,7 @@ func (u *AuthUsecase) RefreshToken(ctx context.Context, refreshTokenStr string) 
 	}
 
 	return &domain.AuthOutput{
-		UserID:       session.UserID,
+		UserID:       session.UserID.String(),
 		AccessToken:  newAccess,
 		RefreshToken: newRefresh,
 	}, nil

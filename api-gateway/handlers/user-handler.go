@@ -139,3 +139,59 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		"data":   userInfo,
 	})
 }
+
+func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
+	id := c.Params("friendID")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.AddFriend(ctx, &pb.FriendRequest{
+		Id:     userID,
+		UserId: id,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"status": "add friend success",
+		"data":   res,
+	})
+}
+
+func (h *UserHandler) GetFriendList(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.GetFriendList(ctx, &pb.GetUserByIDRequest{
+		Id: userID,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	userInfo := mapper.ToUserDomain(res.User)
+	friendInfo := mapper.ToUserList(res.Friends)
+
+	return c.JSON(fiber.Map{
+		"status": "get friend success",
+		"data": fiber.Map{
+			"user":    userInfo,
+			"friends": friendInfo,
+		},
+	})
+}

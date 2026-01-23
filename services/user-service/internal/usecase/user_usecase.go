@@ -24,7 +24,7 @@ func NewUserUsecase(r repo.UserRepository, s *utils.StorageClient) UserUsecase {
 	}
 }
 
-func (u *UserUsecase) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
+func (u *UserUsecase) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
 	user := &domain.User{
 		Email:    req.Email,
 		Username: req.Username,
@@ -34,8 +34,9 @@ func (u *UserUsecase) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, err
 	}
 
-	return &pb.CreateUserResponse{
-		Id: user.ID.String(),
+	return &pb.UserResponse{
+		Success: true,
+		User:    utils.ToUserProto(user),
 	}, nil
 }
 
@@ -80,5 +81,47 @@ func (u *UserUsecase) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 	return &pb.UserResponse{
 		Success: true,
 		User:    utils.ToUserProto(updatedUser),
+	}, nil
+}
+
+func (u *UserUsecase) GetFriendList(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.FriendListResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, errors.New("invalid user id")
+	}
+
+	user, err := u.userRepo.GetUser(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	friendLists, err := u.userRepo.GetFriendList(ctx, id)
+	if err != nil {
+		return &pb.FriendListResponse{Success: false}, err
+	}
+
+	var friends []*pb.User
+	for _, item := range friendLists {
+		friends = append(friends, utils.ToUserProto(&item.Friend))
+	}
+
+	return &pb.FriendListResponse{
+		Success: true,
+		User:    utils.ToUserProto(user),
+		Friends: friends,
+	}, nil
+}
+func (u *UserUsecase) AddFriend(ctx context.Context, req *pb.FriendRequest) (*pb.FriendResponse, error) {
+	friends := &domain.FriendList{
+		UserID:   req.Id,
+		FriendID: req.UserId,
+	}
+
+	if err := u.userRepo.AddFriend(ctx, friends); err != nil {
+		return nil, err
+	}
+
+	return &pb.FriendResponse{
+		Success: true,
 	}, nil
 }

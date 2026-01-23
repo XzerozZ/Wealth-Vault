@@ -8,17 +8,19 @@ import "proto/asset/asset.proto";
 import "proto/asset/liability.proto";
 
 service AssetService {
-  rpc CreateAsset(CreateAssetRequest) returns (CreateAssetResponse);
+  rpc CreateAsset(CreateAssetRequest) returns (AssetResponse);
   rpc UpdateAsset(UpdateAssetRequest) returns (AssetResponse);
   rpc GetAsset(GetAssetRequest) returns (AssetArrayResponse);
   rpc GetAssetByID(GetAssetByIDRequest) returns (AssetResponse);
   rpc DeleteAsset(DeleteAssetRequest) returns (DeleteAssetResponse);
 
-  rpc CreateLiability(CreateLiabilityRequest) returns (CreateLiabilityResponse);
+  rpc CreateLiability(CreateLiabilityRequest) returns (LiabilityResponse);
   rpc GetLiability(GetLiabilityRequest) returns (LiabilityArrayResponse);
   rpc GetLiabilityByID(GetLiabilityByIDRequest) returns (LiabilityResponse);
   rpc UpdateLiability(UpdateLiabilityRequest) returns (LiabilityResponse);
   rpc DeleteLiability(DeleteLiabilityRequest) returns (DeleteLiabilityResponse);
+
+  rpc CheckAssetExist(CheckAssetExistRequest) returns (CheckAssetExistResponse);
   // Dashboard / Wealth
   rpc GetNetWorth(GetNetWorthRequest) returns (GetNetWorthResponse);
 }

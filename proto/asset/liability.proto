@@ -68,11 +68,6 @@ message UpdateLiabilityRequest{
   google.protobuf.FieldMask update_mask = 13;
 }
 
-message CreateLiabilityResponse {
-  bool success = 1;
-  string id = 2;
-}
-
 message LiabilityArrayResponse { 
   bool success = 1;
   repeated Liability liability = 2;

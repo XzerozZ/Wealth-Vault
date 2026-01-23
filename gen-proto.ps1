@@ -43,19 +43,19 @@ protoc `
   --proto_path=. `
   --go_out=services/user-service/pkg/pb --go_opt=paths=source_relative `
   --go-grpc_out=services/user-service/pkg/pb --go-grpc_opt=paths=source_relative `
-  proto/user/user.proto
+  proto/user/*.proto
 
 protoc `
   --proto_path=. `
   --go_out=services/auth-service/pkg/pb --go_opt=paths=source_relative `
   --go-grpc_out=services/auth-service/pkg/pb --go-grpc_opt=paths=source_relative `
-  proto/user/user.proto
+  proto/user/*.proto
 
 protoc `
   --proto_path=. `
   --go_out=api-gateway/pkg/pb --go_opt=paths=source_relative `
   --go-grpc_out=api-gateway/pkg/pb --go-grpc_opt=paths=source_relative `
-  proto/user/user.proto
+  proto/user/*.proto
 
 # =========================
 # ASSET PROTO

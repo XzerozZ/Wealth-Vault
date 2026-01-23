@@ -125,9 +125,11 @@ func (h *AssetHandler) CreateAsset(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	assetInfo := mapper.ToAssetDomain(res.Asset)
+
 	return c.JSON(fiber.Map{
 		"status": "create asset success",
-		"data":   res,
+		"data":   assetInfo,
 	})
 }
 

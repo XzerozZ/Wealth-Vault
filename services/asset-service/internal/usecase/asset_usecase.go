@@ -27,7 +27,7 @@ func NewAssetUsecase(r repo.AssetRepository, fr repo.FileRepository, s *utils.St
 	}
 }
 
-func (u *AssetUsecase) CreateAsset(ctx context.Context, req *pb.CreateAssetRequest) (*pb.CreateAssetResponse, error) {
+func (u *AssetUsecase) CreateAsset(ctx context.Context, req *pb.CreateAssetRequest) (*pb.AssetResponse, error) {
 	userID, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
@@ -64,9 +64,9 @@ func (u *AssetUsecase) CreateAsset(ctx context.Context, req *pb.CreateAssetReque
 		return nil, err
 	}
 
-	return &pb.CreateAssetResponse{
+	return &pb.AssetResponse{
 		Success: true,
-		Id:      asset.ID.String(),
+		Asset:   utils.ToAssetProto(asset),
 	}, nil
 }
 
