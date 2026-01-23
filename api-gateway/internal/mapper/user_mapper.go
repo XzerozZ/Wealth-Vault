@@ -18,8 +18,24 @@ func ToUserDomain(p *pb.User) *domain.User {
 		Lastname:    p.Lastname,
 		Phonenumber: p.Phonenumber,
 		Profile:     p.Profile,
-		Birthday:    p.Birthday,
+		Birthday:    TimeToPtr(p.Birthday.AsTime()),
 		CreatedAt:   p.CreatedAt.AsTime(),
 		UpdatedAt:   p.UpdatedAt.AsTime(),
 	}
+}
+
+func ToUserList(pbList []*pb.User) []domain.User {
+	if pbList == nil {
+		return []domain.User{}
+	}
+
+	entities := make([]domain.User, 0, len(pbList))
+
+	for _, pbItem := range pbList {
+		if item := ToUserDomain(pbItem); item != nil {
+			entities = append(entities, *item)
+		}
+	}
+
+	return entities
 }

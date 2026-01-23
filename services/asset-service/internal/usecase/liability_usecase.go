@@ -27,7 +27,7 @@ func NewLiabilityUsecase(r repo.LiabilityRepository, fr repo.FileRepository, s *
 	}
 }
 
-func (u *LiabilityUsecase) CreateLiability(ctx context.Context, req *pb.CreateLiabilityRequest) (*pb.CreateLiabilityResponse, error) {
+func (u *LiabilityUsecase) CreateLiability(ctx context.Context, req *pb.CreateLiabilityRequest) (*pb.LiabilityResponse, error) {
 	userID, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, errors.New("invalid user id")
@@ -73,9 +73,9 @@ func (u *LiabilityUsecase) CreateLiability(ctx context.Context, req *pb.CreateLi
 		return nil, err
 	}
 
-	return &pb.CreateLiabilityResponse{
-		Success: true,
-		Id:      liability.ID.String(),
+	return &pb.LiabilityResponse{
+		Success:   true,
+		Liability: utils.ToLiabilityProto(liability),
 	}, nil
 }
 

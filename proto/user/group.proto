@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/user/user.proto";
+
+message Group {
+  string id = 1;
+  string name = 2;
+  string profile = 3;
+  string user_id = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  int64 member_count = 7;
+}
+
+message CreateGroupRequest {
+  string name = 1;
+  string profile = 2;
+  string creator_id= 3;
+  repeated string member_ids = 4;
+}
+
+message GroupResponse {
+  Group group = 1;
+}
+
+message GetGroupMembersRequest {
+  string group_id = 1;
+  string user_id = 2;
+}
+
+message GetGroupRequest {
+  string group_id = 1;
+  string user_id = 2;
+}
+
+message GetGroupMembersResponse {
+  repeated User members = 1; 
+  int64 total = 2;         
+}
+
+message UpdateGroupRequest {
+  string id = 1;
+  string user_id = 2;
+  string name = 3;
+  string profile = 4;
+  google.protobuf.FieldMask update_mask = 5;
+}

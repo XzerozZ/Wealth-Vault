@@ -73,6 +73,15 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		})
 	}
 
+	var birthDate *time.Time
+	if req.Birthday != "" {
+		t, err := time.Parse("2006-01-02", req.Birthday)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid start_at format (use YYYY-MM-DD)"})
+		}
+		birthDate = &t
+	}
+
 	fileHeader, err := c.FormFile("profile_image")
 	if err == nil {
 
@@ -108,15 +117,13 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	defer cancel()
 
 	res, err := h.client.UpdateUser(ctx, &pb.UpdateUserRequest{
-		Id: userID,
-		User: &pb.User{
-			Firstname:   req.Firstname,
-			Lastname:    req.Lastname,
-			Username:    req.Username,
-			Profile:     req.Profile,
-			Phonenumber: req.Phonenumber,
-			Birthday:    req.Birthday,
-		},
+		Id:          userID,
+		Firstname:   req.Firstname,
+		Lastname:    req.Lastname,
+		Username:    req.Username,
+		Profile:     req.Profile,
+		Phonenumber: req.Phonenumber,
+		Birthday:    utils.ToProtoTime(birthDate),
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: paths,
 		},
@@ -130,5 +137,61 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"status": "update success",
 		"data":   userInfo,
+	})
+}
+
+func (h *UserHandler) AddFriend(c *fiber.Ctx) error {
+	id := c.Params("friendID")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.AddFriend(ctx, &pb.FriendRequest{
+		Id:     userID,
+		UserId: id,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"status": "add friend success",
+		"data":   res,
+	})
+}
+
+func (h *UserHandler) GetFriendList(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.GetFriendList(ctx, &pb.GetUserByIDRequest{
+		Id: userID,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	userInfo := mapper.ToUserDomain(res.User)
+	friendInfo := mapper.ToUserList(res.Friends)
+
+	return c.JSON(fiber.Map{
+		"status": "get friend success",
+		"data": fiber.Map{
+			"user":    userInfo,
+			"friends": friendInfo,
+		},
 	})
 }

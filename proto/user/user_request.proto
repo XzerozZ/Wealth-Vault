@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "proto/user/user.proto";
+import "proto/user/group.proto";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (UserResponse);
+  rpc GetUser(GetUserByIDRequest) returns (UserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc GetFriendList(GetUserByIDRequest) returns (FriendListResponse);
+  rpc AddFriend(FriendRequest) returns (FriendResponse);
+
+  rpc CreateGroup(CreateGroupRequest) returns (GroupResponse);
+  rpc GetGroup(GetGroupRequest) returns (GroupResponse);
+  rpc GetMember(GetGroupMembersRequest) returns (GetGroupMembersResponse);
+  rpc UpdateGroup(UpdateGroupRequest) returns (GroupResponse);
+}

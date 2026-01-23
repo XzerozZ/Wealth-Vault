@@ -12,7 +12,7 @@ type AssetType string
 const (
 	AssetTypeCash       AssetType = "CASH"
 	AssetTypeBank       AssetType = "BANK"
-	AssetTypeInvestment AssetType = "INVESTMENT" // หุ้น, Crypto, กองทุน
+	AssetTypeInvestment AssetType = "INVESTMENT"
 	AssetTypeRealEstate AssetType = "REAL_ESTATE"
 	AssetTypeInsurance  AssetType = "INSURANCE"
 )

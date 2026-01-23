@@ -36,12 +36,12 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AssetServiceClient interface {
-	CreateAsset(ctx context.Context, in *CreateAssetRequest, opts ...grpc.CallOption) (*CreateAssetResponse, error)
+	CreateAsset(ctx context.Context, in *CreateAssetRequest, opts ...grpc.CallOption) (*AssetResponse, error)
 	UpdateAsset(ctx context.Context, in *UpdateAssetRequest, opts ...grpc.CallOption) (*AssetResponse, error)
 	GetAsset(ctx context.Context, in *GetAssetRequest, opts ...grpc.CallOption) (*AssetArrayResponse, error)
 	GetAssetByID(ctx context.Context, in *GetAssetByIDRequest, opts ...grpc.CallOption) (*AssetResponse, error)
 	DeleteAsset(ctx context.Context, in *DeleteAssetRequest, opts ...grpc.CallOption) (*DeleteAssetResponse, error)
-	CreateLiability(ctx context.Context, in *CreateLiabilityRequest, opts ...grpc.CallOption) (*CreateLiabilityResponse, error)
+	CreateLiability(ctx context.Context, in *CreateLiabilityRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
 	GetLiability(ctx context.Context, in *GetLiabilityRequest, opts ...grpc.CallOption) (*LiabilityArrayResponse, error)
 	GetLiabilityByID(ctx context.Context, in *GetLiabilityByIDRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
 	UpdateLiability(ctx context.Context, in *UpdateLiabilityRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
@@ -58,9 +58,9 @@ func NewAssetServiceClient(cc grpc.ClientConnInterface) AssetServiceClient {
 	return &assetServiceClient{cc}
 }
 
-func (c *assetServiceClient) CreateAsset(ctx context.Context, in *CreateAssetRequest, opts ...grpc.CallOption) (*CreateAssetResponse, error) {
+func (c *assetServiceClient) CreateAsset(ctx context.Context, in *CreateAssetRequest, opts ...grpc.CallOption) (*AssetResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateAssetResponse)
+	out := new(AssetResponse)
 	err := c.cc.Invoke(ctx, AssetService_CreateAsset_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -108,9 +108,9 @@ func (c *assetServiceClient) DeleteAsset(ctx context.Context, in *DeleteAssetReq
 	return out, nil
 }
 
-func (c *assetServiceClient) CreateLiability(ctx context.Context, in *CreateLiabilityRequest, opts ...grpc.CallOption) (*CreateLiabilityResponse, error) {
+func (c *assetServiceClient) CreateLiability(ctx context.Context, in *CreateLiabilityRequest, opts ...grpc.CallOption) (*LiabilityResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateLiabilityResponse)
+	out := new(LiabilityResponse)
 	err := c.cc.Invoke(ctx, AssetService_CreateLiability_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -172,12 +172,12 @@ func (c *assetServiceClient) GetNetWorth(ctx context.Context, in *GetNetWorthReq
 // All implementations must embed UnimplementedAssetServiceServer
 // for forward compatibility.
 type AssetServiceServer interface {
-	CreateAsset(context.Context, *CreateAssetRequest) (*CreateAssetResponse, error)
+	CreateAsset(context.Context, *CreateAssetRequest) (*AssetResponse, error)
 	UpdateAsset(context.Context, *UpdateAssetRequest) (*AssetResponse, error)
 	GetAsset(context.Context, *GetAssetRequest) (*AssetArrayResponse, error)
 	GetAssetByID(context.Context, *GetAssetByIDRequest) (*AssetResponse, error)
 	DeleteAsset(context.Context, *DeleteAssetRequest) (*DeleteAssetResponse, error)
-	CreateLiability(context.Context, *CreateLiabilityRequest) (*CreateLiabilityResponse, error)
+	CreateLiability(context.Context, *CreateLiabilityRequest) (*LiabilityResponse, error)
 	GetLiability(context.Context, *GetLiabilityRequest) (*LiabilityArrayResponse, error)
 	GetLiabilityByID(context.Context, *GetLiabilityByIDRequest) (*LiabilityResponse, error)
 	UpdateLiability(context.Context, *UpdateLiabilityRequest) (*LiabilityResponse, error)
@@ -194,7 +194,7 @@ type AssetServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAssetServiceServer struct{}
 
-func (UnimplementedAssetServiceServer) CreateAsset(context.Context, *CreateAssetRequest) (*CreateAssetResponse, error) {
+func (UnimplementedAssetServiceServer) CreateAsset(context.Context, *CreateAssetRequest) (*AssetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateAsset not implemented")
 }
 func (UnimplementedAssetServiceServer) UpdateAsset(context.Context, *UpdateAssetRequest) (*AssetResponse, error) {
@@ -209,7 +209,7 @@ func (UnimplementedAssetServiceServer) GetAssetByID(context.Context, *GetAssetBy
 func (UnimplementedAssetServiceServer) DeleteAsset(context.Context, *DeleteAssetRequest) (*DeleteAssetResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteAsset not implemented")
 }
-func (UnimplementedAssetServiceServer) CreateLiability(context.Context, *CreateLiabilityRequest) (*CreateLiabilityResponse, error) {
+func (UnimplementedAssetServiceServer) CreateLiability(context.Context, *CreateLiabilityRequest) (*LiabilityResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateLiability not implemented")
 }
 func (UnimplementedAssetServiceServer) GetLiability(context.Context, *GetLiabilityRequest) (*LiabilityArrayResponse, error) {

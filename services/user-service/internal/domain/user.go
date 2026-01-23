@@ -7,16 +7,17 @@ import (
 )
 
 type User struct {
-	ID          uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
-	Email       string    `gorm:"not null;uniqueIndex"`
-	Firstname   string
-	Lastname    string
-	Username    string `gorm:"not null"`
-	Profile     string
-	Phonenumber string
-	Birthday    time.Time `gorm:"type:date"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID           uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	Email        string    `gorm:"not null;uniqueIndex"`
+	Firstname    string
+	Lastname     string
+	Username     string `gorm:"not null"`
+	Profile      string
+	Phonenumber  string
+	Birthday     *time.Time `gorm:"type:date"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+	JoinedGroups []GroupMember `gorm:"foreignKey:UserID"`
 }
 
 type FriendList struct {

@@ -46,9 +46,10 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 	userHandler := handlers.NewUserHandler(userClient, supabaseClient)
 	authHandler := handlers.NewAuthHandler(authClient)
 	assetHandler := handlers.NewAssetHandler(assetClient, supabaseClient)
-	liaHanlder := handlers.NewLiabilityHandler(assetClient, supabaseClient)
+	liaHandler := handlers.NewLiabilityHandler(assetClient, supabaseClient)
+	groupHandler := handlers.NewGroupHandler(userClient, supabaseClient)
 	// ---------- routes ----------
-	routes.Setup(app, cfg.JWT, userHandler, authHandler, assetHandler, liaHanlder)
+	routes.Setup(app, cfg.JWT, userHandler, authHandler, assetHandler, liaHandler, groupHandler)
 
 	return app
 }

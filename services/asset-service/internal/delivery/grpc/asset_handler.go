@@ -19,7 +19,7 @@ func NewAssetGRPCHandler(au usecase.AssetUsecase, lu usecase.LiabilityUsecase) *
 	}
 }
 
-func (h *AssetGRPCHandler) CreateAsset(ctx context.Context, req *pb.CreateAssetRequest) (*pb.CreateAssetResponse, error) {
+func (h *AssetGRPCHandler) CreateAsset(ctx context.Context, req *pb.CreateAssetRequest) (*pb.AssetResponse, error) {
 	res, err := h.assetusecase.CreateAsset(ctx, req)
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (h *AssetGRPCHandler) CreateAsset(ctx context.Context, req *pb.CreateAssetR
 	return res, nil
 }
 
-func (h *AssetGRPCHandler) CreateLiability(ctx context.Context, req *pb.CreateLiabilityRequest) (*pb.CreateLiabilityResponse, error) {
+func (h *AssetGRPCHandler) CreateLiability(ctx context.Context, req *pb.CreateLiabilityRequest) (*pb.LiabilityResponse, error) {
 	res, err := h.liausecase.CreateLiability(ctx, req)
 	if err != nil {
 		return nil, err
