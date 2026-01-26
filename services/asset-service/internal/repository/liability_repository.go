@@ -41,14 +41,9 @@ func (r *LiabilityRepository) GetLiabilityByID(ctx context.Context, id uuid.UUID
 	return &lia, nil
 }
 
-func (r *LiabilityRepository) UpdateLiability(ctx context.Context, lia *domain.Liability, mask []string) (*domain.Liability, error) {
+func (r *LiabilityRepository) UpdateLiability(ctx context.Context, lia *domain.Liability) (*domain.Liability, error) {
 	return lia, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		query := tx.Model(lia).Where("id = ? AND user_id = ?", lia.ID, lia.UserID)
-		if len(mask) > 0 {
-			query = query.Select(mask)
-		}
-
-		if err := query.Updates(lia).Error; err != nil {
+		if err := tx.Save(lia).Error; err != nil {
 			return err
 		}
 

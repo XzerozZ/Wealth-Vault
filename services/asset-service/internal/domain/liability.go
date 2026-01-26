@@ -9,8 +9,8 @@ import (
 type LiabilityType string
 
 const (
-	LiabilityTypeLoan    LiabilityType = "LOAN"    // หนี้
-	LiabilityTypeExpense LiabilityType = "EXPENSE" // ค่าใช้จ่ายต่อเนื่อง
+	LiabilityTypeLoan    LiabilityType = "Loan"    // หนี้
+	LiabilityTypeExpense LiabilityType = "Expense" // ค่าใช้จ่ายต่อเนื่อง
 )
 
 type Liability struct {

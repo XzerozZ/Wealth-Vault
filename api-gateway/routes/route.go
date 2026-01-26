@@ -13,7 +13,12 @@ func Setup(
 	jwt configs.JWT,
 	userHandler *handlers.UserHandler,
 	authHandler *handlers.AuthHandler,
-	assetHandler *handlers.AssetHandler,
+	accHandler *handlers.AccountHandler,
+	cashHandler *handlers.CashHandler,
+	inHandler *handlers.InvestmentHandler,
+	buHandler *handlers.BuildingHandler,
+	landHandler *handlers.LandHandler,
+	insHandler *handlers.InsuranceHandler,
 	liaHandler *handlers.LiabilityHandler,
 	groupHandler *handlers.GroupHandler,
 ) {
@@ -34,11 +39,41 @@ func Setup(
 	api.Get("/group/member/:id", middleware.JWTMiddleware(jwt), groupHandler.GetMember)
 	api.Patch("/group/:id", middleware.JWTMiddleware(jwt), groupHandler.UpdateGroup)
 
-	api.Post("/asset", middleware.JWTMiddleware(jwt), assetHandler.CreateAsset)
-	api.Get("/asset", middleware.JWTMiddleware(jwt), assetHandler.GetAsset)
-	api.Get("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.GetAssetByID)
-	api.Patch("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.UpdateAsset)
-	api.Delete("/asset/:id", middleware.JWTMiddleware(jwt), assetHandler.DeleteAsset)
+	api.Post("/asset/account", middleware.JWTMiddleware(jwt), accHandler.CreateAccount)
+	api.Get("/asset/account", middleware.JWTMiddleware(jwt), accHandler.GetAccount)
+	api.Get("/asset/account/:id", middleware.JWTMiddleware(jwt), accHandler.GetAccountByID)
+	api.Patch("/asset/account/:id", middleware.JWTMiddleware(jwt), accHandler.UpdateAccount)
+	api.Delete("/asset/account/:id", middleware.JWTMiddleware(jwt), accHandler.DeleteAccount)
+
+	api.Post("/asset/invest", middleware.JWTMiddleware(jwt), inHandler.CreateInvestment)
+	api.Get("/asset/invest", middleware.JWTMiddleware(jwt), inHandler.GetInvestment)
+	api.Get("/asset/invest/:id", middleware.JWTMiddleware(jwt), inHandler.GetInvestmentByID)
+	api.Patch("/asset/invest/:id", middleware.JWTMiddleware(jwt), inHandler.UpdateInvestment)
+	api.Delete("/asset/invest/:id", middleware.JWTMiddleware(jwt), inHandler.DeleteInvestment)
+
+	api.Post("/asset/cash", middleware.JWTMiddleware(jwt), cashHandler.CreateCash)
+	api.Get("/asset/cash", middleware.JWTMiddleware(jwt), cashHandler.GetCash)
+	api.Get("/asset/cash/:id", middleware.JWTMiddleware(jwt), cashHandler.GetCashByID)
+	api.Patch("/asset/cash/:id", middleware.JWTMiddleware(jwt), cashHandler.UpdateCash)
+	api.Delete("/asset/cash/:id", middleware.JWTMiddleware(jwt), cashHandler.DeleteCash)
+
+	api.Post("/asset/building", middleware.JWTMiddleware(jwt), buHandler.CreateBuilding)
+	api.Get("/asset/building", middleware.JWTMiddleware(jwt), buHandler.GetBuilding)
+	api.Get("/asset/building/:id", middleware.JWTMiddleware(jwt), buHandler.GetBuildingByID)
+	api.Patch("/asset/building/:id", middleware.JWTMiddleware(jwt), buHandler.UpdateBuilding)
+	api.Delete("/asset/building/:id", middleware.JWTMiddleware(jwt), buHandler.DeleteBuilding)
+
+	api.Post("/asset/land", middleware.JWTMiddleware(jwt), landHandler.CreateLand)
+	api.Get("/asset/land", middleware.JWTMiddleware(jwt), landHandler.GetLand)
+	api.Get("/asset/land/:id", middleware.JWTMiddleware(jwt), landHandler.GetLandByID)
+	api.Patch("/asset/land/:id", middleware.JWTMiddleware(jwt), landHandler.UpdateLand)
+	api.Delete("/asset/land/:id", middleware.JWTMiddleware(jwt), landHandler.DeleteLand)
+
+	api.Post("/asset/insurance", middleware.JWTMiddleware(jwt), insHandler.CreateInsurance)
+	api.Get("/asset/insurance", middleware.JWTMiddleware(jwt), insHandler.GetInsurance)
+	api.Get("/asset/insurance/:id", middleware.JWTMiddleware(jwt), insHandler.GetInsuranceByID)
+	api.Patch("/asset/insurance/:id", middleware.JWTMiddleware(jwt), insHandler.UpdateInsurance)
+	api.Delete("/asset/insurance/:id", middleware.JWTMiddleware(jwt), insHandler.DeleteInsurance)
 
 	api.Post("/lia", middleware.JWTMiddleware(jwt), liaHandler.CreateLiability)
 	api.Get("/lia", middleware.JWTMiddleware(jwt), liaHandler.GetLiability)

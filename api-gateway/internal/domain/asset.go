@@ -40,14 +40,6 @@ type RealEstateDetail struct {
 	LinkedAssetIDs []string `json:"linked_asset_ids"`
 }
 
-type Location struct {
-	Address     string `json:"address"`
-	SubDistrict string `json:"sub_district"`
-	District    string `json:"district"`
-	Province    string `json:"province"`
-	PostalCode  string `json:"postal_code"`
-}
-
 type InsuranceDetail struct {
 	SubType        int       `json:"sub_type"`
 	PolicyNumber   string    `json:"policy_number"`

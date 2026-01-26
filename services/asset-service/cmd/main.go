@@ -24,15 +24,26 @@ func main() {
 
 	supabaseClient, err := storageclient.NewStorageClient(cfg.SUPA.URL, cfg.SUPA.Key, cfg.SUPA.Bucket)
 	// ------ Repository------
-	assetRepo := repo.NewAssetRepository(db)
+	accRepo := repo.NewAccountRepository(db)
+	cashRepo := repo.NewCashRepository(db)
+	inRepo := repo.NewInvestmentRepository(db)
+	buRepo := repo.NewBuildingRepository(db)
+	landRepo := repo.NewLandRepository(db)
+	insRepo := repo.NewInsuranceRepository(db)
 	fileRepo := repo.NewFileRepository(db)
 	liaRepo := repo.NewLiabilityRepository(db)
 
 	// ------ Usecase------
-	assetUC := usecase.NewAssetUsecase(assetRepo, fileRepo, supabaseClient)
+	accUC := usecase.NewAccountUsecase(accRepo, fileRepo, supabaseClient)
+	cashUC := usecase.NewCashUsecase(cashRepo, fileRepo, supabaseClient)
+	inUC := usecase.NewInvestmentUsecase(inRepo, fileRepo, supabaseClient)
+	buUC := usecase.NewBuildingUsecase(buRepo, fileRepo, supabaseClient)
+	landUC := usecase.NewLandUsecase(landRepo, fileRepo, supabaseClient)
+	insUC := usecase.NewInsuranceUsecase(insRepo, fileRepo, supabaseClient)
 	liaUC := usecase.NewLiabilityUsecase(liaRepo, fileRepo, supabaseClient)
+
 	// ------Handler------
-	assetHandler := handler.NewAssetGRPCHandler(assetUC, liaUC)
+	assetHandler := handler.NewAssetGRPCHandler(accUC, cashUC, inUC, buUC, landUC, insUC, liaUC)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {

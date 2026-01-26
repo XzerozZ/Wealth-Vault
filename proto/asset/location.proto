@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+
+
+message Reference {
+  string id = 1;
+  string name = 2;
+}
+
+message Location {
+  string id = 1;
+  string address = 2;
+  string subdistrict = 3;
+  string district = 4;
+  string province = 5;
+  string postal_code = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}

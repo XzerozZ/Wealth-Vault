@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/asset/file.proto";
+
+message Cash {
+  string id = 1; 
+  string user_id = 2;
+  string name = 3;
+  double amount = 4; 
+  string description = 5;
+  repeated FileInfo files = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message CreateCashRequest { 
+  string user_id = 1;
+  string name = 2;
+  double amount = 3;
+  string description = 4;
+  repeated FileInfo new_files = 5;
+}
+
+message UpdateCashRequest{
+  string id = 1; 
+  Cash cash = 2;
+  repeated FileInfo new_files = 3;
+  repeated string delete_file_ids = 4;
+  google.protobuf.FieldMask update_mask = 5;
+}
+
+message CashArrayResponse { 
+  bool success = 1;
+  repeated Cash cash = 2;
+}
+
+message  CashResponse { 
+  bool success = 1;
+  Cash cash = 2; 
+}

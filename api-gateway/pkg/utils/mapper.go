@@ -9,6 +9,7 @@ import (
 
 func GetFieldMaskPaths(c *fiber.Ctx, out interface{}) ([]string, error) {
 	var inputKeys []string
+
 	contentType := c.Get("Content-Type")
 	if strings.HasPrefix(contentType, "multipart/form-data") {
 		form, err := c.MultipartForm()
@@ -19,7 +20,6 @@ func GetFieldMaskPaths(c *fiber.Ctx, out interface{}) ([]string, error) {
 		for k := range form.Value {
 			inputKeys = append(inputKeys, k)
 		}
-
 		for k := range form.File {
 			inputKeys = append(inputKeys, k)
 		}
@@ -29,13 +29,30 @@ func GetFieldMaskPaths(c *fiber.Ctx, out interface{}) ([]string, error) {
 		return []string{}, nil
 	}
 
-	fieldMap := make(map[string]string)
 	v := reflect.ValueOf(out)
 	if v.Kind() == reflect.Ptr {
 		v = v.Elem()
 	}
-	t := v.Type()
 
+	fieldMap := make(map[string]string)
+	buildFieldMap(v.Type(), "", fieldMap)
+
+	uniquePaths := make(map[string]bool)
+	var paths []string
+
+	for _, key := range inputKeys {
+		if target, ok := fieldMap[key]; ok {
+			if !uniquePaths[target] {
+				paths = append(paths, target)
+				uniquePaths[target] = true
+			}
+		}
+	}
+
+	return paths, nil
+}
+
+func buildFieldMap(t reflect.Type, prefix string, fieldMap map[string]string) {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 
@@ -54,20 +71,21 @@ func GetFieldMaskPaths(c *fiber.Ctx, out interface{}) ([]string, error) {
 			maskTarget = inputKey
 		}
 
-		fieldMap[inputKey] = maskTarget
-	}
+		fullInputKey := inputKey
+		fullMask := maskTarget
 
-	uniquePaths := make(map[string]bool)
-	var paths []string
-
-	for _, key := range inputKeys {
-		if target, found := fieldMap[key]; found {
-			if !uniquePaths[target] {
-				paths = append(paths, target)
-				uniquePaths[target] = true
-			}
+		if prefix != "" {
+			fullInputKey = prefix + "." + inputKey
+			fullMask = prefix + "." + maskTarget
 		}
-	}
 
-	return paths, nil
+		if field.Type.Kind() == reflect.Struct &&
+			field.Type.String() != "time.Time" {
+
+			buildFieldMap(field.Type, fullInputKey, fieldMap)
+			continue
+		}
+
+		fieldMap[fullInputKey] = fullMask
+	}
 }

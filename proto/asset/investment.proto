@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/asset/file.proto";
+
+enum InvestmentType {
+  INVEST_TYPE_UNSPECIFIED = 0;
+  INVEST_TYPE_STOCK_TH = 1;        // หุ้นไทย
+  INVEST_TYPE_STOCK_US = 2;        // หุ้นนอก
+  INVEST_TYPE_MUTUAL_FUND = 3;     // กองทุนรวม
+  INVEST_TYPE_BOND = 4;            // พันธบัตร/หุ้นกู้
+  INVEST_TYPE_CRYPTO = 5;          // Cryptocurrency
+  INVEST_TYPE_GOLD = 6;            // ทองคำ (Digital/Paper)
+}
+
+message Investment {
+  string id = 1; 
+  string user_id = 2;
+  string name = 3;
+  string symbol = 4; 
+  InvestmentType type = 5;
+  string broker_name = 6;
+  double quantity = 7;
+  double cost_price = 8;
+  string description = 9;
+  repeated FileInfo files = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+message CreateInvestmentRequest { 
+  string user_id = 1;
+  string name = 2;
+  string symbol = 3; 
+  InvestmentType type = 4;
+  string broker_name = 5;
+  double quantity = 6;
+  double cost_price = 7;
+  string description = 8;
+  repeated FileInfo new_files = 9;
+}
+
+message UpdateInvestmentRequest{
+  string id = 1; 
+  Investment invest = 2;
+  repeated FileInfo new_files = 3;
+  repeated string delete_file_ids = 4;
+  google.protobuf.FieldMask update_mask = 5;
+}
+
+message InvestmentArrayResponse { 
+  bool success = 1;
+  repeated Investment invest = 2; 
+}
+
+message  InvestmentResponse { 
+  bool success = 1;
+  Investment invest = 2; 
+}

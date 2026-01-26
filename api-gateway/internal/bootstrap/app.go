@@ -42,14 +42,21 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 	if err != nil {
 		log.Fatal("asset service:", err)
 	}
+
 	// ---------- handlers ----------
 	userHandler := handlers.NewUserHandler(userClient, supabaseClient)
 	authHandler := handlers.NewAuthHandler(authClient)
-	assetHandler := handlers.NewAssetHandler(assetClient, supabaseClient)
+	accHandler := handlers.NewAccountHandler(assetClient, supabaseClient)
+	cashHandler := handlers.NewCashHandler(assetClient, supabaseClient)
+	inHandler := handlers.NewInvestmentHandler(assetClient, supabaseClient)
+	buHandler := handlers.NewBuildingHandler(assetClient, supabaseClient)
+	landHandler := handlers.NewLandHandler(assetClient, supabaseClient)
+	insHandler := handlers.NewInsuranceHandler(assetClient, supabaseClient)
 	liaHandler := handlers.NewLiabilityHandler(assetClient, supabaseClient)
 	groupHandler := handlers.NewGroupHandler(userClient, supabaseClient)
+
 	// ---------- routes ----------
-	routes.Setup(app, cfg.JWT, userHandler, authHandler, assetHandler, liaHandler, groupHandler)
+	routes.Setup(app, cfg.JWT, userHandler, authHandler, accHandler, cashHandler, inHandler, buHandler, landHandler, insHandler, liaHandler, groupHandler)
 
 	return app
 }

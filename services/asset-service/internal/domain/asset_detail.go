@@ -16,14 +16,6 @@ type InvestmentDetail struct {
 	CostPrice float64 `json:"cost_price"`
 }
 
-type Location struct {
-	Address     string `json:"address"`
-	SubDistrict string `json:"sub_district"`
-	District    string `json:"district"`
-	Province    string `json:"province"`
-	PostalCode  string `json:"postal_code"`
-}
-
 type RealEstateDetail struct {
 	PropertyType   int      `json:"property_type"`
 	DeedNumber     string   `json:"deed_number"`

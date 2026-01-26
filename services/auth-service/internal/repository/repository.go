@@ -17,7 +17,7 @@ func NewAuthRepository(db *gorm.DB) *AuthRepository {
 }
 
 func (r *AuthRepository) Register(ctx context.Context, auth *domain.AuthAccount) error {
-	if err := r.db.WithContext(ctx).Create(&auth).Error; err != nil {
+	if err := r.db.WithContext(ctx).Create(auth).Error; err != nil {
 		return err
 	}
 	return nil

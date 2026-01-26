@@ -54,15 +54,7 @@ message GetLiabilityByIDRequest {
 
 message UpdateLiabilityRequest{
   string id = 1; 
-  string user_id = 2;
-  string name = 3;
-  string creditor = 4;
-  LiabilityType type = 5; 
-  string description = 6;
-  double principal = 7;
-  double interest_rate  = 8;
-  google.protobuf.Timestamp start_at= 9;
-  google.protobuf.Timestamp end_at = 10;
+  Liability liability = 2;
   repeated FileInfo new_files = 11;
   repeated string delete_file_ids = 12;
   google.protobuf.FieldMask update_mask = 13;

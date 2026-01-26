@@ -386,15 +386,7 @@ func (x *GetLiabilityByIDRequest) GetUserId() string {
 type UpdateLiabilityRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Creditor      string                 `protobuf:"bytes,4,opt,name=creditor,proto3" json:"creditor,omitempty"`
-	Type          LiabilityType          `protobuf:"varint,5,opt,name=type,proto3,enum=asset.LiabilityType" json:"type,omitempty"`
-	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
-	Principal     float64                `protobuf:"fixed64,7,opt,name=principal,proto3" json:"principal,omitempty"`
-	InterestRate  float64                `protobuf:"fixed64,8,opt,name=interest_rate,json=interestRate,proto3" json:"interest_rate,omitempty"`
-	StartAt       *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
-	EndAt         *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=end_at,json=endAt,proto3" json:"end_at,omitempty"`
+	Liability     *Liability             `protobuf:"bytes,2,opt,name=liability,proto3" json:"liability,omitempty"`
 	NewFiles      []*FileInfo            `protobuf:"bytes,11,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
 	DeleteFileIds []string               `protobuf:"bytes,12,rep,name=delete_file_ids,json=deleteFileIds,proto3" json:"delete_file_ids,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,13,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
@@ -439,65 +431,9 @@ func (x *UpdateLiabilityRequest) GetId() string {
 	return ""
 }
 
-func (x *UpdateLiabilityRequest) GetUserId() string {
+func (x *UpdateLiabilityRequest) GetLiability() *Liability {
 	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetCreditor() string {
-	if x != nil {
-		return x.Creditor
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetType() LiabilityType {
-	if x != nil {
-		return x.Type
-	}
-	return LiabilityType_LIABILITY_TYPE_UNSPECIFIED
-}
-
-func (x *UpdateLiabilityRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetPrincipal() float64 {
-	if x != nil {
-		return x.Principal
-	}
-	return 0
-}
-
-func (x *UpdateLiabilityRequest) GetInterestRate() float64 {
-	if x != nil {
-		return x.InterestRate
-	}
-	return 0
-}
-
-func (x *UpdateLiabilityRequest) GetStartAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartAt
-	}
-	return nil
-}
-
-func (x *UpdateLiabilityRequest) GetEndAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.EndAt
+		return x.Liability
 	}
 	return nil
 }
@@ -763,19 +699,10 @@ const file_proto_asset_liability_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"B\n" +
 	"\x17GetLiabilityByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"\xfd\x03\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"\xeb\x01\n" +
 	"\x16UpdateLiabilityRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1a\n" +
-	"\bcreditor\x18\x04 \x01(\tR\bcreditor\x12(\n" +
-	"\x04type\x18\x05 \x01(\x0e2\x14.asset.LiabilityTypeR\x04type\x12 \n" +
-	"\vdescription\x18\x06 \x01(\tR\vdescription\x12\x1c\n" +
-	"\tprincipal\x18\a \x01(\x01R\tprincipal\x12#\n" +
-	"\rinterest_rate\x18\b \x01(\x01R\finterestRate\x125\n" +
-	"\bstart_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\astartAt\x121\n" +
-	"\x06end_at\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\x05endAt\x12,\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
+	"\tliability\x18\x02 \x01(\v2\x10.asset.LiabilityR\tliability\x12,\n" +
 	"\tnew_files\x18\v \x03(\v2\x0f.asset.FileInfoR\bnewFiles\x12&\n" +
 	"\x0fdelete_file_ids\x18\f \x03(\tR\rdeleteFileIds\x12;\n" +
 	"\vupdate_mask\x18\r \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
@@ -831,18 +758,16 @@ var file_proto_asset_liability_proto_depIdxs = []int32{
 	10, // 7: asset.CreateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
 	10, // 8: asset.CreateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
 	11, // 9: asset.CreateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	9,  // 10: asset.UpdateLiabilityRequest.type:type_name -> asset.LiabilityType
-	10, // 11: asset.UpdateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
-	10, // 12: asset.UpdateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
-	11, // 13: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	12, // 14: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 15: asset.LiabilityArrayResponse.liability:type_name -> asset.Liability
-	0,  // 16: asset.LiabilityResponse.liability:type_name -> asset.Liability
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	0,  // 10: asset.UpdateLiabilityRequest.liability:type_name -> asset.Liability
+	11, // 11: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
+	12, // 12: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 13: asset.LiabilityArrayResponse.liability:type_name -> asset.Liability
+	0,  // 14: asset.LiabilityResponse.liability:type_name -> asset.Liability
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_liability_proto_init() }
