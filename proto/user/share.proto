@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "proto/user/preview.proto";
+
+message ShareTarget {
+  string id = 1;
+  google.protobuf.Timestamp share_at = 2;
+}
+
+message ShareItemRequest {
+  string user_id = 1;        
+  repeated string item_ids = 2;
+  repeated string item_types = 3;
+  repeated ShareTarget groups = 4;
+  repeated ShareTarget friends = 5;
+  repeated ShareTarget emails = 6;    
+}
+
+message ShareItemResponse {
+  bool finish = 1;
+}
+
+message GetGroupItemsRequest {
+  string group_id = 1;
+  string user_id = 2;
+}
+
+message GetFriendItemRequest {
+  string friend_id = 1;
+  string user_id = 2;
+}
+
+message GetGroupItemsResponse {
+  repeated GroupItemDetail items = 1;
+}
+
+message GroupItemDetail {
+  string group_item_id = 1;
+  string shared_by = 2; 
+  google.protobuf.Timestamp shared_at = 3;
+  AssetPreview asset_detail = 4;
+}
+
+message GetFriendItemsResponse {
+  repeated FriendItemDetail items = 1;
+}
+
+message FriendItemDetail {
+  string friend_item_id = 1; 
+  string shared_by = 2;     
+  google.protobuf.Timestamp shared_at = 3;
+  AssetPreview asset_detail = 4;
+}
+
+message UnshareItemRequest {
+  string item_id  = 1; 
+  string user_id = 2;    
+}

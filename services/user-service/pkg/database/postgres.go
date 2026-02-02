@@ -34,8 +34,10 @@ func InitDB(config configs.PostgreSQL) {
 		&domain.Group{},
 		&domain.GroupMember{},
 		&domain.GroupItem{},
+		&domain.GroupItemViewer{},
+		&domain.FriendItem{},
+		&domain.EmailItem{},
 		&domain.GroupLog{},
-		&domain.Notification{},
 	)
 
 	log.Println("Database connection established successfully!")

@@ -23,10 +23,13 @@ func NewAuthCronJob(u usecase.AuthUsecase) *AuthCronJob {
 
 func (j *AuthCronJob) Start() {
 	bkk, _ := time.LoadLocation("Asia/Bangkok")
-	c := cron.New(cron.WithLocation(bkk))
-	_, err := c.AddFunc("@daily", j.runCleanup)
-	if err != nil {
-		log.Fatalf("Error adding cron job: %v", err)
+	j.cron = cron.New(cron.WithLocation(bkk))
+	if _, err := j.cron.AddFunc("@daily", j.runCleanup); err != nil {
+		log.Fatalf("Error adding cleanup job: %v", err)
+	}
+
+	if _, err := j.cron.AddFunc("@every 1h", j.runCleanupOTP); err != nil {
+		log.Fatalf("Error adding OTP cleanup job: %v", err)
 	}
 
 	j.cron.Start()
@@ -40,6 +43,19 @@ func (j *AuthCronJob) runCleanup() {
 	defer cancel()
 
 	if err := j.usecase.CleanupSessions(ctx); err != nil {
+		log.Printf("Cleanup failed: %v\n", err)
+	} else {
+		log.Println("Cleanup completed successfully")
+	}
+}
+
+func (j *AuthCronJob) runCleanupOTP() {
+	log.Println("Start session cleanup OTP")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := j.usecase.DeleteExpiredOTPs(ctx); err != nil {
 		log.Printf("Cleanup failed: %v\n", err)
 	} else {
 		log.Println("Cleanup completed successfully")

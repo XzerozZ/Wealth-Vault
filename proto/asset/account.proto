@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/asset/file.proto";
+
+enum BankAccType {
+  BANK_ACC_TYPE_UNSPECIFIED = 0;
+  BANK_ACC_TYPE_SAVINGS = 1;       // ออมทรัพย์
+  BANK_ACC_TYPE_CURRENT = 2;       // กระแสรายวัน
+  BANK_ACC_TYPE_FIXED_DEPOSIT = 3; // ฝากประจำ
+}
+
+message Account {
+  string id = 1; 
+  string user_id = 2;
+  string name = 3;
+  string bank_name = 4;
+  string bank_acc = 5;
+  BankAccType type = 6; 
+  double amount = 7; 
+  string description = 8;
+  repeated FileInfo files = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+message CreateAccountRequest { 
+  string user_id = 1;
+  string name = 2;
+  string bank_name = 3;
+  string bank_acc = 4;
+  BankAccType type = 5;
+  double amount = 6;
+  string description = 7;
+  repeated FileInfo new_files = 8;
+}
+
+message UpdateAccountRequest{
+  string id = 1; 
+  Account acc = 2;
+  repeated FileInfo new_files = 3;
+  repeated string delete_file_ids = 4;
+  google.protobuf.FieldMask update_mask = 5;
+}
+
+message AccountArrayResponse { 
+  bool success = 1;
+  repeated Account account = 2; 
+}
+
+message  AccountResponse { 
+  bool success = 1;
+  Account account = 2; 
+}

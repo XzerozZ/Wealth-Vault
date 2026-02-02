@@ -5,56 +5,64 @@ import (
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 )
 
-func ApplyUpdateFields(req *pb.UpdateLiabilityRequest, lia *domain.Liability) ([]string, error) {
-	var updateMask []string
-	has := func(target string) bool {
-		if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
-			return true
-		}
-		for _, p := range req.UpdateMask.Paths {
-			if p == target {
-				return true
+var ProtoToDomainLiType = map[pb.LiabilityType]domain.LiabilityType{
+	pb.LiabilityType_LIABILITY_TYPE_LOAN:    domain.LiabilityTypeLoan,
+	pb.LiabilityType_LIABILITY_TYPE_EXPENSE: domain.LiabilityTypeExpense,
+}
+
+func ApplyUpdateFields(req *pb.UpdateLiabilityRequest, lia *domain.Liability) error {
+	paths := req.UpdateMask.GetPaths()
+	if len(paths) == 0 {
+		return nil
+	}
+
+	for _, path := range paths {
+		switch path {
+		case "name":
+			if req.Liability.Name != "" {
+				lia.Name = req.Liability.Name
+			}
+
+		case "creditor":
+			if req.Liability.Name != "" {
+				lia.Name = req.Liability.Name
+			}
+
+		case "principal":
+			if req.Liability.Principal != 0 {
+				lia.Principal = req.Liability.Principal
+			}
+
+		case "interest_rate":
+			if req.Liability.InterestRate != 0 {
+				lia.InterestRate = req.Liability.InterestRate
+			}
+
+		case "started_at":
+			if req.Liability.StartAt != nil {
+				t := req.Liability.StartAt.AsTime()
+				lia.StartAt = &t
+			}
+
+		case "ended_at":
+			if req.Liability.EndAt != nil {
+				t := req.Liability.EndAt.AsTime()
+				lia.EndAt = &t
+			}
+		case "description":
+			if req.Liability.Description != "" {
+				lia.Description = req.Liability.Description
+			}
+
+		case "type":
+			if req.Liability.Type != pb.LiabilityType_LIABILITY_TYPE_UNSPECIFIED {
+				if val, ok := ProtoToDomainLiType[req.Liability.Type]; ok {
+					lia.Type = val
+				}
 			}
 		}
-		return false
+
 	}
 
-	if has("name") {
-		lia.Name = req.Name
-		updateMask = append(updateMask, "Name")
-	}
-
-	if has("creditor") {
-		lia.Creditor = req.Creditor
-		updateMask = append(updateMask, "Creditor")
-	}
-
-	if has("principal") {
-		lia.Principal = req.Principal
-		updateMask = append(updateMask, "Principal")
-	}
-
-	if has("interest_rate") {
-		lia.InterestRate = req.InterestRate
-		updateMask = append(updateMask, "InterestRate")
-	}
-
-	if has("description") {
-		lia.Description = req.Description
-		updateMask = append(updateMask, "Description")
-	}
-
-	if has("started_at") && req.StartAt != nil {
-		t := req.StartAt.AsTime()
-		lia.StartAt = &t
-		updateMask = append(updateMask, "StartAt")
-	}
-
-	if has("ended_at") && req.EndAt != nil {
-		t := req.EndAt.AsTime()
-		lia.EndAt = &t
-		updateMask = append(updateMask, "EndAt")
-	}
-
-	return updateMask, nil
+	return nil
 }

@@ -23,6 +23,56 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ------Detail Messages------
+type LiabilityType int32
+
+const (
+	LiabilityType_LIABILITY_TYPE_UNSPECIFIED LiabilityType = 0
+	LiabilityType_LIABILITY_TYPE_LOAN        LiabilityType = 1 // หนี้
+	LiabilityType_LIABILITY_TYPE_EXPENSE     LiabilityType = 2 // ค่าใช้จ่ายต่อเนื่อง
+)
+
+// Enum value maps for LiabilityType.
+var (
+	LiabilityType_name = map[int32]string{
+		0: "LIABILITY_TYPE_UNSPECIFIED",
+		1: "LIABILITY_TYPE_LOAN",
+		2: "LIABILITY_TYPE_EXPENSE",
+	}
+	LiabilityType_value = map[string]int32{
+		"LIABILITY_TYPE_UNSPECIFIED": 0,
+		"LIABILITY_TYPE_LOAN":        1,
+		"LIABILITY_TYPE_EXPENSE":     2,
+	}
+)
+
+func (x LiabilityType) Enum() *LiabilityType {
+	p := new(LiabilityType)
+	*p = x
+	return p
+}
+
+func (x LiabilityType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LiabilityType) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_asset_liability_proto_enumTypes[0].Descriptor()
+}
+
+func (LiabilityType) Type() protoreflect.EnumType {
+	return &file_proto_asset_liability_proto_enumTypes[0]
+}
+
+func (x LiabilityType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LiabilityType.Descriptor instead.
+func (LiabilityType) EnumDescriptor() ([]byte, []int) {
+	return file_proto_asset_liability_proto_rawDescGZIP(), []int{0}
+}
+
 type Liability struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	Id                   string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -386,15 +436,7 @@ func (x *GetLiabilityByIDRequest) GetUserId() string {
 type UpdateLiabilityRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Creditor      string                 `protobuf:"bytes,4,opt,name=creditor,proto3" json:"creditor,omitempty"`
-	Type          LiabilityType          `protobuf:"varint,5,opt,name=type,proto3,enum=asset.LiabilityType" json:"type,omitempty"`
-	Description   string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
-	Principal     float64                `protobuf:"fixed64,7,opt,name=principal,proto3" json:"principal,omitempty"`
-	InterestRate  float64                `protobuf:"fixed64,8,opt,name=interest_rate,json=interestRate,proto3" json:"interest_rate,omitempty"`
-	StartAt       *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`
-	EndAt         *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=end_at,json=endAt,proto3" json:"end_at,omitempty"`
+	Liability     *Liability             `protobuf:"bytes,2,opt,name=liability,proto3" json:"liability,omitempty"`
 	NewFiles      []*FileInfo            `protobuf:"bytes,11,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
 	DeleteFileIds []string               `protobuf:"bytes,12,rep,name=delete_file_ids,json=deleteFileIds,proto3" json:"delete_file_ids,omitempty"`
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,13,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
@@ -439,65 +481,9 @@ func (x *UpdateLiabilityRequest) GetId() string {
 	return ""
 }
 
-func (x *UpdateLiabilityRequest) GetUserId() string {
+func (x *UpdateLiabilityRequest) GetLiability() *Liability {
 	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetCreditor() string {
-	if x != nil {
-		return x.Creditor
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetType() LiabilityType {
-	if x != nil {
-		return x.Type
-	}
-	return LiabilityType_LIABILITY_TYPE_UNSPECIFIED
-}
-
-func (x *UpdateLiabilityRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *UpdateLiabilityRequest) GetPrincipal() float64 {
-	if x != nil {
-		return x.Principal
-	}
-	return 0
-}
-
-func (x *UpdateLiabilityRequest) GetInterestRate() float64 {
-	if x != nil {
-		return x.InterestRate
-	}
-	return 0
-}
-
-func (x *UpdateLiabilityRequest) GetStartAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.StartAt
-	}
-	return nil
-}
-
-func (x *UpdateLiabilityRequest) GetEndAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.EndAt
+		return x.Liability
 	}
 	return nil
 }
@@ -727,7 +713,7 @@ var File_proto_asset_liability_proto protoreflect.FileDescriptor
 
 const file_proto_asset_liability_proto_rawDesc = "" +
 	"\n" +
-	"\x1bproto/asset/liability.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/enum.proto\x1a\x16proto/asset/file.proto\"\xb8\x04\n" +
+	"\x1bproto/asset/liability.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xb8\x04\n" +
 	"\tLiability\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
@@ -763,19 +749,10 @@ const file_proto_asset_liability_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"B\n" +
 	"\x17GetLiabilityByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"\xfd\x03\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"\xeb\x01\n" +
 	"\x16UpdateLiabilityRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1a\n" +
-	"\bcreditor\x18\x04 \x01(\tR\bcreditor\x12(\n" +
-	"\x04type\x18\x05 \x01(\x0e2\x14.asset.LiabilityTypeR\x04type\x12 \n" +
-	"\vdescription\x18\x06 \x01(\tR\vdescription\x12\x1c\n" +
-	"\tprincipal\x18\a \x01(\x01R\tprincipal\x12#\n" +
-	"\rinterest_rate\x18\b \x01(\x01R\finterestRate\x125\n" +
-	"\bstart_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\astartAt\x121\n" +
-	"\x06end_at\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\x05endAt\x12,\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
+	"\tliability\x18\x02 \x01(\v2\x10.asset.LiabilityR\tliability\x12,\n" +
 	"\tnew_files\x18\v \x03(\v2\x0f.asset.FileInfoR\bnewFiles\x12&\n" +
 	"\x0fdelete_file_ids\x18\f \x03(\tR\rdeleteFileIds\x12;\n" +
 	"\vupdate_mask\x18\r \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
@@ -790,7 +767,11 @@ const file_proto_asset_liability_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\"3\n" +
 	"\x17DeleteLiabilityResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccessB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\asuccess\x18\x01 \x01(\bR\asuccess*d\n" +
+	"\rLiabilityType\x12\x1e\n" +
+	"\x1aLIABILITY_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13LIABILITY_TYPE_LOAN\x10\x01\x12\x1a\n" +
+	"\x16LIABILITY_TYPE_EXPENSE\x10\x02B\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_asset_liability_proto_rawDescOnce sync.Once
@@ -804,45 +785,44 @@ func file_proto_asset_liability_proto_rawDescGZIP() []byte {
 	return file_proto_asset_liability_proto_rawDescData
 }
 
+var file_proto_asset_liability_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_proto_asset_liability_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_asset_liability_proto_goTypes = []any{
-	(*Liability)(nil),               // 0: asset.Liability
-	(*CreateLiabilityRequest)(nil),  // 1: asset.CreateLiabilityRequest
-	(*GetLiabilityRequest)(nil),     // 2: asset.GetLiabilityRequest
-	(*GetLiabilityByIDRequest)(nil), // 3: asset.GetLiabilityByIDRequest
-	(*UpdateLiabilityRequest)(nil),  // 4: asset.UpdateLiabilityRequest
-	(*LiabilityArrayResponse)(nil),  // 5: asset.LiabilityArrayResponse
-	(*LiabilityResponse)(nil),       // 6: asset.LiabilityResponse
-	(*DeleteLiabilityRequest)(nil),  // 7: asset.DeleteLiabilityRequest
-	(*DeleteLiabilityResponse)(nil), // 8: asset.DeleteLiabilityResponse
-	(LiabilityType)(0),              // 9: asset.LiabilityType
+	(LiabilityType)(0),              // 0: asset.LiabilityType
+	(*Liability)(nil),               // 1: asset.Liability
+	(*CreateLiabilityRequest)(nil),  // 2: asset.CreateLiabilityRequest
+	(*GetLiabilityRequest)(nil),     // 3: asset.GetLiabilityRequest
+	(*GetLiabilityByIDRequest)(nil), // 4: asset.GetLiabilityByIDRequest
+	(*UpdateLiabilityRequest)(nil),  // 5: asset.UpdateLiabilityRequest
+	(*LiabilityArrayResponse)(nil),  // 6: asset.LiabilityArrayResponse
+	(*LiabilityResponse)(nil),       // 7: asset.LiabilityResponse
+	(*DeleteLiabilityRequest)(nil),  // 8: asset.DeleteLiabilityRequest
+	(*DeleteLiabilityResponse)(nil), // 9: asset.DeleteLiabilityResponse
 	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
 	(*FileInfo)(nil),                // 11: asset.FileInfo
 	(*fieldmaskpb.FieldMask)(nil),   // 12: google.protobuf.FieldMask
 }
 var file_proto_asset_liability_proto_depIdxs = []int32{
-	9,  // 0: asset.Liability.type:type_name -> asset.LiabilityType
+	0,  // 0: asset.Liability.type:type_name -> asset.LiabilityType
 	10, // 1: asset.Liability.start_at:type_name -> google.protobuf.Timestamp
 	10, // 2: asset.Liability.end_at:type_name -> google.protobuf.Timestamp
 	11, // 3: asset.Liability.files:type_name -> asset.FileInfo
 	10, // 4: asset.Liability.created_at:type_name -> google.protobuf.Timestamp
 	10, // 5: asset.Liability.updated_at:type_name -> google.protobuf.Timestamp
-	9,  // 6: asset.CreateLiabilityRequest.type:type_name -> asset.LiabilityType
+	0,  // 6: asset.CreateLiabilityRequest.type:type_name -> asset.LiabilityType
 	10, // 7: asset.CreateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
 	10, // 8: asset.CreateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
 	11, // 9: asset.CreateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	9,  // 10: asset.UpdateLiabilityRequest.type:type_name -> asset.LiabilityType
-	10, // 11: asset.UpdateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
-	10, // 12: asset.UpdateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
-	11, // 13: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	12, // 14: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 15: asset.LiabilityArrayResponse.liability:type_name -> asset.Liability
-	0,  // 16: asset.LiabilityResponse.liability:type_name -> asset.Liability
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	1,  // 10: asset.UpdateLiabilityRequest.liability:type_name -> asset.Liability
+	11, // 11: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
+	12, // 12: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 13: asset.LiabilityArrayResponse.liability:type_name -> asset.Liability
+	1,  // 14: asset.LiabilityResponse.liability:type_name -> asset.Liability
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_liability_proto_init() }
@@ -850,20 +830,20 @@ func file_proto_asset_liability_proto_init() {
 	if File_proto_asset_liability_proto != nil {
 		return
 	}
-	file_proto_asset_enum_proto_init()
 	file_proto_asset_file_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_asset_liability_proto_rawDesc), len(file_proto_asset_liability_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_proto_asset_liability_proto_goTypes,
 		DependencyIndexes: file_proto_asset_liability_proto_depIdxs,
+		EnumInfos:         file_proto_asset_liability_proto_enumTypes,
 		MessageInfos:      file_proto_asset_liability_proto_msgTypes,
 	}.Build()
 	File_proto_asset_liability_proto = out.File

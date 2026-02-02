@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"wealth-vault/asset-service/internal/domain"
 
 	"github.com/google/uuid"
@@ -17,61 +16,31 @@ func NewAssetRepository(db *gorm.DB) *AssetRepository {
 	return &AssetRepository{db: db}
 }
 
-func (r *AssetRepository) CreateAsset(ctx context.Context, asset *domain.Asset) error {
-	fmt.Println(asset.IsIncludedInNetWorth)
-	if err := r.db.WithContext(ctx).Create(&asset).Error; err != nil {
-		return err
+func (r *AssetRepository) CheckExists(ctx context.Context, entityType string, id uuid.UUID, uid uuid.UUID) (bool, error) {
+	var count int64
+	var err error
+
+	switch entityType {
+	case "account":
+		err = r.db.WithContext(ctx).Model(&domain.Account{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+	case "investment":
+		err = r.db.WithContext(ctx).Model(&domain.Investment{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+	case "insurance":
+		err = r.db.WithContext(ctx).Model(&domain.Insurance{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+	case "building":
+		err = r.db.WithContext(ctx).Model(&domain.Building{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+	case "land":
+		err = r.db.WithContext(ctx).Model(&domain.Land{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+	case "cash":
+		err = r.db.WithContext(ctx).Model(&domain.Cash{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+	case "liability":
+		err = r.db.WithContext(ctx).Model(&domain.Liability{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+	default:
+		return false, nil
 	}
-	return nil
-}
 
-func (r *AssetRepository) GetAsset(ctx context.Context, uid uuid.UUID) ([]*domain.Asset, error) {
-	var assets []*domain.Asset
-	if err := r.db.WithContext(ctx).Where("user_id = ?", uid).Find(&assets).Error; err != nil {
-		return nil, err
+	if err != nil {
+		return false, err
 	}
-
-	return assets, nil
-}
-
-func (r *AssetRepository) GetAssetByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Asset, error) {
-	var asset domain.Asset
-	if err := r.db.WithContext(ctx).Preload("Files").First(&asset, "id = ? AND user_id = ?", id, uid).Error; err != nil {
-		return nil, err
-	}
-
-	return &asset, nil
-}
-
-func (r *AssetRepository) UpdateAsset(ctx context.Context, asset *domain.Asset, mask []string) (*domain.Asset, error) {
-	return asset, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		query := tx.Model(asset).Where("id = ? AND user_id = ?", asset.ID, asset.UserID)
-		if len(mask) > 0 {
-			query = query.Select(mask)
-		}
-
-		if err := query.Updates(asset).Error; err != nil {
-			return err
-		}
-
-		if err := tx.Preload("Files").First(asset, "id = ?", asset.ID).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
-}
-
-func (r *AssetRepository) DeleteAsset(ctx context.Context, id uuid.UUID, uid uuid.UUID) error {
-	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("entity_id = ? AND entity_type = ?", id, "asset").Delete(&domain.FileAssociate{}).Error; err != nil {
-			return err
-		}
-
-		if err := tx.Where("id = ? AND user_id = ?", id, uid).Delete(&domain.Asset{}).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
+	return count > 0, nil
 }

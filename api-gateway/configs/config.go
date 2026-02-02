@@ -14,6 +14,7 @@ type Configs struct {
 	UserService  User
 	AuthService  Auth
 	AssetService Asset
+	NotiService  Noti
 }
 
 type APP struct {
@@ -41,6 +42,11 @@ type Auth struct {
 }
 
 type Asset struct {
+	Host string
+	Port string
+}
+
+type Noti struct {
 	Host string
 	Port string
 }
@@ -82,6 +88,10 @@ func LoadConfigs() *Configs {
 		AssetService: Asset{
 			Host: requireEnv("ASSET_HOST"),
 			Port: requireEnv("ASSET_PORT"),
+		},
+		NotiService: Noti{
+			Host: requireEnv("NOTI_HOST"),
+			Port: requireEnv("NOTI_PORT"),
 		},
 	}
 }

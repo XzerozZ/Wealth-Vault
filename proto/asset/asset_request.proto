@@ -6,21 +6,72 @@ option go_package = "wealth-vault/pkg/pb";
 
 import "proto/asset/asset.proto";
 import "proto/asset/liability.proto";
+import "proto/asset/account.proto";
+import "proto/asset/cash.proto";
+import "proto/asset/investment.proto";
+import "proto/asset/building.proto";
+import "proto/asset/land.proto";
+import "proto/asset/insurance.proto";
 
 service AssetService {
-  rpc CreateAsset(CreateAssetRequest) returns (AssetResponse);
-  rpc UpdateAsset(UpdateAssetRequest) returns (AssetResponse);
-  rpc GetAsset(GetAssetRequest) returns (AssetArrayResponse);
-  rpc GetAssetByID(GetAssetByIDRequest) returns (AssetResponse);
-  rpc DeleteAsset(DeleteAssetRequest) returns (DeleteAssetResponse);
+  // ------ Account -------
+  rpc CreateAccount(CreateAccountRequest) returns (AccountResponse);
+  rpc UpdateAccount(UpdateAccountRequest) returns (AccountResponse);
+  rpc GetAccount(GetAssetRequest) returns (AccountArrayResponse);
+  rpc GetAccountByID(GetAssetByIDRequest) returns (AccountResponse);
+  rpc DeleteAccount(DeleteAssetRequest) returns (DeleteAssetResponse);
 
+  // ------ Cash -------
+  rpc CreateCash(CreateCashRequest) returns (CashResponse);
+  rpc UpdateCash(UpdateCashRequest) returns (CashResponse);
+  rpc GetCash(GetAssetRequest) returns (CashArrayResponse);
+  rpc GetCashByID(GetAssetByIDRequest) returns (CashResponse);
+  rpc DeleteCash(DeleteAssetRequest) returns (DeleteAssetResponse);
+
+  // ------ Investment -------
+  rpc CreateInvestment(CreateInvestmentRequest) returns (InvestmentResponse);
+  rpc UpdateInvestment(UpdateInvestmentRequest) returns (InvestmentResponse);
+  rpc GetInvestment(GetAssetRequest) returns (InvestmentArrayResponse);
+  rpc GetInvestmentByID(GetAssetByIDRequest) returns (InvestmentResponse);
+  rpc DeleteInvestment(DeleteAssetRequest) returns (DeleteAssetResponse);
+
+  // ------ Building ------
+  rpc CreateBuilding(CreateBuildingRequest) returns (BuildingResponse);
+  rpc UpdateBuilding(UpdateBuildingRequest) returns (BuildingResponse);
+  rpc GetBuilding(GetAssetRequest) returns (BuildingArrayResponse);
+  rpc GetBuildingByID(GetAssetByIDRequest) returns (BuildingResponse);
+  rpc DeleteBuilding(DeleteAssetRequest) returns (DeleteAssetResponse);
+
+  // ------ Land ------
+  rpc CreateLand(CreateLandRequest) returns (LandResponse);
+  rpc UpdateLand(UpdateLandRequest) returns (LandResponse);
+  rpc GetLand(GetAssetRequest) returns (LandArrayResponse);
+  rpc GetLandByID(GetAssetByIDRequest) returns (LandResponse);
+  rpc DeleteLand(DeleteAssetRequest) returns (DeleteAssetResponse);
+
+  // ------ Insurance ------
+  rpc CreateInsurance(CreateInsuranceRequest) returns (InsuranceResponse);
+  rpc UpdateInsurance(UpdateInsuranceRequest) returns (InsuranceResponse);
+  rpc GetInsurance(GetAssetRequest) returns (InsuranceArrayResponse);
+  rpc GetInsuranceByID(GetAssetByIDRequest) returns (InsuranceResponse);
+  rpc DeleteInsurance(DeleteAssetRequest) returns (DeleteAssetResponse);
+
+  // ------ Liability ------
   rpc CreateLiability(CreateLiabilityRequest) returns (LiabilityResponse);
   rpc GetLiability(GetLiabilityRequest) returns (LiabilityArrayResponse);
   rpc GetLiabilityByID(GetLiabilityByIDRequest) returns (LiabilityResponse);
   rpc UpdateLiability(UpdateLiabilityRequest) returns (LiabilityResponse);
   rpc DeleteLiability(DeleteLiabilityRequest) returns (DeleteLiabilityResponse);
 
-  rpc CheckAssetExist(CheckAssetExistRequest) returns (CheckAssetExistResponse);
-  // Dashboard / Wealth
+  // ----- User Service ------
+  rpc CheckAssetExists(CheckAssetRequest) returns (CheckAssetResponse);
+  rpc GetBatchAccount(GetBatchIdsRequest) returns (AccountArrayResponse);
+  rpc GetBatchCash(GetBatchIdsRequest) returns (CashArrayResponse);
+  rpc GetBatchInvestment(GetBatchIdsRequest) returns (InvestmentArrayResponse);
+  rpc GetBatchInsurance(GetBatchIdsRequest) returns (InsuranceArrayResponse);
+  rpc GetBatchBuilding(GetBatchIdsRequest) returns (BuildingArrayResponse);
+  rpc GetBatchLand(GetBatchIdsRequest) returns (LandArrayResponse);
+  rpc GetBatchLiability(GetBatchIdsRequest) returns (LiabilityArrayResponse);
+
   rpc GetNetWorth(GetNetWorthRequest) returns (GetNetWorthResponse);
 }

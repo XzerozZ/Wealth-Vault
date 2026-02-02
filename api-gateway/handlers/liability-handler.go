@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
-	"path/filepath"
 	"strings"
 	"time"
 	"wealth-vault/api-gateway/internal/domain"
@@ -12,7 +10,6 @@ import (
 	"wealth-vault/api-gateway/pkg/utils"
 
 	"github.com/gofiber/fiber/v2"
-	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
@@ -76,41 +73,18 @@ func (h *LiabilityHandler) CreateLiability(c *fiber.Ctx) error {
 
 	inputType := strings.ToUpper(strings.TrimSpace(req.Type))
 	var assetTypeEnum pb.LiabilityType = pb.LiabilityType(mapper.SafeMapEnum(pb.LiabilityType_value, inputType, "LIABILITY_TYPE_"))
-	folderName := utils.GetFolderLiaName(assetTypeEnum)
 	var pbFiles []*pb.FileInfo
 	form, err := c.MultipartForm()
 	if err == nil && form != nil {
 		files := form.File["files"]
 
 		if len(files) > 0 {
-			pbFiles = make([]*pb.FileInfo, len(files))
-			var g errgroup.Group
-
-			for i, fileHeader := range files {
-				index := i
-				f := fileHeader
-				g.Go(func() error {
-					fileData, err := f.Open()
-					if err != nil {
-						return err
-					}
-					defer fileData.Close()
-
-					ext := filepath.Ext(f.Filename)
-					newFileName := fmt.Sprintf("%s/%s-%d-%d%s", folderName, userID, time.Now().UnixNano(), index, ext)
-
-					url, err := h.storage.UploadStream(fileData, newFileName, f.Header.Get("Content-Type"))
-					if err != nil {
-						return err
-					}
-
-					pbFiles[index] = &pb.FileInfo{Url: url, FileType: f.Header.Get("Content-Type")}
-					return nil
-				})
-			}
-			if err := g.Wait(); err != nil {
+			uploadedFiles, err := utils.UploadBatchFiles(files, userID, "liability", h.storage)
+			if err != nil {
 				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 			}
+
+			pbFiles = uploadedFiles
 		}
 	}
 
@@ -255,47 +229,35 @@ func (h *LiabilityHandler) UpdateLiability(c *fiber.Ctx) error {
 
 	var newPbFiles []*pb.FileInfo
 	form, err := c.MultipartForm()
-	folderName := utils.GetFolderLiaName(assetTypeEnum)
-	if err == nil && form != nil && len(form.File["files"]) > 0 {
+	if err == nil && form != nil {
 		files := form.File["files"]
-		newPbFiles = make([]*pb.FileInfo, len(files))
-		var g errgroup.Group
-		for i, fileHeader := range files {
-			index := i
-			f := fileHeader
-			g.Go(func() (err error) {
-				fileData, _ := f.Open()
-				defer fileData.Close()
 
-				ext := filepath.Ext(f.Filename)
-				newFileName := fmt.Sprintf("%s/%s-%d-%d%s", folderName, userID, time.Now().UnixNano(), index, ext)
-				url, err := h.storage.UploadStream(fileData, newFileName, f.Header.Get("Content-Type"))
-				if err != nil {
-					return err
-				}
+		if len(files) > 0 {
+			uploadedFiles, err := utils.UploadBatchFiles(files, userID, "liability", h.storage)
+			if err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+			}
 
-				newPbFiles[index] = &pb.FileInfo{Url: url, FileType: f.Header.Get("Content-Type")}
-				return nil
-			})
-		}
-		if err := g.Wait(); err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": "Upload failed"})
+			newPbFiles = uploadedFiles
 		}
 	}
 
 	grpcReq := &pb.UpdateLiabilityRequest{
-		Id:           id,
-		UserId:       userID,
-		Name:         req.Name,
-		Creditor:     req.Creditor,
-		Principal:    principal,
-		InterestRate: interest,
-		Description:  req.Description,
+		Id: id,
+		Liability: &pb.Liability{
+			CreatedBy:    userID,
+			Type:         assetTypeEnum,
+			Name:         req.Name,
+			Creditor:     req.Creditor,
+			Principal:    principal,
+			InterestRate: interest,
+			StartAt:      utils.ToProtoTime(startAtTime),
+			EndAt:        utils.ToProtoTime(endAtTime),
+			Description:  req.Description,
+		},
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: paths,
 		},
-		StartAt:       utils.ToProtoTime(startAtTime),
-		EndAt:         utils.ToProtoTime(endAtTime),
 		NewFiles:      newPbFiles,
 		DeleteFileIds: req.DeleteFileIDs,
 	}

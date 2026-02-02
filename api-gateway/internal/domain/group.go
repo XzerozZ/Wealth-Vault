@@ -22,3 +22,12 @@ type UpdateGroupRequest struct {
 	GroupName    string `json:"group_name" form:"group_name" mask:"group_name"`
 	GroupProfile string `json:"group_profile" form:"group_profile" mask:"group_profile"`
 }
+
+type AddMemberRequest struct {
+	TargetUserIDS []string `json:"target_ids" form:"target_ids"`
+}
+
+type GrantAccessRequest struct {
+	TargetUserID string   `json:"target_id" form:"target_id"`
+	ItemIDS      []string `json:"item_ids" form:"item_ids"`
+}

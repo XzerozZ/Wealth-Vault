@@ -6,6 +6,7 @@ option go_package = "wealth-vault/pkg/pb";
 
 import "proto/user/user.proto";
 import "proto/user/group.proto";
+import "proto/user/share.proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
@@ -18,4 +19,12 @@ service UserService {
   rpc GetGroup(GetGroupRequest) returns (GroupResponse);
   rpc GetMember(GetGroupMembersRequest) returns (GetGroupMembersResponse);
   rpc UpdateGroup(UpdateGroupRequest) returns (GroupResponse);
+  rpc AddGroupMember(AddMemberRequest) returns (ActionResponse);
+  rpc GrantGroupItemAccess(GrantAccessRequest) returns (ActionResponse);
+
+  rpc ShareItem(ShareItemRequest) returns (ShareItemResponse);
+  rpc GetSharedItem(GetGroupItemsRequest) returns (GetGroupItemsResponse);
+  rpc GetSharedIteminFriend(GetFriendItemRequest) returns (GetFriendItemsResponse);
+  rpc UnsharedItem(UnshareItemRequest) returns (ShareItemResponse);
+  rpc UnsharedIteminFriend(UnshareItemRequest) returns (ShareItemResponse);
 }

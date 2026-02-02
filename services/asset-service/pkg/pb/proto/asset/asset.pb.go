@@ -9,8 +9,6 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -23,945 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type BankDetail struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	BankName      string                 `protobuf:"bytes,1,opt,name=bank_name,json=bankName,proto3" json:"bank_name,omitempty"`
-	AccountNumber string                 `protobuf:"bytes,2,opt,name=account_number,json=accountNumber,proto3" json:"account_number,omitempty"`
-	AccountType   BankAccountType        `protobuf:"varint,3,opt,name=account_type,json=accountType,proto3,enum=asset.BankAccountType" json:"account_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *BankDetail) Reset() {
-	*x = BankDetail{}
-	mi := &file_proto_asset_asset_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *BankDetail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*BankDetail) ProtoMessage() {}
-
-func (x *BankDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use BankDetail.ProtoReflect.Descriptor instead.
-func (*BankDetail) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *BankDetail) GetBankName() string {
-	if x != nil {
-		return x.BankName
-	}
-	return ""
-}
-
-func (x *BankDetail) GetAccountNumber() string {
-	if x != nil {
-		return x.AccountNumber
-	}
-	return ""
-}
-
-func (x *BankDetail) GetAccountType() BankAccountType {
-	if x != nil {
-		return x.AccountType
-	}
-	return BankAccountType_BANK_ACC_TYPE_UNSPECIFIED
-}
-
-type InvestmentDetail struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SubType       InvestmentType         `protobuf:"varint,1,opt,name=sub_type,json=subType,proto3,enum=asset.InvestmentType" json:"sub_type,omitempty"`
-	Symbol        string                 `protobuf:"bytes,2,opt,name=symbol,proto3" json:"symbol,omitempty"`
-	BrokerName    string                 `protobuf:"bytes,3,opt,name=broker_name,json=brokerName,proto3" json:"broker_name,omitempty"`
-	Quantity      float64                `protobuf:"fixed64,4,opt,name=quantity,proto3" json:"quantity,omitempty"`
-	CostPrice     float64                `protobuf:"fixed64,5,opt,name=cost_price,json=costPrice,proto3" json:"cost_price,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InvestmentDetail) Reset() {
-	*x = InvestmentDetail{}
-	mi := &file_proto_asset_asset_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InvestmentDetail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InvestmentDetail) ProtoMessage() {}
-
-func (x *InvestmentDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InvestmentDetail.ProtoReflect.Descriptor instead.
-func (*InvestmentDetail) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *InvestmentDetail) GetSubType() InvestmentType {
-	if x != nil {
-		return x.SubType
-	}
-	return InvestmentType_INVEST_TYPE_UNSPECIFIED
-}
-
-func (x *InvestmentDetail) GetSymbol() string {
-	if x != nil {
-		return x.Symbol
-	}
-	return ""
-}
-
-func (x *InvestmentDetail) GetBrokerName() string {
-	if x != nil {
-		return x.BrokerName
-	}
-	return ""
-}
-
-func (x *InvestmentDetail) GetQuantity() float64 {
-	if x != nil {
-		return x.Quantity
-	}
-	return 0
-}
-
-func (x *InvestmentDetail) GetCostPrice() float64 {
-	if x != nil {
-		return x.CostPrice
-	}
-	return 0
-}
-
-type Location struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Address       string                 `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	SubDistrict   string                 `protobuf:"bytes,2,opt,name=sub_district,json=subDistrict,proto3" json:"sub_district,omitempty"`
-	District      string                 `protobuf:"bytes,3,opt,name=district,proto3" json:"district,omitempty"`
-	Province      string                 `protobuf:"bytes,4,opt,name=province,proto3" json:"province,omitempty"`
-	PostalCode    string                 `protobuf:"bytes,5,opt,name=postal_code,json=postalCode,proto3" json:"postal_code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Location) Reset() {
-	*x = Location{}
-	mi := &file_proto_asset_asset_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Location) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Location) ProtoMessage() {}
-
-func (x *Location) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Location.ProtoReflect.Descriptor instead.
-func (*Location) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *Location) GetAddress() string {
-	if x != nil {
-		return x.Address
-	}
-	return ""
-}
-
-func (x *Location) GetSubDistrict() string {
-	if x != nil {
-		return x.SubDistrict
-	}
-	return ""
-}
-
-func (x *Location) GetDistrict() string {
-	if x != nil {
-		return x.District
-	}
-	return ""
-}
-
-func (x *Location) GetProvince() string {
-	if x != nil {
-		return x.Province
-	}
-	return ""
-}
-
-func (x *Location) GetPostalCode() string {
-	if x != nil {
-		return x.PostalCode
-	}
-	return ""
-}
-
-type RealEstateDetail struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	PropertyType   RealEstateType         `protobuf:"varint,1,opt,name=property_type,json=propertyType,proto3,enum=asset.RealEstateType" json:"property_type,omitempty"`
-	DeedNumber     string                 `protobuf:"bytes,2,opt,name=deed_number,json=deedNumber,proto3" json:"deed_number,omitempty"`
-	AreaSqm        float64                `protobuf:"fixed64,3,opt,name=area_sqm,json=areaSqm,proto3" json:"area_sqm,omitempty"`
-	Location       *Location              `protobuf:"bytes,4,opt,name=location,proto3" json:"location,omitempty"`
-	LinkedAssetIds []string               `protobuf:"bytes,5,rep,name=linked_asset_ids,json=linkedAssetIds,proto3" json:"linked_asset_ids,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *RealEstateDetail) Reset() {
-	*x = RealEstateDetail{}
-	mi := &file_proto_asset_asset_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RealEstateDetail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RealEstateDetail) ProtoMessage() {}
-
-func (x *RealEstateDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RealEstateDetail.ProtoReflect.Descriptor instead.
-func (*RealEstateDetail) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *RealEstateDetail) GetPropertyType() RealEstateType {
-	if x != nil {
-		return x.PropertyType
-	}
-	return RealEstateType_REAL_ESTATE_TYPE_UNSPECIFIED
-}
-
-func (x *RealEstateDetail) GetDeedNumber() string {
-	if x != nil {
-		return x.DeedNumber
-	}
-	return ""
-}
-
-func (x *RealEstateDetail) GetAreaSqm() float64 {
-	if x != nil {
-		return x.AreaSqm
-	}
-	return 0
-}
-
-func (x *RealEstateDetail) GetLocation() *Location {
-	if x != nil {
-		return x.Location
-	}
-	return nil
-}
-
-func (x *RealEstateDetail) GetLinkedAssetIds() []string {
-	if x != nil {
-		return x.LinkedAssetIds
-	}
-	return nil
-}
-
-type InsuranceDetail struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	SubType        InsuranceType          `protobuf:"varint,1,opt,name=sub_type,json=subType,proto3,enum=asset.InsuranceType" json:"sub_type,omitempty"`
-	PolicyNumber   string                 `protobuf:"bytes,2,opt,name=policy_number,json=policyNumber,proto3" json:"policy_number,omitempty"`
-	CompanyName    string                 `protobuf:"bytes,3,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
-	PlanName       string                 `protobuf:"bytes,4,opt,name=plan_name,json=planName,proto3" json:"plan_name,omitempty"`
-	CoverageAmount float64                `protobuf:"fixed64,5,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
-	Premium        float64                `protobuf:"fixed64,6,opt,name=premium,proto3" json:"premium,omitempty"`
-	ExpireDate     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=expire_date,json=expireDate,proto3" json:"expire_date,omitempty"`
-	LinkedAssetId  string                 `protobuf:"bytes,8,opt,name=linked_asset_id,json=linkedAssetId,proto3" json:"linked_asset_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *InsuranceDetail) Reset() {
-	*x = InsuranceDetail{}
-	mi := &file_proto_asset_asset_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InsuranceDetail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InsuranceDetail) ProtoMessage() {}
-
-func (x *InsuranceDetail) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InsuranceDetail.ProtoReflect.Descriptor instead.
-func (*InsuranceDetail) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *InsuranceDetail) GetSubType() InsuranceType {
-	if x != nil {
-		return x.SubType
-	}
-	return InsuranceType_INSURANCE_TYPE_UNSPECIFIED
-}
-
-func (x *InsuranceDetail) GetPolicyNumber() string {
-	if x != nil {
-		return x.PolicyNumber
-	}
-	return ""
-}
-
-func (x *InsuranceDetail) GetCompanyName() string {
-	if x != nil {
-		return x.CompanyName
-	}
-	return ""
-}
-
-func (x *InsuranceDetail) GetPlanName() string {
-	if x != nil {
-		return x.PlanName
-	}
-	return ""
-}
-
-func (x *InsuranceDetail) GetCoverageAmount() float64 {
-	if x != nil {
-		return x.CoverageAmount
-	}
-	return 0
-}
-
-func (x *InsuranceDetail) GetPremium() float64 {
-	if x != nil {
-		return x.Premium
-	}
-	return 0
-}
-
-func (x *InsuranceDetail) GetExpireDate() *timestamppb.Timestamp {
-	if x != nil {
-		return x.ExpireDate
-	}
-	return nil
-}
-
-func (x *InsuranceDetail) GetLinkedAssetId() string {
-	if x != nil {
-		return x.LinkedAssetId
-	}
-	return ""
-}
-
-type Asset struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	Id                   string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Amount               float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	Type                 AssetType              `protobuf:"varint,4,opt,name=type,proto3,enum=asset.AssetType" json:"type,omitempty"`
-	Description          string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
-	IsIncludedInNetWorth bool                   `protobuf:"varint,6,opt,name=is_included_in_net_worth,json=isIncludedInNetWorth,proto3" json:"is_included_in_net_worth,omitempty"`
-	CreatedBy            string                 `protobuf:"bytes,7,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
-	CreatedAt            *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt            *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Files                []*FileInfo            `protobuf:"bytes,10,rep,name=files,proto3" json:"files,omitempty"`
-	// Types that are valid to be assigned to Detail:
-	//
-	//	*Asset_BankDetail
-	//	*Asset_InvestmentDetail
-	//	*Asset_RealEstateDetail
-	//	*Asset_InsuranceDetail
-	Detail        isAsset_Detail `protobuf_oneof:"detail"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Asset) Reset() {
-	*x = Asset{}
-	mi := &file_proto_asset_asset_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Asset) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Asset) ProtoMessage() {}
-
-func (x *Asset) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Asset.ProtoReflect.Descriptor instead.
-func (*Asset) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *Asset) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *Asset) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *Asset) GetAmount() float64 {
-	if x != nil {
-		return x.Amount
-	}
-	return 0
-}
-
-func (x *Asset) GetType() AssetType {
-	if x != nil {
-		return x.Type
-	}
-	return AssetType_ASSET_TYPE_UNSPECIFIED
-}
-
-func (x *Asset) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *Asset) GetIsIncludedInNetWorth() bool {
-	if x != nil {
-		return x.IsIncludedInNetWorth
-	}
-	return false
-}
-
-func (x *Asset) GetCreatedBy() string {
-	if x != nil {
-		return x.CreatedBy
-	}
-	return ""
-}
-
-func (x *Asset) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
-}
-
-func (x *Asset) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
-}
-
-func (x *Asset) GetFiles() []*FileInfo {
-	if x != nil {
-		return x.Files
-	}
-	return nil
-}
-
-func (x *Asset) GetDetail() isAsset_Detail {
-	if x != nil {
-		return x.Detail
-	}
-	return nil
-}
-
-func (x *Asset) GetBankDetail() *BankDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*Asset_BankDetail); ok {
-			return x.BankDetail
-		}
-	}
-	return nil
-}
-
-func (x *Asset) GetInvestmentDetail() *InvestmentDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*Asset_InvestmentDetail); ok {
-			return x.InvestmentDetail
-		}
-	}
-	return nil
-}
-
-func (x *Asset) GetRealEstateDetail() *RealEstateDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*Asset_RealEstateDetail); ok {
-			return x.RealEstateDetail
-		}
-	}
-	return nil
-}
-
-func (x *Asset) GetInsuranceDetail() *InsuranceDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*Asset_InsuranceDetail); ok {
-			return x.InsuranceDetail
-		}
-	}
-	return nil
-}
-
-type isAsset_Detail interface {
-	isAsset_Detail()
-}
-
-type Asset_BankDetail struct {
-	BankDetail *BankDetail `protobuf:"bytes,11,opt,name=bank_detail,json=bankDetail,proto3,oneof"`
-}
-
-type Asset_InvestmentDetail struct {
-	InvestmentDetail *InvestmentDetail `protobuf:"bytes,12,opt,name=investment_detail,json=investmentDetail,proto3,oneof"`
-}
-
-type Asset_RealEstateDetail struct {
-	RealEstateDetail *RealEstateDetail `protobuf:"bytes,13,opt,name=real_estate_detail,json=realEstateDetail,proto3,oneof"`
-}
-
-type Asset_InsuranceDetail struct {
-	InsuranceDetail *InsuranceDetail `protobuf:"bytes,14,opt,name=insurance_detail,json=insuranceDetail,proto3,oneof"`
-}
-
-func (*Asset_BankDetail) isAsset_Detail() {}
-
-func (*Asset_InvestmentDetail) isAsset_Detail() {}
-
-func (*Asset_RealEstateDetail) isAsset_Detail() {}
-
-func (*Asset_InsuranceDetail) isAsset_Detail() {}
-
 // ------Request/Response------
-type CreateAssetRequest struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	UserId               string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Name                 string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Amount               float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	Type                 AssetType              `protobuf:"varint,4,opt,name=type,proto3,enum=asset.AssetType" json:"type,omitempty"`
-	IsIncludedInNetWorth bool                   `protobuf:"varint,5,opt,name=is_included_in_net_worth,json=isIncludedInNetWorth,proto3" json:"is_included_in_net_worth,omitempty"`
-	Description          string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
-	// Types that are valid to be assigned to Detail:
-	//
-	//	*CreateAssetRequest_BankDetail
-	//	*CreateAssetRequest_InvestmentDetail
-	//	*CreateAssetRequest_RealEstateDetail
-	//	*CreateAssetRequest_InsuranceDetail
-	Detail        isCreateAssetRequest_Detail `protobuf_oneof:"detail"`
-	NewFiles      []*FileInfo                 `protobuf:"bytes,11,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateAssetRequest) Reset() {
-	*x = CreateAssetRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateAssetRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateAssetRequest) ProtoMessage() {}
-
-func (x *CreateAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateAssetRequest.ProtoReflect.Descriptor instead.
-func (*CreateAssetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *CreateAssetRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *CreateAssetRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *CreateAssetRequest) GetAmount() float64 {
-	if x != nil {
-		return x.Amount
-	}
-	return 0
-}
-
-func (x *CreateAssetRequest) GetType() AssetType {
-	if x != nil {
-		return x.Type
-	}
-	return AssetType_ASSET_TYPE_UNSPECIFIED
-}
-
-func (x *CreateAssetRequest) GetIsIncludedInNetWorth() bool {
-	if x != nil {
-		return x.IsIncludedInNetWorth
-	}
-	return false
-}
-
-func (x *CreateAssetRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *CreateAssetRequest) GetDetail() isCreateAssetRequest_Detail {
-	if x != nil {
-		return x.Detail
-	}
-	return nil
-}
-
-func (x *CreateAssetRequest) GetBankDetail() *BankDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*CreateAssetRequest_BankDetail); ok {
-			return x.BankDetail
-		}
-	}
-	return nil
-}
-
-func (x *CreateAssetRequest) GetInvestmentDetail() *InvestmentDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*CreateAssetRequest_InvestmentDetail); ok {
-			return x.InvestmentDetail
-		}
-	}
-	return nil
-}
-
-func (x *CreateAssetRequest) GetRealEstateDetail() *RealEstateDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*CreateAssetRequest_RealEstateDetail); ok {
-			return x.RealEstateDetail
-		}
-	}
-	return nil
-}
-
-func (x *CreateAssetRequest) GetInsuranceDetail() *InsuranceDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*CreateAssetRequest_InsuranceDetail); ok {
-			return x.InsuranceDetail
-		}
-	}
-	return nil
-}
-
-func (x *CreateAssetRequest) GetNewFiles() []*FileInfo {
-	if x != nil {
-		return x.NewFiles
-	}
-	return nil
-}
-
-type isCreateAssetRequest_Detail interface {
-	isCreateAssetRequest_Detail()
-}
-
-type CreateAssetRequest_BankDetail struct {
-	BankDetail *BankDetail `protobuf:"bytes,7,opt,name=bank_detail,json=bankDetail,proto3,oneof"`
-}
-
-type CreateAssetRequest_InvestmentDetail struct {
-	InvestmentDetail *InvestmentDetail `protobuf:"bytes,8,opt,name=investment_detail,json=investmentDetail,proto3,oneof"`
-}
-
-type CreateAssetRequest_RealEstateDetail struct {
-	RealEstateDetail *RealEstateDetail `protobuf:"bytes,9,opt,name=real_estate_detail,json=realEstateDetail,proto3,oneof"`
-}
-
-type CreateAssetRequest_InsuranceDetail struct {
-	InsuranceDetail *InsuranceDetail `protobuf:"bytes,10,opt,name=insurance_detail,json=insuranceDetail,proto3,oneof"`
-}
-
-func (*CreateAssetRequest_BankDetail) isCreateAssetRequest_Detail() {}
-
-func (*CreateAssetRequest_InvestmentDetail) isCreateAssetRequest_Detail() {}
-
-func (*CreateAssetRequest_RealEstateDetail) isCreateAssetRequest_Detail() {}
-
-func (*CreateAssetRequest_InsuranceDetail) isCreateAssetRequest_Detail() {}
-
-type UpdateAssetRequest struct {
-	state       protoimpl.MessageState `protogen:"open.v1"`
-	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId      string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Name        string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Amount      float64                `protobuf:"fixed64,4,opt,name=amount,proto3" json:"amount,omitempty"`
-	Type        AssetType              `protobuf:"varint,5,opt,name=type,proto3,enum=asset.AssetType" json:"type,omitempty"`
-	Description string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
-	// Types that are valid to be assigned to Detail:
-	//
-	//	*UpdateAssetRequest_BankDetail
-	//	*UpdateAssetRequest_InvestmentDetail
-	//	*UpdateAssetRequest_RealEstateDetail
-	//	*UpdateAssetRequest_InsuranceDetail
-	Detail        isUpdateAssetRequest_Detail `protobuf_oneof:"detail"`
-	NewFiles      []*FileInfo                 `protobuf:"bytes,11,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
-	DeleteFileIds []string                    `protobuf:"bytes,12,rep,name=delete_file_ids,json=deleteFileIds,proto3" json:"delete_file_ids,omitempty"`
-	UpdateMask    *fieldmaskpb.FieldMask      `protobuf:"bytes,13,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateAssetRequest) Reset() {
-	*x = UpdateAssetRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateAssetRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateAssetRequest) ProtoMessage() {}
-
-func (x *UpdateAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateAssetRequest.ProtoReflect.Descriptor instead.
-func (*UpdateAssetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *UpdateAssetRequest) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *UpdateAssetRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-func (x *UpdateAssetRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-func (x *UpdateAssetRequest) GetAmount() float64 {
-	if x != nil {
-		return x.Amount
-	}
-	return 0
-}
-
-func (x *UpdateAssetRequest) GetType() AssetType {
-	if x != nil {
-		return x.Type
-	}
-	return AssetType_ASSET_TYPE_UNSPECIFIED
-}
-
-func (x *UpdateAssetRequest) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *UpdateAssetRequest) GetDetail() isUpdateAssetRequest_Detail {
-	if x != nil {
-		return x.Detail
-	}
-	return nil
-}
-
-func (x *UpdateAssetRequest) GetBankDetail() *BankDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*UpdateAssetRequest_BankDetail); ok {
-			return x.BankDetail
-		}
-	}
-	return nil
-}
-
-func (x *UpdateAssetRequest) GetInvestmentDetail() *InvestmentDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*UpdateAssetRequest_InvestmentDetail); ok {
-			return x.InvestmentDetail
-		}
-	}
-	return nil
-}
-
-func (x *UpdateAssetRequest) GetRealEstateDetail() *RealEstateDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*UpdateAssetRequest_RealEstateDetail); ok {
-			return x.RealEstateDetail
-		}
-	}
-	return nil
-}
-
-func (x *UpdateAssetRequest) GetInsuranceDetail() *InsuranceDetail {
-	if x != nil {
-		if x, ok := x.Detail.(*UpdateAssetRequest_InsuranceDetail); ok {
-			return x.InsuranceDetail
-		}
-	}
-	return nil
-}
-
-func (x *UpdateAssetRequest) GetNewFiles() []*FileInfo {
-	if x != nil {
-		return x.NewFiles
-	}
-	return nil
-}
-
-func (x *UpdateAssetRequest) GetDeleteFileIds() []string {
-	if x != nil {
-		return x.DeleteFileIds
-	}
-	return nil
-}
-
-func (x *UpdateAssetRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
-	if x != nil {
-		return x.UpdateMask
-	}
-	return nil
-}
-
-type isUpdateAssetRequest_Detail interface {
-	isUpdateAssetRequest_Detail()
-}
-
-type UpdateAssetRequest_BankDetail struct {
-	BankDetail *BankDetail `protobuf:"bytes,7,opt,name=bank_detail,json=bankDetail,proto3,oneof"`
-}
-
-type UpdateAssetRequest_InvestmentDetail struct {
-	InvestmentDetail *InvestmentDetail `protobuf:"bytes,8,opt,name=investment_detail,json=investmentDetail,proto3,oneof"`
-}
-
-type UpdateAssetRequest_RealEstateDetail struct {
-	RealEstateDetail *RealEstateDetail `protobuf:"bytes,9,opt,name=real_estate_detail,json=realEstateDetail,proto3,oneof"`
-}
-
-type UpdateAssetRequest_InsuranceDetail struct {
-	InsuranceDetail *InsuranceDetail `protobuf:"bytes,10,opt,name=insurance_detail,json=insuranceDetail,proto3,oneof"`
-}
-
-func (*UpdateAssetRequest_BankDetail) isUpdateAssetRequest_Detail() {}
-
-func (*UpdateAssetRequest_InvestmentDetail) isUpdateAssetRequest_Detail() {}
-
-func (*UpdateAssetRequest_RealEstateDetail) isUpdateAssetRequest_Detail() {}
-
-func (*UpdateAssetRequest_InsuranceDetail) isUpdateAssetRequest_Detail() {}
-
 type GetAssetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -971,7 +31,7 @@ type GetAssetRequest struct {
 
 func (x *GetAssetRequest) Reset() {
 	*x = GetAssetRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[8]
+	mi := &file_proto_asset_asset_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -983,7 +43,7 @@ func (x *GetAssetRequest) String() string {
 func (*GetAssetRequest) ProtoMessage() {}
 
 func (x *GetAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[8]
+	mi := &file_proto_asset_asset_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -996,7 +56,7 @@ func (x *GetAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAssetRequest.ProtoReflect.Descriptor instead.
 func (*GetAssetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{8}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *GetAssetRequest) GetUserId() string {
@@ -1016,7 +76,7 @@ type GetAssetByIDRequest struct {
 
 func (x *GetAssetByIDRequest) Reset() {
 	*x = GetAssetByIDRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[9]
+	mi := &file_proto_asset_asset_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1028,7 +88,7 @@ func (x *GetAssetByIDRequest) String() string {
 func (*GetAssetByIDRequest) ProtoMessage() {}
 
 func (x *GetAssetByIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[9]
+	mi := &file_proto_asset_asset_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1041,7 +101,7 @@ func (x *GetAssetByIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAssetByIDRequest.ProtoReflect.Descriptor instead.
 func (*GetAssetByIDRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{9}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetAssetByIDRequest) GetId() string {
@@ -1058,29 +118,28 @@ func (x *GetAssetByIDRequest) GetUserId() string {
 	return ""
 }
 
-type AssetArrayResponse struct {
+type GetBatchIdsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Asset         []*Asset               `protobuf:"bytes,2,rep,name=asset,proto3" json:"asset,omitempty"`
+	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AssetArrayResponse) Reset() {
-	*x = AssetArrayResponse{}
-	mi := &file_proto_asset_asset_proto_msgTypes[10]
+func (x *GetBatchIdsRequest) Reset() {
+	*x = GetBatchIdsRequest{}
+	mi := &file_proto_asset_asset_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AssetArrayResponse) String() string {
+func (x *GetBatchIdsRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AssetArrayResponse) ProtoMessage() {}
+func (*GetBatchIdsRequest) ProtoMessage() {}
 
-func (x *AssetArrayResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[10]
+func (x *GetBatchIdsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1091,73 +150,14 @@ func (x *AssetArrayResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AssetArrayResponse.ProtoReflect.Descriptor instead.
-func (*AssetArrayResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{10}
+// Deprecated: Use GetBatchIdsRequest.ProtoReflect.Descriptor instead.
+func (*GetBatchIdsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *AssetArrayResponse) GetSuccess() bool {
+func (x *GetBatchIdsRequest) GetIds() []string {
 	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *AssetArrayResponse) GetAsset() []*Asset {
-	if x != nil {
-		return x.Asset
-	}
-	return nil
-}
-
-type AssetResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Asset         *Asset                 `protobuf:"bytes,2,opt,name=asset,proto3" json:"asset,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AssetResponse) Reset() {
-	*x = AssetResponse{}
-	mi := &file_proto_asset_asset_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AssetResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AssetResponse) ProtoMessage() {}
-
-func (x *AssetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AssetResponse.ProtoReflect.Descriptor instead.
-func (*AssetResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *AssetResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *AssetResponse) GetAsset() *Asset {
-	if x != nil {
-		return x.Asset
+		return x.Ids
 	}
 	return nil
 }
@@ -1171,7 +171,7 @@ type GetNetWorthRequest struct {
 
 func (x *GetNetWorthRequest) Reset() {
 	*x = GetNetWorthRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[12]
+	mi := &file_proto_asset_asset_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1183,7 +183,7 @@ func (x *GetNetWorthRequest) String() string {
 func (*GetNetWorthRequest) ProtoMessage() {}
 
 func (x *GetNetWorthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[12]
+	mi := &file_proto_asset_asset_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1196,7 +196,7 @@ func (x *GetNetWorthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNetWorthRequest.ProtoReflect.Descriptor instead.
 func (*GetNetWorthRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{12}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetNetWorthRequest) GetUserId() string {
@@ -1217,7 +217,7 @@ type GetNetWorthResponse struct {
 
 func (x *GetNetWorthResponse) Reset() {
 	*x = GetNetWorthResponse{}
-	mi := &file_proto_asset_asset_proto_msgTypes[13]
+	mi := &file_proto_asset_asset_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1229,7 +229,7 @@ func (x *GetNetWorthResponse) String() string {
 func (*GetNetWorthResponse) ProtoMessage() {}
 
 func (x *GetNetWorthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[13]
+	mi := &file_proto_asset_asset_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1242,7 +242,7 @@ func (x *GetNetWorthResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNetWorthResponse.ProtoReflect.Descriptor instead.
 func (*GetNetWorthResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{13}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetNetWorthResponse) GetTotalAssets() float64 {
@@ -1276,7 +276,7 @@ type DeleteAssetRequest struct {
 
 func (x *DeleteAssetRequest) Reset() {
 	*x = DeleteAssetRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[14]
+	mi := &file_proto_asset_asset_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1288,7 +288,7 @@ func (x *DeleteAssetRequest) String() string {
 func (*DeleteAssetRequest) ProtoMessage() {}
 
 func (x *DeleteAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[14]
+	mi := &file_proto_asset_asset_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1301,7 +301,7 @@ func (x *DeleteAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAssetRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAssetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{14}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DeleteAssetRequest) GetId() string {
@@ -1327,7 +327,7 @@ type DeleteAssetResponse struct {
 
 func (x *DeleteAssetResponse) Reset() {
 	*x = DeleteAssetResponse{}
-	mi := &file_proto_asset_asset_proto_msgTypes[15]
+	mi := &file_proto_asset_asset_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1339,7 +339,7 @@ func (x *DeleteAssetResponse) String() string {
 func (*DeleteAssetResponse) ProtoMessage() {}
 
 func (x *DeleteAssetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[15]
+	mi := &file_proto_asset_asset_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1352,7 +352,7 @@ func (x *DeleteAssetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAssetResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAssetResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{15}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteAssetResponse) GetSuccess() bool {
@@ -1362,113 +362,122 @@ func (x *DeleteAssetResponse) GetSuccess() bool {
 	return false
 }
 
+type CheckAssetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckAssetRequest) Reset() {
+	*x = CheckAssetRequest{}
+	mi := &file_proto_asset_asset_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckAssetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckAssetRequest) ProtoMessage() {}
+
+func (x *CheckAssetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckAssetRequest.ProtoReflect.Descriptor instead.
+func (*CheckAssetRequest) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CheckAssetRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CheckAssetRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CheckAssetRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+type CheckAssetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Exists        bool                   `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckAssetResponse) Reset() {
+	*x = CheckAssetResponse{}
+	mi := &file_proto_asset_asset_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckAssetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckAssetResponse) ProtoMessage() {}
+
+func (x *CheckAssetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckAssetResponse.ProtoReflect.Descriptor instead.
+func (*CheckAssetResponse) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CheckAssetResponse) GetExists() bool {
+	if x != nil {
+		return x.Exists
+	}
+	return false
+}
+
 var File_proto_asset_asset_proto protoreflect.FileDescriptor
 
 const file_proto_asset_asset_proto_rawDesc = "" +
 	"\n" +
-	"\x17proto/asset/asset.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/enum.proto\x1a\x16proto/asset/file.proto\"\x8b\x01\n" +
-	"\n" +
-	"BankDetail\x12\x1b\n" +
-	"\tbank_name\x18\x01 \x01(\tR\bbankName\x12%\n" +
-	"\x0eaccount_number\x18\x02 \x01(\tR\raccountNumber\x129\n" +
-	"\faccount_type\x18\x03 \x01(\x0e2\x16.asset.BankAccountTypeR\vaccountType\"\xb8\x01\n" +
-	"\x10InvestmentDetail\x120\n" +
-	"\bsub_type\x18\x01 \x01(\x0e2\x15.asset.InvestmentTypeR\asubType\x12\x16\n" +
-	"\x06symbol\x18\x02 \x01(\tR\x06symbol\x12\x1f\n" +
-	"\vbroker_name\x18\x03 \x01(\tR\n" +
-	"brokerName\x12\x1a\n" +
-	"\bquantity\x18\x04 \x01(\x01R\bquantity\x12\x1d\n" +
-	"\n" +
-	"cost_price\x18\x05 \x01(\x01R\tcostPrice\"\xa0\x01\n" +
-	"\bLocation\x12\x18\n" +
-	"\aaddress\x18\x01 \x01(\tR\aaddress\x12!\n" +
-	"\fsub_district\x18\x02 \x01(\tR\vsubDistrict\x12\x1a\n" +
-	"\bdistrict\x18\x03 \x01(\tR\bdistrict\x12\x1a\n" +
-	"\bprovince\x18\x04 \x01(\tR\bprovince\x12\x1f\n" +
-	"\vpostal_code\x18\x05 \x01(\tR\n" +
-	"postalCode\"\xe1\x01\n" +
-	"\x10RealEstateDetail\x12:\n" +
-	"\rproperty_type\x18\x01 \x01(\x0e2\x15.asset.RealEstateTypeR\fpropertyType\x12\x1f\n" +
-	"\vdeed_number\x18\x02 \x01(\tR\n" +
-	"deedNumber\x12\x19\n" +
-	"\barea_sqm\x18\x03 \x01(\x01R\aareaSqm\x12+\n" +
-	"\blocation\x18\x04 \x01(\v2\x0f.asset.LocationR\blocation\x12(\n" +
-	"\x10linked_asset_ids\x18\x05 \x03(\tR\x0elinkedAssetIds\"\xcf\x02\n" +
-	"\x0fInsuranceDetail\x12/\n" +
-	"\bsub_type\x18\x01 \x01(\x0e2\x14.asset.InsuranceTypeR\asubType\x12#\n" +
-	"\rpolicy_number\x18\x02 \x01(\tR\fpolicyNumber\x12!\n" +
-	"\fcompany_name\x18\x03 \x01(\tR\vcompanyName\x12\x1b\n" +
-	"\tplan_name\x18\x04 \x01(\tR\bplanName\x12'\n" +
-	"\x0fcoverage_amount\x18\x05 \x01(\x01R\x0ecoverageAmount\x12\x18\n" +
-	"\apremium\x18\x06 \x01(\x01R\apremium\x12;\n" +
-	"\vexpire_date\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"expireDate\x12&\n" +
-	"\x0flinked_asset_id\x18\b \x01(\tR\rlinkedAssetId\"\x95\x05\n" +
-	"\x05Asset\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06amount\x18\x03 \x01(\x01R\x06amount\x12$\n" +
-	"\x04type\x18\x04 \x01(\x0e2\x10.asset.AssetTypeR\x04type\x12 \n" +
-	"\vdescription\x18\x05 \x01(\tR\vdescription\x126\n" +
-	"\x18is_included_in_net_worth\x18\x06 \x01(\bR\x14isIncludedInNetWorth\x12\x1d\n" +
-	"\n" +
-	"created_by\x18\a \x01(\tR\tcreatedBy\x129\n" +
-	"\n" +
-	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
-	"\n" +
-	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12%\n" +
-	"\x05files\x18\n" +
-	" \x03(\v2\x0f.asset.FileInfoR\x05files\x124\n" +
-	"\vbank_detail\x18\v \x01(\v2\x11.asset.BankDetailH\x00R\n" +
-	"bankDetail\x12F\n" +
-	"\x11investment_detail\x18\f \x01(\v2\x17.asset.InvestmentDetailH\x00R\x10investmentDetail\x12G\n" +
-	"\x12real_estate_detail\x18\r \x01(\v2\x17.asset.RealEstateDetailH\x00R\x10realEstateDetail\x12C\n" +
-	"\x10insurance_detail\x18\x0e \x01(\v2\x16.asset.InsuranceDetailH\x00R\x0finsuranceDetailB\b\n" +
-	"\x06detail\"\x9d\x04\n" +
-	"\x12CreateAssetRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06amount\x18\x03 \x01(\x01R\x06amount\x12$\n" +
-	"\x04type\x18\x04 \x01(\x0e2\x10.asset.AssetTypeR\x04type\x126\n" +
-	"\x18is_included_in_net_worth\x18\x05 \x01(\bR\x14isIncludedInNetWorth\x12 \n" +
-	"\vdescription\x18\x06 \x01(\tR\vdescription\x124\n" +
-	"\vbank_detail\x18\a \x01(\v2\x11.asset.BankDetailH\x00R\n" +
-	"bankDetail\x12F\n" +
-	"\x11investment_detail\x18\b \x01(\v2\x17.asset.InvestmentDetailH\x00R\x10investmentDetail\x12G\n" +
-	"\x12real_estate_detail\x18\t \x01(\v2\x17.asset.RealEstateDetailH\x00R\x10realEstateDetail\x12C\n" +
-	"\x10insurance_detail\x18\n" +
-	" \x01(\v2\x16.asset.InsuranceDetailH\x00R\x0finsuranceDetail\x12,\n" +
-	"\tnew_files\x18\v \x03(\v2\x0f.asset.FileInfoR\bnewFilesB\b\n" +
-	"\x06detail\"\xda\x04\n" +
-	"\x12UpdateAssetRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04name\x18\x03 \x01(\tR\x04name\x12\x16\n" +
-	"\x06amount\x18\x04 \x01(\x01R\x06amount\x12$\n" +
-	"\x04type\x18\x05 \x01(\x0e2\x10.asset.AssetTypeR\x04type\x12 \n" +
-	"\vdescription\x18\x06 \x01(\tR\vdescription\x124\n" +
-	"\vbank_detail\x18\a \x01(\v2\x11.asset.BankDetailH\x00R\n" +
-	"bankDetail\x12F\n" +
-	"\x11investment_detail\x18\b \x01(\v2\x17.asset.InvestmentDetailH\x00R\x10investmentDetail\x12G\n" +
-	"\x12real_estate_detail\x18\t \x01(\v2\x17.asset.RealEstateDetailH\x00R\x10realEstateDetail\x12C\n" +
-	"\x10insurance_detail\x18\n" +
-	" \x01(\v2\x16.asset.InsuranceDetailH\x00R\x0finsuranceDetail\x12,\n" +
-	"\tnew_files\x18\v \x03(\v2\x0f.asset.FileInfoR\bnewFiles\x12&\n" +
-	"\x0fdelete_file_ids\x18\f \x03(\tR\rdeleteFileIds\x12;\n" +
-	"\vupdate_mask\x18\r \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMaskB\b\n" +
-	"\x06detail\"*\n" +
+	"\x17proto/asset/asset.proto\x12\x05asset\"*\n" +
 	"\x0fGetAssetRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\">\n" +
 	"\x13GetAssetByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"R\n" +
-	"\x12AssetArrayResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\"\n" +
-	"\x05asset\x18\x02 \x03(\v2\f.asset.AssetR\x05asset\"M\n" +
-	"\rAssetResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\"\n" +
-	"\x05asset\x18\x02 \x01(\v2\f.asset.AssetR\x05asset\"-\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"&\n" +
+	"\x12GetBatchIdsRequest\x12\x10\n" +
+	"\x03ids\x18\x01 \x03(\tR\x03ids\"-\n" +
 	"\x12GetNetWorthRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"\x82\x01\n" +
 	"\x13GetNetWorthResponse\x12!\n" +
@@ -1479,7 +488,13 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\"/\n" +
 	"\x13DeleteAssetResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccessB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"P\n" +
+	"\x11CheckAssetRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\",\n" +
+	"\x12CheckAssetResponse\x12\x16\n" +
+	"\x06exists\x18\x01 \x01(\bR\x06existsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_asset_asset_proto_rawDescOnce sync.Once
@@ -1493,68 +508,24 @@ func file_proto_asset_asset_proto_rawDescGZIP() []byte {
 	return file_proto_asset_asset_proto_rawDescData
 }
 
-var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_asset_asset_proto_goTypes = []any{
-	(*BankDetail)(nil),            // 0: asset.BankDetail
-	(*InvestmentDetail)(nil),      // 1: asset.InvestmentDetail
-	(*Location)(nil),              // 2: asset.Location
-	(*RealEstateDetail)(nil),      // 3: asset.RealEstateDetail
-	(*InsuranceDetail)(nil),       // 4: asset.InsuranceDetail
-	(*Asset)(nil),                 // 5: asset.Asset
-	(*CreateAssetRequest)(nil),    // 6: asset.CreateAssetRequest
-	(*UpdateAssetRequest)(nil),    // 7: asset.UpdateAssetRequest
-	(*GetAssetRequest)(nil),       // 8: asset.GetAssetRequest
-	(*GetAssetByIDRequest)(nil),   // 9: asset.GetAssetByIDRequest
-	(*AssetArrayResponse)(nil),    // 10: asset.AssetArrayResponse
-	(*AssetResponse)(nil),         // 11: asset.AssetResponse
-	(*GetNetWorthRequest)(nil),    // 12: asset.GetNetWorthRequest
-	(*GetNetWorthResponse)(nil),   // 13: asset.GetNetWorthResponse
-	(*DeleteAssetRequest)(nil),    // 14: asset.DeleteAssetRequest
-	(*DeleteAssetResponse)(nil),   // 15: asset.DeleteAssetResponse
-	(BankAccountType)(0),          // 16: asset.BankAccountType
-	(InvestmentType)(0),           // 17: asset.InvestmentType
-	(RealEstateType)(0),           // 18: asset.RealEstateType
-	(InsuranceType)(0),            // 19: asset.InsuranceType
-	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
-	(AssetType)(0),                // 21: asset.AssetType
-	(*FileInfo)(nil),              // 22: asset.FileInfo
-	(*fieldmaskpb.FieldMask)(nil), // 23: google.protobuf.FieldMask
+	(*GetAssetRequest)(nil),     // 0: asset.GetAssetRequest
+	(*GetAssetByIDRequest)(nil), // 1: asset.GetAssetByIDRequest
+	(*GetBatchIdsRequest)(nil),  // 2: asset.GetBatchIdsRequest
+	(*GetNetWorthRequest)(nil),  // 3: asset.GetNetWorthRequest
+	(*GetNetWorthResponse)(nil), // 4: asset.GetNetWorthResponse
+	(*DeleteAssetRequest)(nil),  // 5: asset.DeleteAssetRequest
+	(*DeleteAssetResponse)(nil), // 6: asset.DeleteAssetResponse
+	(*CheckAssetRequest)(nil),   // 7: asset.CheckAssetRequest
+	(*CheckAssetResponse)(nil),  // 8: asset.CheckAssetResponse
 }
 var file_proto_asset_asset_proto_depIdxs = []int32{
-	16, // 0: asset.BankDetail.account_type:type_name -> asset.BankAccountType
-	17, // 1: asset.InvestmentDetail.sub_type:type_name -> asset.InvestmentType
-	18, // 2: asset.RealEstateDetail.property_type:type_name -> asset.RealEstateType
-	2,  // 3: asset.RealEstateDetail.location:type_name -> asset.Location
-	19, // 4: asset.InsuranceDetail.sub_type:type_name -> asset.InsuranceType
-	20, // 5: asset.InsuranceDetail.expire_date:type_name -> google.protobuf.Timestamp
-	21, // 6: asset.Asset.type:type_name -> asset.AssetType
-	20, // 7: asset.Asset.created_at:type_name -> google.protobuf.Timestamp
-	20, // 8: asset.Asset.updated_at:type_name -> google.protobuf.Timestamp
-	22, // 9: asset.Asset.files:type_name -> asset.FileInfo
-	0,  // 10: asset.Asset.bank_detail:type_name -> asset.BankDetail
-	1,  // 11: asset.Asset.investment_detail:type_name -> asset.InvestmentDetail
-	3,  // 12: asset.Asset.real_estate_detail:type_name -> asset.RealEstateDetail
-	4,  // 13: asset.Asset.insurance_detail:type_name -> asset.InsuranceDetail
-	21, // 14: asset.CreateAssetRequest.type:type_name -> asset.AssetType
-	0,  // 15: asset.CreateAssetRequest.bank_detail:type_name -> asset.BankDetail
-	1,  // 16: asset.CreateAssetRequest.investment_detail:type_name -> asset.InvestmentDetail
-	3,  // 17: asset.CreateAssetRequest.real_estate_detail:type_name -> asset.RealEstateDetail
-	4,  // 18: asset.CreateAssetRequest.insurance_detail:type_name -> asset.InsuranceDetail
-	22, // 19: asset.CreateAssetRequest.new_files:type_name -> asset.FileInfo
-	21, // 20: asset.UpdateAssetRequest.type:type_name -> asset.AssetType
-	0,  // 21: asset.UpdateAssetRequest.bank_detail:type_name -> asset.BankDetail
-	1,  // 22: asset.UpdateAssetRequest.investment_detail:type_name -> asset.InvestmentDetail
-	3,  // 23: asset.UpdateAssetRequest.real_estate_detail:type_name -> asset.RealEstateDetail
-	4,  // 24: asset.UpdateAssetRequest.insurance_detail:type_name -> asset.InsuranceDetail
-	22, // 25: asset.UpdateAssetRequest.new_files:type_name -> asset.FileInfo
-	23, // 26: asset.UpdateAssetRequest.update_mask:type_name -> google.protobuf.FieldMask
-	5,  // 27: asset.AssetArrayResponse.asset:type_name -> asset.Asset
-	5,  // 28: asset.AssetResponse.asset:type_name -> asset.Asset
-	29, // [29:29] is the sub-list for method output_type
-	29, // [29:29] is the sub-list for method input_type
-	29, // [29:29] is the sub-list for extension type_name
-	29, // [29:29] is the sub-list for extension extendee
-	0,  // [0:29] is the sub-list for field type_name
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_asset_proto_init() }
@@ -1562,33 +533,13 @@ func file_proto_asset_asset_proto_init() {
 	if File_proto_asset_asset_proto != nil {
 		return
 	}
-	file_proto_asset_enum_proto_init()
-	file_proto_asset_file_proto_init()
-	file_proto_asset_asset_proto_msgTypes[5].OneofWrappers = []any{
-		(*Asset_BankDetail)(nil),
-		(*Asset_InvestmentDetail)(nil),
-		(*Asset_RealEstateDetail)(nil),
-		(*Asset_InsuranceDetail)(nil),
-	}
-	file_proto_asset_asset_proto_msgTypes[6].OneofWrappers = []any{
-		(*CreateAssetRequest_BankDetail)(nil),
-		(*CreateAssetRequest_InvestmentDetail)(nil),
-		(*CreateAssetRequest_RealEstateDetail)(nil),
-		(*CreateAssetRequest_InsuranceDetail)(nil),
-	}
-	file_proto_asset_asset_proto_msgTypes[7].OneofWrappers = []any{
-		(*UpdateAssetRequest_BankDetail)(nil),
-		(*UpdateAssetRequest_InvestmentDetail)(nil),
-		(*UpdateAssetRequest_RealEstateDetail)(nil),
-		(*UpdateAssetRequest_InsuranceDetail)(nil),
-	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_asset_asset_proto_rawDesc), len(file_proto_asset_asset_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

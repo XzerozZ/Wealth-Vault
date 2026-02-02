@@ -9,6 +9,7 @@ import (
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
+	"wealth-vault/asset-service/pkg/utils/mapper"
 
 	"github.com/google/uuid"
 )
@@ -45,6 +46,11 @@ func (u *LiabilityUsecase) CreateLiability(ctx context.Context, req *pb.CreateLi
 		endAt = &t
 	}
 
+	liType := domain.LiabilityTypeLoan
+	if val, ok := helper.ProtoToDomainLiType[req.Type]; ok {
+		liType = val
+	}
+
 	var domainFiles []domain.FileAssociate
 	if len(req.NewFiles) > 0 {
 		for _, f := range req.NewFiles {
@@ -58,7 +64,7 @@ func (u *LiabilityUsecase) CreateLiability(ctx context.Context, req *pb.CreateLi
 
 	liability := &domain.Liability{
 		UserID:       userID,
-		Type:         domain.LiabilityType(req.Type.String()),
+		Type:         liType,
 		Name:         req.Name,
 		Creditor:     req.Creditor,
 		Principal:    req.Principal,
@@ -75,7 +81,7 @@ func (u *LiabilityUsecase) CreateLiability(ctx context.Context, req *pb.CreateLi
 
 	return &pb.LiabilityResponse{
 		Success:   true,
-		Liability: utils.ToLiabilityProto(liability),
+		Liability: mapper.ToLiabilityProto(liability),
 	}, nil
 }
 
@@ -92,12 +98,35 @@ func (u *LiabilityUsecase) GetLiability(ctx context.Context, req *pb.GetLiabilit
 
 	var LiaList []*pb.Liability
 	for _, item := range lias {
-		LiaList = append(LiaList, utils.ToLiabilityProto(item))
+		LiaList = append(LiaList, mapper.ToLiabilityProto(item))
 	}
 
 	return &pb.LiabilityArrayResponse{
 		Success:   true,
 		Liability: LiaList,
+	}, nil
+}
+
+func (u *LiabilityUsecase) GetLiabilityByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LiabilityArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.liaRepo.GetLiabilityByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbLia []*pb.Liability
+	for _, a := range bu {
+		pbLia = append(pbLia, mapper.ToLiabilityProto(a))
+	}
+
+	return &pb.LiabilityArrayResponse{
+		Liability: pbLia,
 	}, nil
 }
 
@@ -114,12 +143,12 @@ func (u *LiabilityUsecase) GetLiabilityByID(ctx context.Context, req *pb.GetLiab
 
 	return &pb.LiabilityResponse{
 		Success:   true,
-		Liability: utils.ToLiabilityProto(lia),
+		Liability: mapper.ToLiabilityProto(lia),
 	}, nil
 }
 
 func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLiabilityRequest) (*pb.LiabilityResponse, error) {
-	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
+	id, uid, err := utils.ValidateIDs(req.Id, req.Liability.CreatedBy)
 	if err != nil {
 		return nil, err
 	}
@@ -129,8 +158,7 @@ func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLi
 		return nil, err
 	}
 
-	updateMask, err := helper.ApplyUpdateFields(req, lia)
-	if err != nil {
+	if err := helper.ApplyUpdateFields(req, lia); err != nil {
 		return nil, err
 	}
 
@@ -147,14 +175,14 @@ func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLi
 		return nil, err
 	}
 
-	updatedLia, err := u.liaRepo.UpdateLiability(ctx, lia, updateMask)
+	updatedLia, err := u.liaRepo.UpdateLiability(ctx, lia)
 	if err != nil {
 		return nil, err
 	}
 
 	return &pb.LiabilityResponse{
 		Success:   true,
-		Liability: utils.ToLiabilityProto(updatedLia),
+		Liability: mapper.ToLiabilityProto(updatedLia),
 	}, nil
 }
 

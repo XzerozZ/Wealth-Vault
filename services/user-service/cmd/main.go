@@ -3,13 +3,18 @@ package main
 import (
 	"log"
 	"net"
+	grpcclient "wealth-vault/user-service/client"
 	config "wealth-vault/user-service/configs"
+	userCron "wealth-vault/user-service/internal/delivery/cron"
 	handler "wealth-vault/user-service/internal/delivery/grpc"
+	"wealth-vault/user-service/internal/event"
+	"wealth-vault/user-service/internal/infra"
 	repo "wealth-vault/user-service/internal/repository"
 	usecase "wealth-vault/user-service/internal/usecase"
 	"wealth-vault/user-service/pkg/database"
 	userpb "wealth-vault/user-service/pkg/pb/proto/user"
 	storageclient "wealth-vault/user-service/pkg/utils"
+	mailclient "wealth-vault/user-service/pkg/utils/mail"
 
 	"google.golang.org/grpc"
 )
@@ -22,12 +27,36 @@ func main() {
 		log.Fatal("Failed to initialize database")
 	}
 
+	assetClient, err := grpcclient.NewAssetClient(cfg.AssetGRPC.Host, cfg.AssetGRPC.Port)
+	if err != nil {
+		log.Fatal("user service:", err)
+	}
+
 	supabaseClient, err := storageclient.NewStorageClient(cfg.SUPA.URL, cfg.SUPA.Key, cfg.SUPA.Bucket)
+	if err != nil {
+		log.Fatal("supabase client:", err)
+	}
+
+	nc, err := infra.NewNATSConnection(cfg.NATS.Host, cfg.NATS.Port)
+	if err != nil {
+		log.Fatal("Failed to connect to NATS:", err)
+	}
+	defer nc.Close()
+
+	natsPublisher := event.NewPublisher(nc)
+	mailClient := mailclient.NewMailClient(cfg.Mail)
 	urepo := repo.NewUserRepository(db)
 	grepo := repo.NewGroupRepository(db)
+	irepo := repo.NewShareItemRepository(db)
+
 	uuc := usecase.NewUserUsecase(urepo, supabaseClient)
 	guc := usecase.NewGroupUsecase(grepo, supabaseClient)
-	uhandler := handler.NewUserGRPCHandler(uuc, guc)
+	iuc := usecase.NewShareItemUsecase(irepo, grepo, urepo, assetClient, mailClient, natsPublisher)
+
+	uhandler := handler.NewUserGRPCHandler(uuc, guc, iuc)
+	cronjob := userCron.NewAuthCronJob(iuc)
+
+	cronjob.Start()
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {

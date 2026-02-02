@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/asset/location.proto";
+import "proto/asset/file.proto";
+
+
+enum BuildingType {
+  BUILDING_TYPE_UNSPECIFIED = 0;
+  BUILDING_TYPE_CONDO = 1;      // คอนโด
+  BUILDING_TYPE_HOUSE = 2;      // บ้าน
+  BUILDING_TYPE_TOWNHOME = 3;   // ทาวน์โฮม
+  BUILDING_TYPE_COMMERCIAL = 4; // อาคารพาณิชย์
+}
+
+message Building {
+  string id = 1; 
+  string user_id = 2;
+  string name = 3;
+  BuildingType type = 4;
+  double area = 5;
+  double amount = 6; 
+  string description = 7;
+  Location location = 8;
+  repeated FileInfo files = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+  repeated Reference ref = 12;
+  repeated Reference ins = 13;
+}
+
+message CreateBuildingRequest { 
+  string user_id = 1;
+  string name = 2;
+  double area = 3;
+  BuildingType type = 4;
+  double amount = 5; 
+  string description = 6;
+  Location location = 7;
+  repeated FileInfo new_files = 8;
+  repeated string land_ids = 9;
+  repeated string ins_ids = 10;
+}
+
+message UpdateBuildingRequest{
+  string id = 1; 
+  Building building = 2;
+  repeated FileInfo new_files = 3;
+  repeated string delete_file_ids = 4;
+  google.protobuf.FieldMask update_mask = 5;
+  repeated string land_ids = 6;
+  repeated string delete_land_ids = 7;
+  repeated string ins_ids = 8;
+  repeated string delete_ins_ids = 9;
+}
+
+message BuildingArrayResponse { 
+  bool success = 1;
+  repeated Building building = 2; 
+}
+
+message  BuildingResponse { 
+  bool success = 1;
+  Building building = 2; 
+}

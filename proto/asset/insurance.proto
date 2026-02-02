@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package asset;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "proto/asset/file.proto";
+
+enum InsuranceType {
+  INSURANCE_TYPE_UNSPECIFIED = 0;
+  INSURANCE_TYPE_LIFE = 1;         // ชีวิต/สะสมทรัพย์
+  INSURANCE_TYPE_HEALTH = 2;       // สุขภาพ
+  INSURANCE_TYPE_ACCIDENT = 3;     // อุบัติเหตุ (PA)
+  INSURANCE_TYPE_PROPERTY = 4;     // อัคคีภัย/บ้าน
+  INSURANCE_TYPE_VEHICLE = 5;      // พาหนะ
+}
+
+message Insurance {
+  string id = 1; 
+  string user_id = 2;
+  string name = 3;
+  InsuranceType type  = 4; 
+  string pol_num = 5;
+  string company_name = 6;
+  double coverage_period = 7;
+  double coverage_amount = 8;
+  google.protobuf.Timestamp con_date = 9;
+  google.protobuf.Timestamp exp_date = 10;
+  string description = 11;
+  repeated FileInfo files = 12;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+}
+
+message CreateInsuranceRequest { 
+  string user_id = 1;
+  InsuranceType type = 2;
+  string name = 3;
+  string pol_num = 4; 
+  string company_name = 5;
+  double coverage_period = 6;
+  double coverage_amount = 7;
+  google.protobuf.Timestamp con_date = 8;
+  google.protobuf.Timestamp exp_date = 9;
+  string description = 10;
+  repeated FileInfo new_files = 11;
+}
+
+message UpdateInsuranceRequest{
+  string id = 1; 
+  Insurance insurance = 2;
+  repeated FileInfo new_files = 3;
+  repeated string delete_file_ids = 4;
+  google.protobuf.FieldMask update_mask = 5;
+}
+
+message InsuranceArrayResponse { 
+  bool success = 1;
+  repeated Insurance insurance = 2; 
+}
+
+message  InsuranceResponse { 
+  bool success = 1;
+  Insurance insurance = 2; 
+}

@@ -3,10 +3,12 @@ syntax = "proto3";
 option go_package = "wealth-vault/pkg/pb";
 
 service AuthService {
-  rpc Register (AuthRequest) returns (AuthResponse);
-  rpc Login (AuthRequest) returns (AuthResponse);
-
-  rpc RefreshToken (RefreshTokenRequest) returns (AuthResponse);
+  rpc Register(AuthRequest) returns (AuthResponse);
+  rpc Login(AuthRequest) returns (AuthResponse);
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse);
+  rpc VerifyForgotPasswordOTP(VerifyOTPRequest) returns (VerifyOTPResponse);
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (AuthResponse);
 }
 
 message AuthRequest {
@@ -23,4 +25,31 @@ message AuthResponse {
 
 message RefreshTokenRequest {
   string refresh_token = 1;
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ForgotPasswordResponse {
+  bool success = 1;
+}
+
+message VerifyOTPRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message VerifyOTPResponse {
+  bool success = 1;
+  string reset_token = 2;
+}
+
+message ResetPasswordRequest {
+  string reset_token = 1;
+  string new_password = 2;
+}
+
+message ResetPasswordResponse {
+  bool success = 1;
 }
