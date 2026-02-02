@@ -91,6 +91,7 @@ func (h *InsuranceHandler) CreateInsurance(c *fiber.Ctx) error {
 
 	grpcReq := &pb.CreateInsuranceRequest{
 		UserId:         userID,
+		Name:           req.Name,
 		PolNum:         req.PolicyNumber,
 		CompanyName:    req.CompanyName,
 		CoveragePeriod: period,
@@ -247,6 +248,7 @@ func (h *InsuranceHandler) UpdateInsurance(c *fiber.Ctx) error {
 		Id: id,
 		Insurance: &pb.Insurance{
 			UserId:         userID,
+			Name:           req.Name,
 			PolNum:         req.PolicyNumber,
 			CompanyName:    req.CompanyName,
 			CoveragePeriod: period,

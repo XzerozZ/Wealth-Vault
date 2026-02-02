@@ -10,6 +10,7 @@ import (
 type InvestmentRepository interface {
 	CreateInvestment(ctx context.Context, invest *domain.Investment) error
 	GetInvestment(ctx context.Context, uid uuid.UUID) ([]*domain.Investment, error)
+	GetInvestmentByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Investment, error)
 	GetInvestmentByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Investment, error)
 	UpdateInvestment(ctx context.Context, invest *domain.Investment) (*domain.Investment, error)
 	DeleteInvestment(ctx context.Context, id uuid.UUID, uid uuid.UUID) error

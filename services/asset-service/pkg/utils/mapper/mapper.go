@@ -38,6 +38,22 @@ func ToRefLandProto(land []domain.Land) []*pb.Reference {
 	return ref
 }
 
+func ToRefInsProto(land []domain.Insurance) []*pb.Reference {
+	if len(land) == 0 {
+		return []*pb.Reference{}
+	}
+
+	ref := make([]*pb.Reference, len(land))
+	for i, f := range land {
+		ref[i] = &pb.Reference{
+			Id:   f.ID.String(),
+			Name: f.Name,
+		}
+	}
+
+	return ref
+}
+
 func ToRefBuildingProto(build []domain.Building) []*pb.Reference {
 	if len(build) == 0 {
 		return []*pb.Reference{}

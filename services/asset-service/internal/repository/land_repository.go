@@ -33,6 +33,15 @@ func (r *LandRepository) GetLand(ctx context.Context, uid uuid.UUID) ([]*domain.
 	return items, nil
 }
 
+func (r *LandRepository) GetLandByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Land, error) {
+	var items []*domain.Land
+	if err := r.db.WithContext(ctx).Preload("Location").Where("id IN ?", ids).Find(&items).Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r *LandRepository) GetLandByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Land, error) {
 	var item domain.Land
 	if err := r.db.WithContext(ctx).Preload("Files").Preload("Location").Preload("Buildings").First(&item, "id = ? AND user_id = ?", id, uid).Error; err != nil {

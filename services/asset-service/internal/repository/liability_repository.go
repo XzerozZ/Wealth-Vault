@@ -32,6 +32,15 @@ func (r *LiabilityRepository) GetLiability(ctx context.Context, uid uuid.UUID) (
 	return lias, nil
 }
 
+func (r *LiabilityRepository) GetLiabilityByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Liability, error) {
+	var items []*domain.Liability
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&items).Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r *LiabilityRepository) GetLiabilityByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Liability, error) {
 	var lia domain.Liability
 	if err := r.db.WithContext(ctx).Preload("Files").First(&lia, "id = ? AND user_id = ?", id, uid).Error; err != nil {

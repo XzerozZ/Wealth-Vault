@@ -24,7 +24,7 @@ var File_proto_user_user_request_proto protoreflect.FileDescriptor
 
 const file_proto_user_user_request_proto_rawDesc = "" +
 	"\n" +
-	"\x1dproto/user/user_request.proto\x12\x04user\x1a\x15proto/user/user.proto\x1a\x16proto/user/group.proto2\xb7\x04\n" +
+	"\x1dproto/user/user_request.proto\x12\x04user\x1a\x15proto/user/user.proto\x1a\x16proto/user/group.proto\x1a\x16proto/user/share.proto2\xa8\b\n" +
 	"\vUserService\x129\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x12.user.UserResponse\x127\n" +
@@ -36,7 +36,14 @@ const file_proto_user_user_request_proto_rawDesc = "" +
 	"\vCreateGroup\x12\x18.user.CreateGroupRequest\x1a\x13.user.GroupResponse\x126\n" +
 	"\bGetGroup\x12\x15.user.GetGroupRequest\x1a\x13.user.GroupResponse\x12H\n" +
 	"\tGetMember\x12\x1c.user.GetGroupMembersRequest\x1a\x1d.user.GetGroupMembersResponse\x12<\n" +
-	"\vUpdateGroup\x12\x18.user.UpdateGroupRequest\x1a\x13.user.GroupResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\vUpdateGroup\x12\x18.user.UpdateGroupRequest\x1a\x13.user.GroupResponse\x12>\n" +
+	"\x0eAddGroupMember\x12\x16.user.AddMemberRequest\x1a\x14.user.ActionResponse\x12F\n" +
+	"\x14GrantGroupItemAccess\x12\x18.user.GrantAccessRequest\x1a\x14.user.ActionResponse\x12<\n" +
+	"\tShareItem\x12\x16.user.ShareItemRequest\x1a\x17.user.ShareItemResponse\x12H\n" +
+	"\rGetSharedItem\x12\x1a.user.GetGroupItemsRequest\x1a\x1b.user.GetGroupItemsResponse\x12Q\n" +
+	"\x15GetSharedIteminFriend\x12\x1a.user.GetFriendItemRequest\x1a\x1c.user.GetFriendItemsResponse\x12A\n" +
+	"\fUnsharedItem\x12\x18.user.UnshareItemRequest\x1a\x17.user.ShareItemResponse\x12I\n" +
+	"\x14UnsharedIteminFriend\x12\x18.user.UnshareItemRequest\x1a\x17.user.ShareItemResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var file_proto_user_user_request_proto_goTypes = []any{
 	(*CreateUserRequest)(nil),       // 0: user.CreateUserRequest
@@ -47,11 +54,21 @@ var file_proto_user_user_request_proto_goTypes = []any{
 	(*GetGroupRequest)(nil),         // 5: user.GetGroupRequest
 	(*GetGroupMembersRequest)(nil),  // 6: user.GetGroupMembersRequest
 	(*UpdateGroupRequest)(nil),      // 7: user.UpdateGroupRequest
-	(*UserResponse)(nil),            // 8: user.UserResponse
-	(*FriendListResponse)(nil),      // 9: user.FriendListResponse
-	(*FriendResponse)(nil),          // 10: user.FriendResponse
-	(*GroupResponse)(nil),           // 11: user.GroupResponse
-	(*GetGroupMembersResponse)(nil), // 12: user.GetGroupMembersResponse
+	(*AddMemberRequest)(nil),        // 8: user.AddMemberRequest
+	(*GrantAccessRequest)(nil),      // 9: user.GrantAccessRequest
+	(*ShareItemRequest)(nil),        // 10: user.ShareItemRequest
+	(*GetGroupItemsRequest)(nil),    // 11: user.GetGroupItemsRequest
+	(*GetFriendItemRequest)(nil),    // 12: user.GetFriendItemRequest
+	(*UnshareItemRequest)(nil),      // 13: user.UnshareItemRequest
+	(*UserResponse)(nil),            // 14: user.UserResponse
+	(*FriendListResponse)(nil),      // 15: user.FriendListResponse
+	(*FriendResponse)(nil),          // 16: user.FriendResponse
+	(*GroupResponse)(nil),           // 17: user.GroupResponse
+	(*GetGroupMembersResponse)(nil), // 18: user.GetGroupMembersResponse
+	(*ActionResponse)(nil),          // 19: user.ActionResponse
+	(*ShareItemResponse)(nil),       // 20: user.ShareItemResponse
+	(*GetGroupItemsResponse)(nil),   // 21: user.GetGroupItemsResponse
+	(*GetFriendItemsResponse)(nil),  // 22: user.GetFriendItemsResponse
 }
 var file_proto_user_user_request_proto_depIdxs = []int32{
 	0,  // 0: user.UserService.CreateUser:input_type -> user.CreateUserRequest
@@ -63,17 +80,31 @@ var file_proto_user_user_request_proto_depIdxs = []int32{
 	5,  // 6: user.UserService.GetGroup:input_type -> user.GetGroupRequest
 	6,  // 7: user.UserService.GetMember:input_type -> user.GetGroupMembersRequest
 	7,  // 8: user.UserService.UpdateGroup:input_type -> user.UpdateGroupRequest
-	8,  // 9: user.UserService.CreateUser:output_type -> user.UserResponse
-	8,  // 10: user.UserService.GetUser:output_type -> user.UserResponse
-	8,  // 11: user.UserService.UpdateUser:output_type -> user.UserResponse
-	9,  // 12: user.UserService.GetFriendList:output_type -> user.FriendListResponse
-	10, // 13: user.UserService.AddFriend:output_type -> user.FriendResponse
-	11, // 14: user.UserService.CreateGroup:output_type -> user.GroupResponse
-	11, // 15: user.UserService.GetGroup:output_type -> user.GroupResponse
-	12, // 16: user.UserService.GetMember:output_type -> user.GetGroupMembersResponse
-	11, // 17: user.UserService.UpdateGroup:output_type -> user.GroupResponse
-	9,  // [9:18] is the sub-list for method output_type
-	0,  // [0:9] is the sub-list for method input_type
+	8,  // 9: user.UserService.AddGroupMember:input_type -> user.AddMemberRequest
+	9,  // 10: user.UserService.GrantGroupItemAccess:input_type -> user.GrantAccessRequest
+	10, // 11: user.UserService.ShareItem:input_type -> user.ShareItemRequest
+	11, // 12: user.UserService.GetSharedItem:input_type -> user.GetGroupItemsRequest
+	12, // 13: user.UserService.GetSharedIteminFriend:input_type -> user.GetFriendItemRequest
+	13, // 14: user.UserService.UnsharedItem:input_type -> user.UnshareItemRequest
+	13, // 15: user.UserService.UnsharedIteminFriend:input_type -> user.UnshareItemRequest
+	14, // 16: user.UserService.CreateUser:output_type -> user.UserResponse
+	14, // 17: user.UserService.GetUser:output_type -> user.UserResponse
+	14, // 18: user.UserService.UpdateUser:output_type -> user.UserResponse
+	15, // 19: user.UserService.GetFriendList:output_type -> user.FriendListResponse
+	16, // 20: user.UserService.AddFriend:output_type -> user.FriendResponse
+	17, // 21: user.UserService.CreateGroup:output_type -> user.GroupResponse
+	17, // 22: user.UserService.GetGroup:output_type -> user.GroupResponse
+	18, // 23: user.UserService.GetMember:output_type -> user.GetGroupMembersResponse
+	17, // 24: user.UserService.UpdateGroup:output_type -> user.GroupResponse
+	19, // 25: user.UserService.AddGroupMember:output_type -> user.ActionResponse
+	19, // 26: user.UserService.GrantGroupItemAccess:output_type -> user.ActionResponse
+	20, // 27: user.UserService.ShareItem:output_type -> user.ShareItemResponse
+	21, // 28: user.UserService.GetSharedItem:output_type -> user.GetGroupItemsResponse
+	22, // 29: user.UserService.GetSharedIteminFriend:output_type -> user.GetFriendItemsResponse
+	20, // 30: user.UserService.UnsharedItem:output_type -> user.ShareItemResponse
+	20, // 31: user.UserService.UnsharedIteminFriend:output_type -> user.ShareItemResponse
+	16, // [16:32] is the sub-list for method output_type
+	0,  // [0:16] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -86,6 +117,7 @@ func file_proto_user_user_request_proto_init() {
 	}
 	file_proto_user_user_proto_init()
 	file_proto_user_group_proto_init()
+	file_proto_user_share_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

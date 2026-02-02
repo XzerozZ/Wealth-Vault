@@ -33,6 +33,7 @@ func ToBuildingProto(d *domain.Building) *pb.Building {
 		Location:    ToLocationProto(&d.Location),
 		Files:       ToPbFiles(d.Files),
 		Ref:         ToRefLandProto(d.Lands),
+		Ins:         ToRefInsProto(d.Insurances),
 		CreatedAt:   timestamppb.New(d.CreatedAt),
 		UpdatedAt:   timestamppb.New(d.UpdatedAt),
 	}

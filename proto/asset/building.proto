@@ -31,6 +31,7 @@ message Building {
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
   repeated Reference ref = 12;
+  repeated Reference ins = 13;
 }
 
 message CreateBuildingRequest { 
@@ -43,6 +44,7 @@ message CreateBuildingRequest {
   Location location = 7;
   repeated FileInfo new_files = 8;
   repeated string land_ids = 9;
+  repeated string ins_ids = 10;
 }
 
 message UpdateBuildingRequest{
@@ -53,6 +55,8 @@ message UpdateBuildingRequest{
   google.protobuf.FieldMask update_mask = 5;
   repeated string land_ids = 6;
   repeated string delete_land_ids = 7;
+  repeated string ins_ids = 8;
+  repeated string delete_ins_ids = 9;
 }
 
 message BuildingArrayResponse { 

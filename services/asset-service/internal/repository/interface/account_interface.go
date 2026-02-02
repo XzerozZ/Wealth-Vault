@@ -10,6 +10,7 @@ import (
 type AccountRepository interface {
 	CreateAccount(ctx context.Context, item *domain.Account) error
 	GetAccount(ctx context.Context, uid uuid.UUID) ([]*domain.Account, error)
+	GetAccountByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Account, error)
 	GetAccountByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Account, error)
 	UpdateAccount(ctx context.Context, item *domain.Account) (*domain.Account, error)
 	DeleteAccount(ctx context.Context, id uuid.UUID, uid uuid.UUID) error

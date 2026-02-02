@@ -58,6 +58,15 @@ func (u *BuildingUsecase) CreateBuilding(ctx context.Context, req *pb.CreateBuil
 		}
 	}
 
+	var ins []domain.Insurance
+	if len(req.InsIds) > 0 {
+		for _, id := range req.InsIds {
+			if uid, err := uuid.Parse(id); err == nil {
+				ins = append(ins, domain.Insurance{ID: uid})
+			}
+		}
+	}
+
 	loc := domain.Location{
 		Address:     req.Location.Address,
 		Subdistrict: req.Location.Subdistrict,
@@ -75,6 +84,7 @@ func (u *BuildingUsecase) CreateBuilding(ctx context.Context, req *pb.CreateBuil
 		Description: req.Description,
 		Location:    loc,
 		Lands:       lands,
+		Insurances:  ins,
 		Files:       domainFiles,
 	}
 
@@ -106,6 +116,29 @@ func (u *BuildingUsecase) GetBuilding(ctx context.Context, req *pb.GetAssetReque
 	return &pb.BuildingArrayResponse{
 		Success:  true,
 		Building: BuildList,
+	}, nil
+}
+
+func (u *BuildingUsecase) GetBuildingByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.BuildingArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.buildRepo.GetBuildingByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbBuildings []*pb.Building
+	for _, a := range bu {
+		pbBuildings = append(pbBuildings, mapper.ToBuildingProto(a))
+	}
+
+	return &pb.BuildingArrayResponse{
+		Building: pbBuildings,
 	}, nil
 }
 
@@ -141,8 +174,7 @@ func (u *BuildingUsecase) UpdateBuilding(ctx context.Context, req *pb.UpdateBuil
 		return nil, err
 	}
 
-	var addLandIDs, removeLandIDs []uuid.UUID
-
+	var addLandIDs, removeLandIDs, addInsIDs, removeInsIDs []uuid.UUID
 	if len(req.LandIds) > 0 {
 		for _, idStr := range req.LandIds {
 			if parsedID, err := uuid.Parse(idStr); err == nil {
@@ -155,6 +187,22 @@ func (u *BuildingUsecase) UpdateBuilding(ctx context.Context, req *pb.UpdateBuil
 		for _, idStr := range req.DeleteLandIds {
 			if parsedID, err := uuid.Parse(idStr); err == nil {
 				removeLandIDs = append(removeLandIDs, parsedID)
+			}
+		}
+	}
+
+	if len(req.InsIds) > 0 {
+		for _, idStr := range req.InsIds {
+			if parsedID, err := uuid.Parse(idStr); err == nil {
+				addInsIDs = append(addInsIDs, parsedID)
+			}
+		}
+	}
+
+	if len(req.DeleteInsIds) > 0 {
+		for _, idStr := range req.DeleteInsIds {
+			if parsedID, err := uuid.Parse(idStr); err == nil {
+				removeInsIDs = append(removeInsIDs, parsedID)
 			}
 		}
 	}
@@ -172,7 +220,7 @@ func (u *BuildingUsecase) UpdateBuilding(ctx context.Context, req *pb.UpdateBuil
 		return nil, err
 	}
 
-	updatedBuilding, err := u.buildRepo.UpdateBuilding(ctx, building, addLandIDs, removeLandIDs)
+	updatedBuilding, err := u.buildRepo.UpdateBuilding(ctx, building, addLandIDs, removeLandIDs, addInsIDs, removeInsIDs)
 	if err != nil {
 		return nil, err
 	}

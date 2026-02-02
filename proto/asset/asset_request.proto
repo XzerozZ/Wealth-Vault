@@ -56,12 +56,22 @@ service AssetService {
   rpc GetInsuranceByID(GetAssetByIDRequest) returns (InsuranceResponse);
   rpc DeleteInsurance(DeleteAssetRequest) returns (DeleteAssetResponse);
 
+  // ------ Liability ------
   rpc CreateLiability(CreateLiabilityRequest) returns (LiabilityResponse);
   rpc GetLiability(GetLiabilityRequest) returns (LiabilityArrayResponse);
   rpc GetLiabilityByID(GetLiabilityByIDRequest) returns (LiabilityResponse);
   rpc UpdateLiability(UpdateLiabilityRequest) returns (LiabilityResponse);
   rpc DeleteLiability(DeleteLiabilityRequest) returns (DeleteLiabilityResponse);
 
-  // Dashboard / Wealth
+  // ----- User Service ------
+  rpc CheckAssetExists(CheckAssetRequest) returns (CheckAssetResponse);
+  rpc GetBatchAccount(GetBatchIdsRequest) returns (AccountArrayResponse);
+  rpc GetBatchCash(GetBatchIdsRequest) returns (CashArrayResponse);
+  rpc GetBatchInvestment(GetBatchIdsRequest) returns (InvestmentArrayResponse);
+  rpc GetBatchInsurance(GetBatchIdsRequest) returns (InsuranceArrayResponse);
+  rpc GetBatchBuilding(GetBatchIdsRequest) returns (BuildingArrayResponse);
+  rpc GetBatchLand(GetBatchIdsRequest) returns (LandArrayResponse);
+  rpc GetBatchLiability(GetBatchIdsRequest) returns (LiabilityArrayResponse);
+
   rpc GetNetWorth(GetNetWorthRequest) returns (GetNetWorthResponse);
 }

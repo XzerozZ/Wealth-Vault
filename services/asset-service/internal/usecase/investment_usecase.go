@@ -92,6 +92,29 @@ func (u *InvestmentUsecase) GetInvestment(ctx context.Context, req *pb.GetAssetR
 	}, nil
 }
 
+func (u *InvestmentUsecase) GetInvestmentByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.InvestmentArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.inRepo.GetInvestmentByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbIns []*pb.Investment
+	for _, a := range bu {
+		pbIns = append(pbIns, mapper.ToInvestProto(a))
+	}
+
+	return &pb.InvestmentArrayResponse{
+		Invest: pbIns,
+	}, nil
+}
+
 func (u *InvestmentUsecase) GetInvestmentByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.InvestmentResponse, error) {
 	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {

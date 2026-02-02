@@ -2,9 +2,7 @@ package utils
 
 import (
 	"strconv"
-	"strings"
 	"time"
-	pb "wealth-vault/api-gateway/pkg/pb/proto/asset"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -16,26 +14,6 @@ func Parseamount(amountStr string) (float64, error) {
 	}
 
 	return val, nil
-}
-
-func GetFolderName(t pb.AssetType) string {
-	rawName := t.String()
-	if t == pb.AssetType_ASSET_TYPE_UNSPECIFIED {
-		return "misc"
-	}
-
-	cleanName := strings.TrimPrefix(rawName, "LIABILITY_TYPE_")
-	return strings.ToLower(cleanName)
-}
-
-func GetFolderLiaName(t pb.LiabilityType) string {
-	rawName := t.String()
-	if t == pb.LiabilityType_LIABILITY_TYPE_UNSPECIFIED {
-		return "misc"
-	}
-
-	cleanName := strings.TrimPrefix(rawName, "ASSET_TYPE_")
-	return strings.ToLower(cleanName)
 }
 
 func ToProtoTime(t *time.Time) *timestamppb.Timestamp {

@@ -13,6 +13,7 @@ type Building struct {
 	Location    Location   `json:"location"`
 	Files       []FileInfo `json:"files,omitempty"`
 	Ref         []RefInfo  `json:"ref,omitempty"`
+	Ins         []InsInfo  `json:"ins,omitempty"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 }
@@ -25,6 +26,7 @@ type CreateBuildingRequest struct {
 	Description  string          `json:"desc" form:"description"`
 	Location     LocationRequest `json:"location" form:"location"`
 	ReferenceIDs []string        `json:"reference_ids" form:"reference_ids"`
+	InsIDs       []string        `json:"ins_ids" form:"ins_ids"`
 }
 
 type UpdateBuildingRequest struct {
@@ -36,5 +38,7 @@ type UpdateBuildingRequest struct {
 	Location           LocationRequest `json:"location" form:"location"`
 	ReferenceIDs       []string        `json:"reference_ids" form:"reference_ids"`
 	DeleteReferenceIDs []string        `json:"delete_reference_ids" form:"delete_reference_ids"`
+	InsIDs             []string        `json:"ins_ids" form:"ins_ids"`
+	DeleteInsIDs       []string        `json:"delete_ins_ids" form:"delete_ins_ids"`
 	DeleteFileIDs      []string        `json:"delete_file_ids" form:"delete_file_ids"`
 }

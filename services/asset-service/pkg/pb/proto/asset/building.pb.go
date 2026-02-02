@@ -92,6 +92,7 @@ type Building struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Ref           []*Reference           `protobuf:"bytes,12,rep,name=ref,proto3" json:"ref,omitempty"`
+	Ins           []*Reference           `protobuf:"bytes,13,rep,name=ins,proto3" json:"ins,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -210,6 +211,13 @@ func (x *Building) GetRef() []*Reference {
 	return nil
 }
 
+func (x *Building) GetIns() []*Reference {
+	if x != nil {
+		return x.Ins
+	}
+	return nil
+}
+
 type CreateBuildingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -221,6 +229,7 @@ type CreateBuildingRequest struct {
 	Location      *Location              `protobuf:"bytes,7,opt,name=location,proto3" json:"location,omitempty"`
 	NewFiles      []*FileInfo            `protobuf:"bytes,8,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
 	LandIds       []string               `protobuf:"bytes,9,rep,name=land_ids,json=landIds,proto3" json:"land_ids,omitempty"`
+	InsIds        []string               `protobuf:"bytes,10,rep,name=ins_ids,json=insIds,proto3" json:"ins_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -318,6 +327,13 @@ func (x *CreateBuildingRequest) GetLandIds() []string {
 	return nil
 }
 
+func (x *CreateBuildingRequest) GetInsIds() []string {
+	if x != nil {
+		return x.InsIds
+	}
+	return nil
+}
+
 type UpdateBuildingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -327,6 +343,8 @@ type UpdateBuildingRequest struct {
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,5,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	LandIds       []string               `protobuf:"bytes,6,rep,name=land_ids,json=landIds,proto3" json:"land_ids,omitempty"`
 	DeleteLandIds []string               `protobuf:"bytes,7,rep,name=delete_land_ids,json=deleteLandIds,proto3" json:"delete_land_ids,omitempty"`
+	InsIds        []string               `protobuf:"bytes,8,rep,name=ins_ids,json=insIds,proto3" json:"ins_ids,omitempty"`
+	DeleteInsIds  []string               `protobuf:"bytes,9,rep,name=delete_ins_ids,json=deleteInsIds,proto3" json:"delete_ins_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -406,6 +424,20 @@ func (x *UpdateBuildingRequest) GetLandIds() []string {
 func (x *UpdateBuildingRequest) GetDeleteLandIds() []string {
 	if x != nil {
 		return x.DeleteLandIds
+	}
+	return nil
+}
+
+func (x *UpdateBuildingRequest) GetInsIds() []string {
+	if x != nil {
+		return x.InsIds
+	}
+	return nil
+}
+
+func (x *UpdateBuildingRequest) GetDeleteInsIds() []string {
+	if x != nil {
+		return x.DeleteInsIds
 	}
 	return nil
 }
@@ -518,7 +550,7 @@ var File_proto_asset_building_proto protoreflect.FileDescriptor
 
 const file_proto_asset_building_proto_rawDesc = "" +
 	"\n" +
-	"\x1aproto/asset/building.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1aproto/asset/location.proto\x1a\x16proto/asset/file.proto\"\xac\x03\n" +
+	"\x1aproto/asset/building.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1aproto/asset/location.proto\x1a\x16proto/asset/file.proto\"\xd0\x03\n" +
 	"\bBuilding\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
@@ -534,7 +566,8 @@ const file_proto_asset_building_proto_rawDesc = "" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\"\n" +
-	"\x03ref\x18\f \x03(\v2\x10.asset.ReferenceR\x03ref\"\xb1\x02\n" +
+	"\x03ref\x18\f \x03(\v2\x10.asset.ReferenceR\x03ref\x12\"\n" +
+	"\x03ins\x18\r \x03(\v2\x10.asset.ReferenceR\x03ins\"\xca\x02\n" +
 	"\x15CreateBuildingRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -544,7 +577,9 @@ const file_proto_asset_building_proto_rawDesc = "" +
 	"\vdescription\x18\x06 \x01(\tR\vdescription\x12+\n" +
 	"\blocation\x18\a \x01(\v2\x0f.asset.LocationR\blocation\x12,\n" +
 	"\tnew_files\x18\b \x03(\v2\x0f.asset.FileInfoR\bnewFiles\x12\x19\n" +
-	"\bland_ids\x18\t \x03(\tR\alandIds\"\xaa\x02\n" +
+	"\bland_ids\x18\t \x03(\tR\alandIds\x12\x17\n" +
+	"\ains_ids\x18\n" +
+	" \x03(\tR\x06insIds\"\xe9\x02\n" +
 	"\x15UpdateBuildingRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12+\n" +
 	"\bbuilding\x18\x02 \x01(\v2\x0f.asset.BuildingR\bbuilding\x12,\n" +
@@ -553,7 +588,9 @@ const file_proto_asset_building_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x05 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
 	"updateMask\x12\x19\n" +
 	"\bland_ids\x18\x06 \x03(\tR\alandIds\x12&\n" +
-	"\x0fdelete_land_ids\x18\a \x03(\tR\rdeleteLandIds\"^\n" +
+	"\x0fdelete_land_ids\x18\a \x03(\tR\rdeleteLandIds\x12\x17\n" +
+	"\ains_ids\x18\b \x03(\tR\x06insIds\x12$\n" +
+	"\x0edelete_ins_ids\x18\t \x03(\tR\fdeleteInsIds\"^\n" +
 	"\x15BuildingArrayResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12+\n" +
 	"\bbuilding\x18\x02 \x03(\v2\x0f.asset.BuildingR\bbuilding\"Y\n" +
@@ -601,19 +638,20 @@ var file_proto_asset_building_proto_depIdxs = []int32{
 	8,  // 3: asset.Building.created_at:type_name -> google.protobuf.Timestamp
 	8,  // 4: asset.Building.updated_at:type_name -> google.protobuf.Timestamp
 	9,  // 5: asset.Building.ref:type_name -> asset.Reference
-	0,  // 6: asset.CreateBuildingRequest.type:type_name -> asset.BuildingType
-	6,  // 7: asset.CreateBuildingRequest.location:type_name -> asset.Location
-	7,  // 8: asset.CreateBuildingRequest.new_files:type_name -> asset.FileInfo
-	1,  // 9: asset.UpdateBuildingRequest.building:type_name -> asset.Building
-	7,  // 10: asset.UpdateBuildingRequest.new_files:type_name -> asset.FileInfo
-	10, // 11: asset.UpdateBuildingRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,  // 12: asset.BuildingArrayResponse.building:type_name -> asset.Building
-	1,  // 13: asset.BuildingResponse.building:type_name -> asset.Building
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	9,  // 6: asset.Building.ins:type_name -> asset.Reference
+	0,  // 7: asset.CreateBuildingRequest.type:type_name -> asset.BuildingType
+	6,  // 8: asset.CreateBuildingRequest.location:type_name -> asset.Location
+	7,  // 9: asset.CreateBuildingRequest.new_files:type_name -> asset.FileInfo
+	1,  // 10: asset.UpdateBuildingRequest.building:type_name -> asset.Building
+	7,  // 11: asset.UpdateBuildingRequest.new_files:type_name -> asset.FileInfo
+	10, // 12: asset.UpdateBuildingRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 13: asset.BuildingArrayResponse.building:type_name -> asset.Building
+	1,  // 14: asset.BuildingResponse.building:type_name -> asset.Building
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_building_proto_init() }

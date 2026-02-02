@@ -19,42 +19,50 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AssetService_CreateAccount_FullMethodName     = "/asset.AssetService/CreateAccount"
-	AssetService_UpdateAccount_FullMethodName     = "/asset.AssetService/UpdateAccount"
-	AssetService_GetAccount_FullMethodName        = "/asset.AssetService/GetAccount"
-	AssetService_GetAccountByID_FullMethodName    = "/asset.AssetService/GetAccountByID"
-	AssetService_DeleteAccount_FullMethodName     = "/asset.AssetService/DeleteAccount"
-	AssetService_CreateCash_FullMethodName        = "/asset.AssetService/CreateCash"
-	AssetService_UpdateCash_FullMethodName        = "/asset.AssetService/UpdateCash"
-	AssetService_GetCash_FullMethodName           = "/asset.AssetService/GetCash"
-	AssetService_GetCashByID_FullMethodName       = "/asset.AssetService/GetCashByID"
-	AssetService_DeleteCash_FullMethodName        = "/asset.AssetService/DeleteCash"
-	AssetService_CreateInvestment_FullMethodName  = "/asset.AssetService/CreateInvestment"
-	AssetService_UpdateInvestment_FullMethodName  = "/asset.AssetService/UpdateInvestment"
-	AssetService_GetInvestment_FullMethodName     = "/asset.AssetService/GetInvestment"
-	AssetService_GetInvestmentByID_FullMethodName = "/asset.AssetService/GetInvestmentByID"
-	AssetService_DeleteInvestment_FullMethodName  = "/asset.AssetService/DeleteInvestment"
-	AssetService_CreateBuilding_FullMethodName    = "/asset.AssetService/CreateBuilding"
-	AssetService_UpdateBuilding_FullMethodName    = "/asset.AssetService/UpdateBuilding"
-	AssetService_GetBuilding_FullMethodName       = "/asset.AssetService/GetBuilding"
-	AssetService_GetBuildingByID_FullMethodName   = "/asset.AssetService/GetBuildingByID"
-	AssetService_DeleteBuilding_FullMethodName    = "/asset.AssetService/DeleteBuilding"
-	AssetService_CreateLand_FullMethodName        = "/asset.AssetService/CreateLand"
-	AssetService_UpdateLand_FullMethodName        = "/asset.AssetService/UpdateLand"
-	AssetService_GetLand_FullMethodName           = "/asset.AssetService/GetLand"
-	AssetService_GetLandByID_FullMethodName       = "/asset.AssetService/GetLandByID"
-	AssetService_DeleteLand_FullMethodName        = "/asset.AssetService/DeleteLand"
-	AssetService_CreateInsurance_FullMethodName   = "/asset.AssetService/CreateInsurance"
-	AssetService_UpdateInsurance_FullMethodName   = "/asset.AssetService/UpdateInsurance"
-	AssetService_GetInsurance_FullMethodName      = "/asset.AssetService/GetInsurance"
-	AssetService_GetInsuranceByID_FullMethodName  = "/asset.AssetService/GetInsuranceByID"
-	AssetService_DeleteInsurance_FullMethodName   = "/asset.AssetService/DeleteInsurance"
-	AssetService_CreateLiability_FullMethodName   = "/asset.AssetService/CreateLiability"
-	AssetService_GetLiability_FullMethodName      = "/asset.AssetService/GetLiability"
-	AssetService_GetLiabilityByID_FullMethodName  = "/asset.AssetService/GetLiabilityByID"
-	AssetService_UpdateLiability_FullMethodName   = "/asset.AssetService/UpdateLiability"
-	AssetService_DeleteLiability_FullMethodName   = "/asset.AssetService/DeleteLiability"
-	AssetService_GetNetWorth_FullMethodName       = "/asset.AssetService/GetNetWorth"
+	AssetService_CreateAccount_FullMethodName      = "/asset.AssetService/CreateAccount"
+	AssetService_UpdateAccount_FullMethodName      = "/asset.AssetService/UpdateAccount"
+	AssetService_GetAccount_FullMethodName         = "/asset.AssetService/GetAccount"
+	AssetService_GetAccountByID_FullMethodName     = "/asset.AssetService/GetAccountByID"
+	AssetService_DeleteAccount_FullMethodName      = "/asset.AssetService/DeleteAccount"
+	AssetService_CreateCash_FullMethodName         = "/asset.AssetService/CreateCash"
+	AssetService_UpdateCash_FullMethodName         = "/asset.AssetService/UpdateCash"
+	AssetService_GetCash_FullMethodName            = "/asset.AssetService/GetCash"
+	AssetService_GetCashByID_FullMethodName        = "/asset.AssetService/GetCashByID"
+	AssetService_DeleteCash_FullMethodName         = "/asset.AssetService/DeleteCash"
+	AssetService_CreateInvestment_FullMethodName   = "/asset.AssetService/CreateInvestment"
+	AssetService_UpdateInvestment_FullMethodName   = "/asset.AssetService/UpdateInvestment"
+	AssetService_GetInvestment_FullMethodName      = "/asset.AssetService/GetInvestment"
+	AssetService_GetInvestmentByID_FullMethodName  = "/asset.AssetService/GetInvestmentByID"
+	AssetService_DeleteInvestment_FullMethodName   = "/asset.AssetService/DeleteInvestment"
+	AssetService_CreateBuilding_FullMethodName     = "/asset.AssetService/CreateBuilding"
+	AssetService_UpdateBuilding_FullMethodName     = "/asset.AssetService/UpdateBuilding"
+	AssetService_GetBuilding_FullMethodName        = "/asset.AssetService/GetBuilding"
+	AssetService_GetBuildingByID_FullMethodName    = "/asset.AssetService/GetBuildingByID"
+	AssetService_DeleteBuilding_FullMethodName     = "/asset.AssetService/DeleteBuilding"
+	AssetService_CreateLand_FullMethodName         = "/asset.AssetService/CreateLand"
+	AssetService_UpdateLand_FullMethodName         = "/asset.AssetService/UpdateLand"
+	AssetService_GetLand_FullMethodName            = "/asset.AssetService/GetLand"
+	AssetService_GetLandByID_FullMethodName        = "/asset.AssetService/GetLandByID"
+	AssetService_DeleteLand_FullMethodName         = "/asset.AssetService/DeleteLand"
+	AssetService_CreateInsurance_FullMethodName    = "/asset.AssetService/CreateInsurance"
+	AssetService_UpdateInsurance_FullMethodName    = "/asset.AssetService/UpdateInsurance"
+	AssetService_GetInsurance_FullMethodName       = "/asset.AssetService/GetInsurance"
+	AssetService_GetInsuranceByID_FullMethodName   = "/asset.AssetService/GetInsuranceByID"
+	AssetService_DeleteInsurance_FullMethodName    = "/asset.AssetService/DeleteInsurance"
+	AssetService_CreateLiability_FullMethodName    = "/asset.AssetService/CreateLiability"
+	AssetService_GetLiability_FullMethodName       = "/asset.AssetService/GetLiability"
+	AssetService_GetLiabilityByID_FullMethodName   = "/asset.AssetService/GetLiabilityByID"
+	AssetService_UpdateLiability_FullMethodName    = "/asset.AssetService/UpdateLiability"
+	AssetService_DeleteLiability_FullMethodName    = "/asset.AssetService/DeleteLiability"
+	AssetService_CheckAssetExists_FullMethodName   = "/asset.AssetService/CheckAssetExists"
+	AssetService_GetBatchAccount_FullMethodName    = "/asset.AssetService/GetBatchAccount"
+	AssetService_GetBatchCash_FullMethodName       = "/asset.AssetService/GetBatchCash"
+	AssetService_GetBatchInvestment_FullMethodName = "/asset.AssetService/GetBatchInvestment"
+	AssetService_GetBatchInsurance_FullMethodName  = "/asset.AssetService/GetBatchInsurance"
+	AssetService_GetBatchBuilding_FullMethodName   = "/asset.AssetService/GetBatchBuilding"
+	AssetService_GetBatchLand_FullMethodName       = "/asset.AssetService/GetBatchLand"
+	AssetService_GetBatchLiability_FullMethodName  = "/asset.AssetService/GetBatchLiability"
+	AssetService_GetNetWorth_FullMethodName        = "/asset.AssetService/GetNetWorth"
 )
 
 // AssetServiceClient is the client API for AssetService service.
@@ -97,12 +105,21 @@ type AssetServiceClient interface {
 	GetInsurance(ctx context.Context, in *GetAssetRequest, opts ...grpc.CallOption) (*InsuranceArrayResponse, error)
 	GetInsuranceByID(ctx context.Context, in *GetAssetByIDRequest, opts ...grpc.CallOption) (*InsuranceResponse, error)
 	DeleteInsurance(ctx context.Context, in *DeleteAssetRequest, opts ...grpc.CallOption) (*DeleteAssetResponse, error)
+	// ------ Liability ------
 	CreateLiability(ctx context.Context, in *CreateLiabilityRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
 	GetLiability(ctx context.Context, in *GetLiabilityRequest, opts ...grpc.CallOption) (*LiabilityArrayResponse, error)
 	GetLiabilityByID(ctx context.Context, in *GetLiabilityByIDRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
 	UpdateLiability(ctx context.Context, in *UpdateLiabilityRequest, opts ...grpc.CallOption) (*LiabilityResponse, error)
 	DeleteLiability(ctx context.Context, in *DeleteLiabilityRequest, opts ...grpc.CallOption) (*DeleteLiabilityResponse, error)
-	// Dashboard / Wealth
+	// ----- User Service ------
+	CheckAssetExists(ctx context.Context, in *CheckAssetRequest, opts ...grpc.CallOption) (*CheckAssetResponse, error)
+	GetBatchAccount(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*AccountArrayResponse, error)
+	GetBatchCash(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*CashArrayResponse, error)
+	GetBatchInvestment(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*InvestmentArrayResponse, error)
+	GetBatchInsurance(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*InsuranceArrayResponse, error)
+	GetBatchBuilding(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*BuildingArrayResponse, error)
+	GetBatchLand(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*LandArrayResponse, error)
+	GetBatchLiability(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*LiabilityArrayResponse, error)
 	GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error)
 }
 
@@ -464,6 +481,86 @@ func (c *assetServiceClient) DeleteLiability(ctx context.Context, in *DeleteLiab
 	return out, nil
 }
 
+func (c *assetServiceClient) CheckAssetExists(ctx context.Context, in *CheckAssetRequest, opts ...grpc.CallOption) (*CheckAssetResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckAssetResponse)
+	err := c.cc.Invoke(ctx, AssetService_CheckAssetExists_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetBatchAccount(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*AccountArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AccountArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetBatchAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetBatchCash(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*CashArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CashArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetBatchCash_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetBatchInvestment(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*InvestmentArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InvestmentArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetBatchInvestment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetBatchInsurance(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*InsuranceArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InsuranceArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetBatchInsurance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetBatchBuilding(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*BuildingArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BuildingArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetBatchBuilding_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetBatchLand(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*LandArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LandArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetBatchLand_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *assetServiceClient) GetBatchLiability(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*LiabilityArrayResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LiabilityArrayResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetBatchLiability_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *assetServiceClient) GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetNetWorthResponse)
@@ -514,12 +611,21 @@ type AssetServiceServer interface {
 	GetInsurance(context.Context, *GetAssetRequest) (*InsuranceArrayResponse, error)
 	GetInsuranceByID(context.Context, *GetAssetByIDRequest) (*InsuranceResponse, error)
 	DeleteInsurance(context.Context, *DeleteAssetRequest) (*DeleteAssetResponse, error)
+	// ------ Liability ------
 	CreateLiability(context.Context, *CreateLiabilityRequest) (*LiabilityResponse, error)
 	GetLiability(context.Context, *GetLiabilityRequest) (*LiabilityArrayResponse, error)
 	GetLiabilityByID(context.Context, *GetLiabilityByIDRequest) (*LiabilityResponse, error)
 	UpdateLiability(context.Context, *UpdateLiabilityRequest) (*LiabilityResponse, error)
 	DeleteLiability(context.Context, *DeleteLiabilityRequest) (*DeleteLiabilityResponse, error)
-	// Dashboard / Wealth
+	// ----- User Service ------
+	CheckAssetExists(context.Context, *CheckAssetRequest) (*CheckAssetResponse, error)
+	GetBatchAccount(context.Context, *GetBatchIdsRequest) (*AccountArrayResponse, error)
+	GetBatchCash(context.Context, *GetBatchIdsRequest) (*CashArrayResponse, error)
+	GetBatchInvestment(context.Context, *GetBatchIdsRequest) (*InvestmentArrayResponse, error)
+	GetBatchInsurance(context.Context, *GetBatchIdsRequest) (*InsuranceArrayResponse, error)
+	GetBatchBuilding(context.Context, *GetBatchIdsRequest) (*BuildingArrayResponse, error)
+	GetBatchLand(context.Context, *GetBatchIdsRequest) (*LandArrayResponse, error)
+	GetBatchLiability(context.Context, *GetBatchIdsRequest) (*LiabilityArrayResponse, error)
 	GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error)
 	mustEmbedUnimplementedAssetServiceServer()
 }
@@ -635,6 +741,30 @@ func (UnimplementedAssetServiceServer) UpdateLiability(context.Context, *UpdateL
 }
 func (UnimplementedAssetServiceServer) DeleteLiability(context.Context, *DeleteLiabilityRequest) (*DeleteLiabilityResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteLiability not implemented")
+}
+func (UnimplementedAssetServiceServer) CheckAssetExists(context.Context, *CheckAssetRequest) (*CheckAssetResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckAssetExists not implemented")
+}
+func (UnimplementedAssetServiceServer) GetBatchAccount(context.Context, *GetBatchIdsRequest) (*AccountArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchAccount not implemented")
+}
+func (UnimplementedAssetServiceServer) GetBatchCash(context.Context, *GetBatchIdsRequest) (*CashArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchCash not implemented")
+}
+func (UnimplementedAssetServiceServer) GetBatchInvestment(context.Context, *GetBatchIdsRequest) (*InvestmentArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchInvestment not implemented")
+}
+func (UnimplementedAssetServiceServer) GetBatchInsurance(context.Context, *GetBatchIdsRequest) (*InsuranceArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchInsurance not implemented")
+}
+func (UnimplementedAssetServiceServer) GetBatchBuilding(context.Context, *GetBatchIdsRequest) (*BuildingArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchBuilding not implemented")
+}
+func (UnimplementedAssetServiceServer) GetBatchLand(context.Context, *GetBatchIdsRequest) (*LandArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchLand not implemented")
+}
+func (UnimplementedAssetServiceServer) GetBatchLiability(context.Context, *GetBatchIdsRequest) (*LiabilityArrayResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetBatchLiability not implemented")
 }
 func (UnimplementedAssetServiceServer) GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNetWorth not implemented")
@@ -1290,6 +1420,150 @@ func _AssetService_DeleteLiability_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AssetService_CheckAssetExists_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckAssetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).CheckAssetExists(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_CheckAssetExists_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).CheckAssetExists(ctx, req.(*CheckAssetRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetBatchAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetBatchAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetBatchAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetBatchAccount(ctx, req.(*GetBatchIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetBatchCash_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetBatchCash(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetBatchCash_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetBatchCash(ctx, req.(*GetBatchIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetBatchInvestment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetBatchInvestment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetBatchInvestment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetBatchInvestment(ctx, req.(*GetBatchIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetBatchInsurance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetBatchInsurance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetBatchInsurance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetBatchInsurance(ctx, req.(*GetBatchIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetBatchBuilding_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetBatchBuilding(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetBatchBuilding_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetBatchBuilding(ctx, req.(*GetBatchIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetBatchLand_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetBatchLand(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetBatchLand_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetBatchLand(ctx, req.(*GetBatchIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AssetService_GetBatchLiability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBatchIdsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetBatchLiability(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetBatchLiability_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetBatchLiability(ctx, req.(*GetBatchIdsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AssetService_GetNetWorth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetNetWorthRequest)
 	if err := dec(in); err != nil {
@@ -1454,6 +1728,38 @@ var AssetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteLiability",
 			Handler:    _AssetService_DeleteLiability_Handler,
+		},
+		{
+			MethodName: "CheckAssetExists",
+			Handler:    _AssetService_CheckAssetExists_Handler,
+		},
+		{
+			MethodName: "GetBatchAccount",
+			Handler:    _AssetService_GetBatchAccount_Handler,
+		},
+		{
+			MethodName: "GetBatchCash",
+			Handler:    _AssetService_GetBatchCash_Handler,
+		},
+		{
+			MethodName: "GetBatchInvestment",
+			Handler:    _AssetService_GetBatchInvestment_Handler,
+		},
+		{
+			MethodName: "GetBatchInsurance",
+			Handler:    _AssetService_GetBatchInsurance_Handler,
+		},
+		{
+			MethodName: "GetBatchBuilding",
+			Handler:    _AssetService_GetBatchBuilding_Handler,
+		},
+		{
+			MethodName: "GetBatchLand",
+			Handler:    _AssetService_GetBatchLand_Handler,
+		},
+		{
+			MethodName: "GetBatchLiability",
+			Handler:    _AssetService_GetBatchLiability_Handler,
 		},
 		{
 			MethodName: "GetNetWorth",

@@ -33,16 +33,25 @@ func (r *BuildingRepository) GetBuilding(ctx context.Context, uid uuid.UUID) ([]
 	return items, nil
 }
 
+func (r *BuildingRepository) GetBuildingByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Building, error) {
+	var items []*domain.Building
+	if err := r.db.WithContext(ctx).Preload("Location").Where("id IN ?", ids).Find(&items).Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r *BuildingRepository) GetBuildingByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Building, error) {
 	var item domain.Building
-	if err := r.db.WithContext(ctx).Preload("Files").Preload("Location").Preload("Lands").First(&item, "id = ? AND user_id = ?", id, uid).Error; err != nil {
+	if err := r.db.WithContext(ctx).Preload("Files").Preload("Location").Preload("Lands").Preload("Insurances").First(&item, "id = ? AND user_id = ?", id, uid).Error; err != nil {
 		return nil, err
 	}
 
 	return &item, nil
 }
 
-func (r *BuildingRepository) UpdateBuilding(ctx context.Context, item *domain.Building, addLandIDs []uuid.UUID, removeLandIDs []uuid.UUID) (*domain.Building, error) {
+func (r *BuildingRepository) UpdateBuilding(ctx context.Context, item *domain.Building, addLandIDs, removeLandIDs, addInsIDs, removeInsIDs []uuid.UUID) (*domain.Building, error) {
 	return item, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(item).Error; err != nil {
 			return err
@@ -63,6 +72,28 @@ func (r *BuildingRepository) UpdateBuilding(ctx context.Context, item *domain.Bu
 			}
 		}
 
+		if len(addInsIDs) > 0 {
+			var instoAdd []domain.Insurance
+			for _, id := range addInsIDs {
+				instoAdd = append(instoAdd, domain.Insurance{ID: id})
+			}
+
+			if err := tx.Model(item).Association("Insurances").Append(instoAdd); err != nil {
+				return err
+			}
+		}
+
+		if len(removeInsIDs) > 0 {
+			var insToDelete []domain.Insurance
+			for _, id := range removeInsIDs {
+				insToDelete = append(insToDelete, domain.Insurance{ID: id})
+			}
+
+			if err := tx.Model(item).Association("Insurances").Delete(insToDelete); err != nil {
+				return err
+			}
+		}
+
 		if len(addLandIDs) > 0 {
 			var landsToAdd []domain.Land
 			for _, id := range addLandIDs {
@@ -74,7 +105,7 @@ func (r *BuildingRepository) UpdateBuilding(ctx context.Context, item *domain.Bu
 			}
 		}
 
-		if err := tx.Preload("Files").Preload("Location").Preload("Lands").First(item, "id = ?", item.ID).Error; err != nil {
+		if err := tx.Preload("Files").Preload("Location").Preload("Lands").Preload("Insurances").First(item, "id = ?", item.ID).Error; err != nil {
 			return err
 		}
 

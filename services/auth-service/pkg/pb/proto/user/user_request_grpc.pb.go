@@ -19,15 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_CreateUser_FullMethodName    = "/user.UserService/CreateUser"
-	UserService_GetUser_FullMethodName       = "/user.UserService/GetUser"
-	UserService_UpdateUser_FullMethodName    = "/user.UserService/UpdateUser"
-	UserService_GetFriendList_FullMethodName = "/user.UserService/GetFriendList"
-	UserService_AddFriend_FullMethodName     = "/user.UserService/AddFriend"
-	UserService_CreateGroup_FullMethodName   = "/user.UserService/CreateGroup"
-	UserService_GetGroup_FullMethodName      = "/user.UserService/GetGroup"
-	UserService_GetMember_FullMethodName     = "/user.UserService/GetMember"
-	UserService_UpdateGroup_FullMethodName   = "/user.UserService/UpdateGroup"
+	UserService_CreateUser_FullMethodName            = "/user.UserService/CreateUser"
+	UserService_GetUser_FullMethodName               = "/user.UserService/GetUser"
+	UserService_UpdateUser_FullMethodName            = "/user.UserService/UpdateUser"
+	UserService_GetFriendList_FullMethodName         = "/user.UserService/GetFriendList"
+	UserService_AddFriend_FullMethodName             = "/user.UserService/AddFriend"
+	UserService_CreateGroup_FullMethodName           = "/user.UserService/CreateGroup"
+	UserService_GetGroup_FullMethodName              = "/user.UserService/GetGroup"
+	UserService_GetMember_FullMethodName             = "/user.UserService/GetMember"
+	UserService_UpdateGroup_FullMethodName           = "/user.UserService/UpdateGroup"
+	UserService_AddGroupMember_FullMethodName        = "/user.UserService/AddGroupMember"
+	UserService_GrantGroupItemAccess_FullMethodName  = "/user.UserService/GrantGroupItemAccess"
+	UserService_ShareItem_FullMethodName             = "/user.UserService/ShareItem"
+	UserService_GetSharedItem_FullMethodName         = "/user.UserService/GetSharedItem"
+	UserService_GetSharedIteminFriend_FullMethodName = "/user.UserService/GetSharedIteminFriend"
+	UserService_UnsharedItem_FullMethodName          = "/user.UserService/UnsharedItem"
+	UserService_UnsharedIteminFriend_FullMethodName  = "/user.UserService/UnsharedIteminFriend"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -43,6 +50,13 @@ type UserServiceClient interface {
 	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GroupResponse, error)
 	GetMember(ctx context.Context, in *GetGroupMembersRequest, opts ...grpc.CallOption) (*GetGroupMembersResponse, error)
 	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...grpc.CallOption) (*GroupResponse, error)
+	AddGroupMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*ActionResponse, error)
+	GrantGroupItemAccess(ctx context.Context, in *GrantAccessRequest, opts ...grpc.CallOption) (*ActionResponse, error)
+	ShareItem(ctx context.Context, in *ShareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error)
+	GetSharedItem(ctx context.Context, in *GetGroupItemsRequest, opts ...grpc.CallOption) (*GetGroupItemsResponse, error)
+	GetSharedIteminFriend(ctx context.Context, in *GetFriendItemRequest, opts ...grpc.CallOption) (*GetFriendItemsResponse, error)
+	UnsharedItem(ctx context.Context, in *UnshareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error)
+	UnsharedIteminFriend(ctx context.Context, in *UnshareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error)
 }
 
 type userServiceClient struct {
@@ -143,6 +157,76 @@ func (c *userServiceClient) UpdateGroup(ctx context.Context, in *UpdateGroupRequ
 	return out, nil
 }
 
+func (c *userServiceClient) AddGroupMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*ActionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ActionResponse)
+	err := c.cc.Invoke(ctx, UserService_AddGroupMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GrantGroupItemAccess(ctx context.Context, in *GrantAccessRequest, opts ...grpc.CallOption) (*ActionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ActionResponse)
+	err := c.cc.Invoke(ctx, UserService_GrantGroupItemAccess_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) ShareItem(ctx context.Context, in *ShareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareItemResponse)
+	err := c.cc.Invoke(ctx, UserService_ShareItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetSharedItem(ctx context.Context, in *GetGroupItemsRequest, opts ...grpc.CallOption) (*GetGroupItemsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetGroupItemsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetSharedItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetSharedIteminFriend(ctx context.Context, in *GetFriendItemRequest, opts ...grpc.CallOption) (*GetFriendItemsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetFriendItemsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetSharedIteminFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UnsharedItem(ctx context.Context, in *UnshareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareItemResponse)
+	err := c.cc.Invoke(ctx, UserService_UnsharedItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UnsharedIteminFriend(ctx context.Context, in *UnshareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShareItemResponse)
+	err := c.cc.Invoke(ctx, UserService_UnsharedIteminFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -156,6 +240,13 @@ type UserServiceServer interface {
 	GetGroup(context.Context, *GetGroupRequest) (*GroupResponse, error)
 	GetMember(context.Context, *GetGroupMembersRequest) (*GetGroupMembersResponse, error)
 	UpdateGroup(context.Context, *UpdateGroupRequest) (*GroupResponse, error)
+	AddGroupMember(context.Context, *AddMemberRequest) (*ActionResponse, error)
+	GrantGroupItemAccess(context.Context, *GrantAccessRequest) (*ActionResponse, error)
+	ShareItem(context.Context, *ShareItemRequest) (*ShareItemResponse, error)
+	GetSharedItem(context.Context, *GetGroupItemsRequest) (*GetGroupItemsResponse, error)
+	GetSharedIteminFriend(context.Context, *GetFriendItemRequest) (*GetFriendItemsResponse, error)
+	UnsharedItem(context.Context, *UnshareItemRequest) (*ShareItemResponse, error)
+	UnsharedIteminFriend(context.Context, *UnshareItemRequest) (*ShareItemResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -192,6 +283,27 @@ func (UnimplementedUserServiceServer) GetMember(context.Context, *GetGroupMember
 }
 func (UnimplementedUserServiceServer) UpdateGroup(context.Context, *UpdateGroupRequest) (*GroupResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateGroup not implemented")
+}
+func (UnimplementedUserServiceServer) AddGroupMember(context.Context, *AddMemberRequest) (*ActionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AddGroupMember not implemented")
+}
+func (UnimplementedUserServiceServer) GrantGroupItemAccess(context.Context, *GrantAccessRequest) (*ActionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GrantGroupItemAccess not implemented")
+}
+func (UnimplementedUserServiceServer) ShareItem(context.Context, *ShareItemRequest) (*ShareItemResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ShareItem not implemented")
+}
+func (UnimplementedUserServiceServer) GetSharedItem(context.Context, *GetGroupItemsRequest) (*GetGroupItemsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSharedItem not implemented")
+}
+func (UnimplementedUserServiceServer) GetSharedIteminFriend(context.Context, *GetFriendItemRequest) (*GetFriendItemsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSharedIteminFriend not implemented")
+}
+func (UnimplementedUserServiceServer) UnsharedItem(context.Context, *UnshareItemRequest) (*ShareItemResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UnsharedItem not implemented")
+}
+func (UnimplementedUserServiceServer) UnsharedIteminFriend(context.Context, *UnshareItemRequest) (*ShareItemResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UnsharedIteminFriend not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -376,6 +488,132 @@ func _UserService_UpdateGroup_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_AddGroupMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AddGroupMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_AddGroupMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AddGroupMember(ctx, req.(*AddMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GrantGroupItemAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GrantAccessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GrantGroupItemAccess(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GrantGroupItemAccess_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GrantGroupItemAccess(ctx, req.(*GrantAccessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_ShareItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShareItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).ShareItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_ShareItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).ShareItem(ctx, req.(*ShareItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetSharedItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGroupItemsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetSharedItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetSharedItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetSharedItem(ctx, req.(*GetGroupItemsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetSharedIteminFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFriendItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetSharedIteminFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetSharedIteminFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetSharedIteminFriend(ctx, req.(*GetFriendItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UnsharedItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnshareItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UnsharedItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UnsharedItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UnsharedItem(ctx, req.(*UnshareItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UnsharedIteminFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnshareItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UnsharedIteminFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UnsharedIteminFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UnsharedIteminFriend(ctx, req.(*UnshareItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +656,34 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateGroup",
 			Handler:    _UserService_UpdateGroup_Handler,
+		},
+		{
+			MethodName: "AddGroupMember",
+			Handler:    _UserService_AddGroupMember_Handler,
+		},
+		{
+			MethodName: "GrantGroupItemAccess",
+			Handler:    _UserService_GrantGroupItemAccess_Handler,
+		},
+		{
+			MethodName: "ShareItem",
+			Handler:    _UserService_ShareItem_Handler,
+		},
+		{
+			MethodName: "GetSharedItem",
+			Handler:    _UserService_GetSharedItem_Handler,
+		},
+		{
+			MethodName: "GetSharedIteminFriend",
+			Handler:    _UserService_GetSharedIteminFriend_Handler,
+		},
+		{
+			MethodName: "UnsharedItem",
+			Handler:    _UserService_UnsharedItem_Handler,
+		},
+		{
+			MethodName: "UnsharedIteminFriend",
+			Handler:    _UserService_UnsharedIteminFriend_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

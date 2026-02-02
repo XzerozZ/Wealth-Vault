@@ -91,6 +91,29 @@ func (u *AccountUsecase) GetAccount(ctx context.Context, req *pb.GetAssetRequest
 	}, nil
 }
 
+func (u *AccountUsecase) GetAccountByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.AccountArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	acc, err := u.accRepo.GetAccountByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbAccounts []*pb.Account
+	for _, a := range acc {
+		pbAccounts = append(pbAccounts, mapper.ToBankProto(a))
+	}
+
+	return &pb.AccountArrayResponse{
+		Account: pbAccounts,
+	}, nil
+}
+
 func (u *AccountUsecase) GetAccountByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.AccountResponse, error) {
 	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {

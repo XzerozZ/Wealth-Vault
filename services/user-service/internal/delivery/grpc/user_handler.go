@@ -8,14 +8,16 @@ import (
 
 type UserGRPCHandler struct {
 	pb.UnimplementedUserServiceServer
-	usecase  usecase.UserUsecase
-	gusecase usecase.GroupUsecase
+	usecase   usecase.UserUsecase
+	gusecase  usecase.GroupUsecase
+	giusecase usecase.ShareItemUsecase
 }
 
-func NewUserGRPCHandler(u usecase.UserUsecase, g usecase.GroupUsecase) *UserGRPCHandler {
+func NewUserGRPCHandler(u usecase.UserUsecase, g usecase.GroupUsecase, i usecase.ShareItemUsecase) *UserGRPCHandler {
 	return &UserGRPCHandler{
-		usecase:  u,
-		gusecase: g,
+		usecase:   u,
+		gusecase:  g,
+		giusecase: i,
 	}
 }
 
@@ -93,6 +95,69 @@ func (h *UserGRPCHandler) GetGroup(ctx context.Context, req *pb.GetGroupRequest)
 
 func (h *UserGRPCHandler) UpdateGroup(ctx context.Context, req *pb.UpdateGroupRequest) (*pb.GroupResponse, error) {
 	res, err := h.gusecase.UpdateGroup(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) ShareItem(ctx context.Context, req *pb.ShareItemRequest) (*pb.ShareItemResponse, error) {
+	res, err := h.giusecase.ShareItem(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetSharedItem(ctx context.Context, req *pb.GetGroupItemsRequest) (*pb.GetGroupItemsResponse, error) {
+	res, err := h.giusecase.GetSharedIteminGroup(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetSharedIteminFriend(ctx context.Context, req *pb.GetFriendItemRequest) (*pb.GetFriendItemsResponse, error) {
+	res, err := h.giusecase.GetSharedIteminFriend(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) UnsharedItem(ctx context.Context, req *pb.UnshareItemRequest) (*pb.ShareItemResponse, error) {
+	res, err := h.giusecase.UnsharedIteminGroup(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) UnsharedIteminFriend(ctx context.Context, req *pb.UnshareItemRequest) (*pb.ShareItemResponse, error) {
+	res, err := h.giusecase.UnsharedIteminFriend(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) AddGroupMember(ctx context.Context, req *pb.AddMemberRequest) (*pb.ActionResponse, error) {
+	res, err := h.giusecase.AddMemberToGroup(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GrantGroupItemAccess(ctx context.Context, req *pb.GrantAccessRequest) (*pb.ActionResponse, error) {
+	res, err := h.giusecase.GrantAccess(ctx, req)
 	if err != nil {
 		return nil, err
 	}

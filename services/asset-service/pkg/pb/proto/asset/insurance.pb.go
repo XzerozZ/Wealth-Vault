@@ -85,17 +85,18 @@ type Insurance struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId         string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Type           InsuranceType          `protobuf:"varint,3,opt,name=type,proto3,enum=asset.InsuranceType" json:"type,omitempty"`
-	PolNum         string                 `protobuf:"bytes,4,opt,name=pol_num,json=polNum,proto3" json:"pol_num,omitempty"`
-	CompanyName    string                 `protobuf:"bytes,5,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
-	CoveragePeriod float64                `protobuf:"fixed64,6,opt,name=coverage_period,json=coveragePeriod,proto3" json:"coverage_period,omitempty"`
-	CoverageAmount float64                `protobuf:"fixed64,7,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
-	ConDate        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=con_date,json=conDate,proto3" json:"con_date,omitempty"`
-	ExpDate        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=exp_date,json=expDate,proto3" json:"exp_date,omitempty"`
-	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
-	Files          []*FileInfo            `protobuf:"bytes,11,rep,name=files,proto3" json:"files,omitempty"`
-	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt      *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Name           string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Type           InsuranceType          `protobuf:"varint,4,opt,name=type,proto3,enum=asset.InsuranceType" json:"type,omitempty"`
+	PolNum         string                 `protobuf:"bytes,5,opt,name=pol_num,json=polNum,proto3" json:"pol_num,omitempty"`
+	CompanyName    string                 `protobuf:"bytes,6,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
+	CoveragePeriod float64                `protobuf:"fixed64,7,opt,name=coverage_period,json=coveragePeriod,proto3" json:"coverage_period,omitempty"`
+	CoverageAmount float64                `protobuf:"fixed64,8,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
+	ConDate        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=con_date,json=conDate,proto3" json:"con_date,omitempty"`
+	ExpDate        *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=exp_date,json=expDate,proto3" json:"exp_date,omitempty"`
+	Description    string                 `protobuf:"bytes,11,opt,name=description,proto3" json:"description,omitempty"`
+	Files          []*FileInfo            `protobuf:"bytes,12,rep,name=files,proto3" json:"files,omitempty"`
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt      *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -140,6 +141,13 @@ func (x *Insurance) GetId() string {
 func (x *Insurance) GetUserId() string {
 	if x != nil {
 		return x.UserId
+	}
+	return ""
+}
+
+func (x *Insurance) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
@@ -225,14 +233,15 @@ type CreateInsuranceRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	UserId         string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Type           InsuranceType          `protobuf:"varint,2,opt,name=type,proto3,enum=asset.InsuranceType" json:"type,omitempty"`
-	PolNum         string                 `protobuf:"bytes,3,opt,name=pol_num,json=polNum,proto3" json:"pol_num,omitempty"`
-	CompanyName    string                 `protobuf:"bytes,4,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
-	CoveragePeriod float64                `protobuf:"fixed64,5,opt,name=coverage_period,json=coveragePeriod,proto3" json:"coverage_period,omitempty"`
-	CoverageAmount float64                `protobuf:"fixed64,6,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
-	ConDate        *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=con_date,json=conDate,proto3" json:"con_date,omitempty"`
-	ExpDate        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=exp_date,json=expDate,proto3" json:"exp_date,omitempty"`
-	Description    string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
-	NewFiles       []*FileInfo            `protobuf:"bytes,10,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
+	Name           string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	PolNum         string                 `protobuf:"bytes,4,opt,name=pol_num,json=polNum,proto3" json:"pol_num,omitempty"`
+	CompanyName    string                 `protobuf:"bytes,5,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
+	CoveragePeriod float64                `protobuf:"fixed64,6,opt,name=coverage_period,json=coveragePeriod,proto3" json:"coverage_period,omitempty"`
+	CoverageAmount float64                `protobuf:"fixed64,7,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
+	ConDate        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=con_date,json=conDate,proto3" json:"con_date,omitempty"`
+	ExpDate        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=exp_date,json=expDate,proto3" json:"exp_date,omitempty"`
+	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+	NewFiles       []*FileInfo            `protobuf:"bytes,11,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -279,6 +288,13 @@ func (x *CreateInsuranceRequest) GetType() InsuranceType {
 		return x.Type
 	}
 	return InsuranceType_INSURANCE_TYPE_UNSPECIFIED
+}
+
+func (x *CreateInsuranceRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
 }
 
 func (x *CreateInsuranceRequest) GetPolNum() string {
@@ -521,11 +537,29 @@ var File_proto_asset_insurance_proto protoreflect.FileDescriptor
 
 const file_proto_asset_insurance_proto_rawDesc = "" +
 	"\n" +
-	"\x1bproto/asset/insurance.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\x99\x04\n" +
+	"\x1bproto/asset/insurance.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xad\x04\n" +
 	"\tInsurance\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12(\n" +
-	"\x04type\x18\x03 \x01(\x0e2\x14.asset.InsuranceTypeR\x04type\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12(\n" +
+	"\x04type\x18\x04 \x01(\x0e2\x14.asset.InsuranceTypeR\x04type\x12\x17\n" +
+	"\apol_num\x18\x05 \x01(\tR\x06polNum\x12!\n" +
+	"\fcompany_name\x18\x06 \x01(\tR\vcompanyName\x12'\n" +
+	"\x0fcoverage_period\x18\a \x01(\x01R\x0ecoveragePeriod\x12'\n" +
+	"\x0fcoverage_amount\x18\b \x01(\x01R\x0ecoverageAmount\x125\n" +
+	"\bcon_date\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\aconDate\x125\n" +
+	"\bexp_date\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\aexpDate\x12 \n" +
+	"\vdescription\x18\v \x01(\tR\vdescription\x12%\n" +
+	"\x05files\x18\f \x03(\v2\x0f.asset.FileInfoR\x05files\x129\n" +
+	"\n" +
+	"created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xbb\x03\n" +
+	"\x16CreateInsuranceRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
+	"\x04type\x18\x02 \x01(\x0e2\x14.asset.InsuranceTypeR\x04type\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x17\n" +
 	"\apol_num\x18\x04 \x01(\tR\x06polNum\x12!\n" +
 	"\fcompany_name\x18\x05 \x01(\tR\vcompanyName\x12'\n" +
 	"\x0fcoverage_period\x18\x06 \x01(\x01R\x0ecoveragePeriod\x12'\n" +
@@ -533,24 +567,8 @@ const file_proto_asset_insurance_proto_rawDesc = "" +
 	"\bcon_date\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aconDate\x125\n" +
 	"\bexp_date\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\aexpDate\x12 \n" +
 	"\vdescription\x18\n" +
-	" \x01(\tR\vdescription\x12%\n" +
-	"\x05files\x18\v \x03(\v2\x0f.asset.FileInfoR\x05files\x129\n" +
-	"\n" +
-	"created_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
-	"\n" +
-	"updated_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xa7\x03\n" +
-	"\x16CreateInsuranceRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
-	"\x04type\x18\x02 \x01(\x0e2\x14.asset.InsuranceTypeR\x04type\x12\x17\n" +
-	"\apol_num\x18\x03 \x01(\tR\x06polNum\x12!\n" +
-	"\fcompany_name\x18\x04 \x01(\tR\vcompanyName\x12'\n" +
-	"\x0fcoverage_period\x18\x05 \x01(\x01R\x0ecoveragePeriod\x12'\n" +
-	"\x0fcoverage_amount\x18\x06 \x01(\x01R\x0ecoverageAmount\x125\n" +
-	"\bcon_date\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\aconDate\x125\n" +
-	"\bexp_date\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\aexpDate\x12 \n" +
-	"\vdescription\x18\t \x01(\tR\vdescription\x12,\n" +
-	"\tnew_files\x18\n" +
-	" \x03(\v2\x0f.asset.FileInfoR\bnewFiles\"\xeb\x01\n" +
+	" \x01(\tR\vdescription\x12,\n" +
+	"\tnew_files\x18\v \x03(\v2\x0f.asset.FileInfoR\bnewFiles\"\xeb\x01\n" +
 	"\x16UpdateInsuranceRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
 	"\tinsurance\x18\x02 \x01(\v2\x10.asset.InsuranceR\tinsurance\x12,\n" +

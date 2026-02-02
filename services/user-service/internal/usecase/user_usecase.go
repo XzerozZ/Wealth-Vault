@@ -111,6 +111,7 @@ func (u *UserUsecase) GetFriendList(ctx context.Context, req *pb.GetUserByIDRequ
 		Friends: friends,
 	}, nil
 }
+
 func (u *UserUsecase) AddFriend(ctx context.Context, req *pb.FriendRequest) (*pb.FriendResponse, error) {
 	friends := &domain.FriendList{
 		UserID:   req.Id,

@@ -6,10 +6,14 @@ option go_package = "wealth-vault/pkg/pb";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/field_mask.proto";
-import "proto/asset/enum.proto";
 import "proto/asset/file.proto";
 
 // ------Detail Messages------
+enum LiabilityType {
+  LIABILITY_TYPE_UNSPECIFIED = 0;
+  LIABILITY_TYPE_LOAN = 1;          // หนี้
+  LIABILITY_TYPE_EXPENSE = 2;       // ค่าใช้จ่ายต่อเนื่อง
+}
 
 message Liability {
   string id = 1;

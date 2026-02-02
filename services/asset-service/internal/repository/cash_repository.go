@@ -32,6 +32,15 @@ func (r *CashRepository) GetCash(ctx context.Context, uid uuid.UUID) ([]*domain.
 	return items, nil
 }
 
+func (r *CashRepository) GetCashByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Cash, error) {
+	var items []*domain.Cash
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&items).Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r *CashRepository) GetCashByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Cash, error) {
 	var item domain.Cash
 	if err := r.db.WithContext(ctx).Preload("Files").First(&item, "id = ? AND user_id = ?", id, uid).Error; err != nil {

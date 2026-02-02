@@ -107,6 +107,29 @@ func (u *LiabilityUsecase) GetLiability(ctx context.Context, req *pb.GetLiabilit
 	}, nil
 }
 
+func (u *LiabilityUsecase) GetLiabilityByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LiabilityArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.liaRepo.GetLiabilityByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbLia []*pb.Liability
+	for _, a := range bu {
+		pbLia = append(pbLia, mapper.ToLiabilityProto(a))
+	}
+
+	return &pb.LiabilityArrayResponse{
+		Liability: pbLia,
+	}, nil
+}
+
 func (u *LiabilityUsecase) GetLiabilityByID(ctx context.Context, req *pb.GetLiabilityByIDRequest) (*pb.LiabilityResponse, error) {
 	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {

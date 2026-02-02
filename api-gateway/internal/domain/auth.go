@@ -8,3 +8,17 @@ type Authenticate struct {
 type RefreshToken struct {
 	RefreshToken string `json:"refreshtoken"`
 }
+
+type ForgetPassword struct {
+	Email string `json:"email" form:"email"`
+}
+
+type OTP struct {
+	Email string `json:"email" form:"email"`
+	OTP   string `json:"otp" form:"otp"`
+}
+
+type ResetPassword struct {
+	ResetToken string `json:"resettoken" form:"resettoken"`
+	Password   string `json:"password" form:"password"`
+}

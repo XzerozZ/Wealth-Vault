@@ -12,6 +12,7 @@ type Configs struct {
 	GRPC       GRPC
 	UserGRPC   UserGRPC
 	PostgreSQL PostgreSQL
+	Mail       Mail
 }
 
 type GRPC struct {
@@ -33,6 +34,13 @@ type PostgreSQL struct {
 	Username string
 	Password string
 	Database string
+}
+
+type Mail struct {
+	Host   string
+	Port   string
+	Sender string
+	Key    string
 }
 
 func LoadConfigs() *Configs {
@@ -66,6 +74,12 @@ func LoadConfigs() *Configs {
 			Username: requireEnv("DB_USER"),
 			Password: requireEnv("DB_PASSWORD"),
 			Database: requireEnv("DB_NAME"),
+		},
+		Mail: Mail{
+			Host:   requireEnv("EMAIL_HOST"),
+			Port:   requireEnv("EMAIL_PORT"),
+			Sender: requireEnv("EMAIL_USER"),
+			Key:    requireEnv("EMAIL_PASS"),
 		},
 	}
 }

@@ -64,6 +64,7 @@ func (u *InsuranceUsecase) CreateInsurance(ctx context.Context, req *pb.CreateIn
 	ins := &domain.Insurance{
 		UserID:         userID,
 		Type:           inType,
+		Name:           req.Name,
 		PolicyNumber:   req.PolNum,
 		CompanyName:    req.CompanyName,
 		CoveragePeriod: req.CoveragePeriod,
@@ -102,6 +103,29 @@ func (u *InsuranceUsecase) GetInsurance(ctx context.Context, req *pb.GetAssetReq
 	return &pb.InsuranceArrayResponse{
 		Success:   true,
 		Insurance: InvestList,
+	}, nil
+}
+
+func (u *InsuranceUsecase) GetInsuranceByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.InsuranceArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.insRepo.GetInsuranceByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbIns []*pb.Insurance
+	for _, a := range bu {
+		pbIns = append(pbIns, mapper.ToInsuranceProto(a))
+	}
+
+	return &pb.InsuranceArrayResponse{
+		Insurance: pbIns,
 	}, nil
 }
 

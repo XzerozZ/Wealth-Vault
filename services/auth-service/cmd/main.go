@@ -12,6 +12,7 @@ import (
 	"wealth-vault/auth-service/pkg/database"
 	authpb "wealth-vault/auth-service/pkg/pb/proto/auth"
 	authToken "wealth-vault/auth-service/pkg/token"
+	mailclient "wealth-vault/auth-service/pkg/utils/mail"
 
 	"google.golang.org/grpc"
 )
@@ -29,9 +30,10 @@ func main() {
 		log.Fatal("user service:", err)
 	}
 
+	mailClient := mailclient.NewMailClient(cfg.Mail)
 	repo := authRepo.NewAuthRepository(db)
 	token := authToken.NewJWT(cfg.JWT.Secret)
-	uc := authUsecase.NewAuthUsecase(repo, userClient, token)
+	uc := authUsecase.NewAuthUsecase(repo, userClient, token, mailClient)
 	handler := authHandler.NewAuthGRPCHandler(uc)
 	cronJob := authCron.NewAuthCronJob(uc)
 

@@ -19,10 +19,10 @@ type AuthAccount struct {
 }
 
 type AuthOTP struct {
-	ID        string    `json:"id" gorm:"primaryKey;default:gen_random_uuid()"`
-	UserID    string    `json:"u_id"  gorm:"not null"`
+	ID        uuid.UUID `json:"id" gorm:"primaryKey;default:gen_random_uuid()"`
+	UserID    uuid.UUID `json:"u_id"  gorm:"not null"`
 	OTP       string    `gorm:"type:varchar(6);not null"`
-	ExpiresAt time.Time `gorm:"not null"`
+	ExpiredAt time.Time `gorm:"not null"`
 }
 
 type AuthSession struct {

@@ -6,6 +6,7 @@ import (
 	"wealth-vault/api-gateway/internal/middleware"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/websocket/v2"
 )
 
 func Setup(
@@ -21,6 +22,8 @@ func Setup(
 	insHandler *handlers.InsuranceHandler,
 	liaHandler *handlers.LiabilityHandler,
 	groupHandler *handlers.GroupHandler,
+	groupitemHandler *handlers.GroupItemHandler,
+	notificationHandler *handlers.NotificationHandler,
 ) {
 	api := app.Group("/api")
 
@@ -28,16 +31,26 @@ func Setup(
 	auth.Post("/register", authHandler.RegisterLocal)
 	auth.Post("/login", authHandler.Login)
 	auth.Post("/refresh", authHandler.RefreshToken)
+	auth.Post("/forgot/password", authHandler.ForgotPassword)
+	auth.Post("/forgot/otp", authHandler.VerifyForgotPasswordOTP)
+	auth.Patch("/reset/password", authHandler.ResetPassword)
 
 	api.Get("/user", middleware.JWTMiddleware(jwt), userHandler.GetUser)
 	api.Patch("/user", middleware.JWTMiddleware(jwt), userHandler.UpdateUser)
 	api.Post("/friend/:friendID", middleware.JWTMiddleware(jwt), userHandler.AddFriend)
 	api.Get("/friend", middleware.JWTMiddleware(jwt), userHandler.GetFriendList)
+	api.Get("/friend/:id/item", middleware.JWTMiddleware(jwt), groupitemHandler.GetFriendItems)
+	api.Post("/group/:id/addmember", middleware.JWTMiddleware(jwt), groupHandler.AddMember)
+	api.Post("/group/:id/grantaccess", middleware.JWTMiddleware(jwt), groupHandler.GrantAccess)
 
 	api.Post("/group", middleware.JWTMiddleware(jwt), groupHandler.CreateGroup)
 	api.Get("/group/detail/:id", middleware.JWTMiddleware(jwt), groupHandler.GetGroup)
 	api.Get("/group/member/:id", middleware.JWTMiddleware(jwt), groupHandler.GetMember)
 	api.Patch("/group/:id", middleware.JWTMiddleware(jwt), groupHandler.UpdateGroup)
+	api.Post("/share/item", middleware.JWTMiddleware(jwt), groupitemHandler.ShareItem)
+	api.Get("/group/:id/item", middleware.JWTMiddleware(jwt), groupitemHandler.GetGroupItems)
+	api.Delete("/group/item/:id", middleware.JWTMiddleware(jwt), groupitemHandler.UnsharedItem)
+	api.Delete("/friend/item/:id", middleware.JWTMiddleware(jwt), groupitemHandler.UnsharedIteminFriend)
 
 	api.Post("/asset/account", middleware.JWTMiddleware(jwt), accHandler.CreateAccount)
 	api.Get("/asset/account", middleware.JWTMiddleware(jwt), accHandler.GetAccount)
@@ -80,4 +93,7 @@ func Setup(
 	api.Get("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.GetLiabilityByID)
 	api.Patch("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.UpdateLiability)
 	api.Delete("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.DeleteLiability)
+
+	api.Get("/ws", middleware.TokenFromQuery, middleware.JWTMiddleware(jwt), websocket.New(notificationHandler.ProxyWebSocket))
+	api.All("/notifications/*", middleware.JWTMiddleware(jwt), notificationHandler.ProxyAPI)
 }

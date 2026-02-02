@@ -20,30 +20,32 @@ enum InsuranceType {
 message Insurance {
   string id = 1; 
   string user_id = 2;
-  InsuranceType type  = 3; 
-  string pol_num = 4;
+  string name = 3;
+  InsuranceType type  = 4; 
+  string pol_num = 5;
+  string company_name = 6;
+  double coverage_period = 7;
+  double coverage_amount = 8;
+  google.protobuf.Timestamp con_date = 9;
+  google.protobuf.Timestamp exp_date = 10;
+  string description = 11;
+  repeated FileInfo files = 12;
+  google.protobuf.Timestamp created_at = 13;
+  google.protobuf.Timestamp updated_at = 14;
+}
+
+message CreateInsuranceRequest { 
+  string user_id = 1;
+  InsuranceType type = 2;
+  string name = 3;
+  string pol_num = 4; 
   string company_name = 5;
   double coverage_period = 6;
   double coverage_amount = 7;
   google.protobuf.Timestamp con_date = 8;
   google.protobuf.Timestamp exp_date = 9;
   string description = 10;
-  repeated FileInfo files = 11;
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp updated_at = 13;
-}
-
-message CreateInsuranceRequest { 
-  string user_id = 1;
-  InsuranceType type = 2;
-  string pol_num = 3; 
-  string company_name = 4;
-  double coverage_period = 5;
-  double coverage_amount = 6;
-  google.protobuf.Timestamp con_date = 7;
-  google.protobuf.Timestamp exp_date = 8;
-  string description = 9;
-  repeated FileInfo new_files = 10;
+  repeated FileInfo new_files = 11;
 }
 
 message UpdateInsuranceRequest{

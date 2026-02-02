@@ -104,6 +104,29 @@ func (u *LandUsecase) GetLand(ctx context.Context, req *pb.GetAssetRequest) (*pb
 	}, nil
 }
 
+func (u *LandUsecase) GetLandByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LandArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.landRepo.GetLandByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbLand []*pb.Land
+	for _, a := range bu {
+		pbLand = append(pbLand, mapper.ToLandProto(a))
+	}
+
+	return &pb.LandArrayResponse{
+		Land: pbLand,
+	}, nil
+}
+
 func (u *LandUsecase) GetLandByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.LandResponse, error) {
 	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {

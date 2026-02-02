@@ -118,6 +118,50 @@ func (x *GetAssetByIDRequest) GetUserId() string {
 	return ""
 }
 
+type GetBatchIdsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBatchIdsRequest) Reset() {
+	*x = GetBatchIdsRequest{}
+	mi := &file_proto_asset_asset_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBatchIdsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBatchIdsRequest) ProtoMessage() {}
+
+func (x *GetBatchIdsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBatchIdsRequest.ProtoReflect.Descriptor instead.
+func (*GetBatchIdsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetBatchIdsRequest) GetIds() []string {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
+}
+
 type GetNetWorthRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -127,7 +171,7 @@ type GetNetWorthRequest struct {
 
 func (x *GetNetWorthRequest) Reset() {
 	*x = GetNetWorthRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[2]
+	mi := &file_proto_asset_asset_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -139,7 +183,7 @@ func (x *GetNetWorthRequest) String() string {
 func (*GetNetWorthRequest) ProtoMessage() {}
 
 func (x *GetNetWorthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[2]
+	mi := &file_proto_asset_asset_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -152,7 +196,7 @@ func (x *GetNetWorthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNetWorthRequest.ProtoReflect.Descriptor instead.
 func (*GetNetWorthRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{2}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetNetWorthRequest) GetUserId() string {
@@ -173,7 +217,7 @@ type GetNetWorthResponse struct {
 
 func (x *GetNetWorthResponse) Reset() {
 	*x = GetNetWorthResponse{}
-	mi := &file_proto_asset_asset_proto_msgTypes[3]
+	mi := &file_proto_asset_asset_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -185,7 +229,7 @@ func (x *GetNetWorthResponse) String() string {
 func (*GetNetWorthResponse) ProtoMessage() {}
 
 func (x *GetNetWorthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[3]
+	mi := &file_proto_asset_asset_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -198,7 +242,7 @@ func (x *GetNetWorthResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNetWorthResponse.ProtoReflect.Descriptor instead.
 func (*GetNetWorthResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{3}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetNetWorthResponse) GetTotalAssets() float64 {
@@ -232,7 +276,7 @@ type DeleteAssetRequest struct {
 
 func (x *DeleteAssetRequest) Reset() {
 	*x = DeleteAssetRequest{}
-	mi := &file_proto_asset_asset_proto_msgTypes[4]
+	mi := &file_proto_asset_asset_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -244,7 +288,7 @@ func (x *DeleteAssetRequest) String() string {
 func (*DeleteAssetRequest) ProtoMessage() {}
 
 func (x *DeleteAssetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[4]
+	mi := &file_proto_asset_asset_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -257,7 +301,7 @@ func (x *DeleteAssetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAssetRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAssetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{4}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *DeleteAssetRequest) GetId() string {
@@ -283,7 +327,7 @@ type DeleteAssetResponse struct {
 
 func (x *DeleteAssetResponse) Reset() {
 	*x = DeleteAssetResponse{}
-	mi := &file_proto_asset_asset_proto_msgTypes[5]
+	mi := &file_proto_asset_asset_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -295,7 +339,7 @@ func (x *DeleteAssetResponse) String() string {
 func (*DeleteAssetResponse) ProtoMessage() {}
 
 func (x *DeleteAssetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_asset_asset_proto_msgTypes[5]
+	mi := &file_proto_asset_asset_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,12 +352,116 @@ func (x *DeleteAssetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAssetResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAssetResponse) Descriptor() ([]byte, []int) {
-	return file_proto_asset_asset_proto_rawDescGZIP(), []int{5}
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteAssetResponse) GetSuccess() bool {
 	if x != nil {
 		return x.Success
+	}
+	return false
+}
+
+type CheckAssetRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckAssetRequest) Reset() {
+	*x = CheckAssetRequest{}
+	mi := &file_proto_asset_asset_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckAssetRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckAssetRequest) ProtoMessage() {}
+
+func (x *CheckAssetRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckAssetRequest.ProtoReflect.Descriptor instead.
+func (*CheckAssetRequest) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CheckAssetRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CheckAssetRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CheckAssetRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+type CheckAssetResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Exists        bool                   `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckAssetResponse) Reset() {
+	*x = CheckAssetResponse{}
+	mi := &file_proto_asset_asset_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckAssetResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckAssetResponse) ProtoMessage() {}
+
+func (x *CheckAssetResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckAssetResponse.ProtoReflect.Descriptor instead.
+func (*CheckAssetResponse) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CheckAssetResponse) GetExists() bool {
+	if x != nil {
+		return x.Exists
 	}
 	return false
 }
@@ -327,7 +475,9 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\">\n" +
 	"\x13GetAssetByIDRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"-\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"&\n" +
+	"\x12GetBatchIdsRequest\x12\x10\n" +
+	"\x03ids\x18\x01 \x03(\tR\x03ids\"-\n" +
 	"\x12GetNetWorthRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"\x82\x01\n" +
 	"\x13GetNetWorthResponse\x12!\n" +
@@ -338,7 +488,13 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\"/\n" +
 	"\x13DeleteAssetResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccessB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"P\n" +
+	"\x11CheckAssetRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\",\n" +
+	"\x12CheckAssetResponse\x12\x16\n" +
+	"\x06exists\x18\x01 \x01(\bR\x06existsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_asset_asset_proto_rawDescOnce sync.Once
@@ -352,14 +508,17 @@ func file_proto_asset_asset_proto_rawDescGZIP() []byte {
 	return file_proto_asset_asset_proto_rawDescData
 }
 
-var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_proto_asset_asset_proto_goTypes = []any{
 	(*GetAssetRequest)(nil),     // 0: asset.GetAssetRequest
 	(*GetAssetByIDRequest)(nil), // 1: asset.GetAssetByIDRequest
-	(*GetNetWorthRequest)(nil),  // 2: asset.GetNetWorthRequest
-	(*GetNetWorthResponse)(nil), // 3: asset.GetNetWorthResponse
-	(*DeleteAssetRequest)(nil),  // 4: asset.DeleteAssetRequest
-	(*DeleteAssetResponse)(nil), // 5: asset.DeleteAssetResponse
+	(*GetBatchIdsRequest)(nil),  // 2: asset.GetBatchIdsRequest
+	(*GetNetWorthRequest)(nil),  // 3: asset.GetNetWorthRequest
+	(*GetNetWorthResponse)(nil), // 4: asset.GetNetWorthResponse
+	(*DeleteAssetRequest)(nil),  // 5: asset.DeleteAssetRequest
+	(*DeleteAssetResponse)(nil), // 6: asset.DeleteAssetResponse
+	(*CheckAssetRequest)(nil),   // 7: asset.CheckAssetRequest
+	(*CheckAssetResponse)(nil),  // 8: asset.CheckAssetResponse
 }
 var file_proto_asset_asset_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -380,7 +539,7 @@ func file_proto_asset_asset_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_asset_asset_proto_rawDesc), len(file_proto_asset_asset_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

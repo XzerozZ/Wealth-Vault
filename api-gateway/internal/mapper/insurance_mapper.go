@@ -25,6 +25,7 @@ func ToInsuranceDomain(p *pb.Insurance) *domain.Insurance {
 	return &domain.Insurance{
 		ID:             p.Id,
 		UserID:         p.UserId,
+		Name:           p.Name,
 		PolicyNumber:   p.PolNum,
 		Type:           p.Type.String(),
 		CompanyName:    p.CompanyName,

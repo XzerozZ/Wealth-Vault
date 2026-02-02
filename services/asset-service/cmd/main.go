@@ -24,6 +24,7 @@ func main() {
 
 	supabaseClient, err := storageclient.NewStorageClient(cfg.SUPA.URL, cfg.SUPA.Key, cfg.SUPA.Bucket)
 	// ------ Repository------
+	assRepo := repo.NewAssetRepository(db)
 	accRepo := repo.NewAccountRepository(db)
 	cashRepo := repo.NewCashRepository(db)
 	inRepo := repo.NewInvestmentRepository(db)
@@ -34,6 +35,7 @@ func main() {
 	liaRepo := repo.NewLiabilityRepository(db)
 
 	// ------ Usecase------
+	assUC := usecase.NewAssetUsecase(assRepo)
 	accUC := usecase.NewAccountUsecase(accRepo, fileRepo, supabaseClient)
 	cashUC := usecase.NewCashUsecase(cashRepo, fileRepo, supabaseClient)
 	inUC := usecase.NewInvestmentUsecase(inRepo, fileRepo, supabaseClient)
@@ -43,7 +45,7 @@ func main() {
 	liaUC := usecase.NewLiabilityUsecase(liaRepo, fileRepo, supabaseClient)
 
 	// ------Handler------
-	assetHandler := handler.NewAssetGRPCHandler(accUC, cashUC, inUC, buUC, landUC, insUC, liaUC)
+	assetHandler := handler.NewAssetGRPCHandler(assUC, accUC, cashUC, inUC, buUC, landUC, insUC, liaUC)
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)
 	if err != nil {

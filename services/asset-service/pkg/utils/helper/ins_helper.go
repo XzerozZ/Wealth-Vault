@@ -21,6 +21,11 @@ func ApplyUpdateInsuranceFields(req *pb.UpdateInsuranceRequest, in *domain.Insur
 
 	for _, path := range paths {
 		switch path {
+		case "name":
+			if req.Insurance.Name != "" {
+				in.Name = req.Insurance.Name
+			}
+
 		case "policy_number":
 			if req.Insurance.PolNum != "" {
 				in.PolicyNumber = req.Insurance.PolNum

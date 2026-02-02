@@ -14,6 +14,10 @@ message GetAssetByIDRequest {
   string user_id = 2;
 }
 
+message GetBatchIdsRequest {
+  repeated string ids = 1;
+}
+
 message GetNetWorthRequest { 
   string user_id = 1; 
 }
@@ -31,4 +35,14 @@ message DeleteAssetRequest {
 
 message DeleteAssetResponse {
   bool success = 1;
+}
+
+message CheckAssetRequest {
+  string id = 1;
+  string user_id = 2;
+  string type = 3;
+}
+
+message CheckAssetResponse {
+  bool exists = 1;
 }

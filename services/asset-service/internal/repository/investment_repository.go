@@ -32,6 +32,15 @@ func (r *InvestmentRepository) GetInvestment(ctx context.Context, uid uuid.UUID)
 	return items, nil
 }
 
+func (r *InvestmentRepository) GetInvestmentByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Investment, error) {
+	var items []*domain.Investment
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&items).Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r *InvestmentRepository) GetInvestmentByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Investment, error) {
 	var item domain.Investment
 	if err := r.db.WithContext(ctx).Preload("Files").First(&item, "id = ? AND user_id = ?", id, uid).Error; err != nil {

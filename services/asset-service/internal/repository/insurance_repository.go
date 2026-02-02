@@ -32,6 +32,15 @@ func (r *InsuranceRepository) GetInsurance(ctx context.Context, uid uuid.UUID) (
 	return items, nil
 }
 
+func (r *InsuranceRepository) GetInsuranceByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Insurance, error) {
+	var items []*domain.Insurance
+	if err := r.db.WithContext(ctx).Where("id IN ?", ids).Find(&items).Error; err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
 func (r *InsuranceRepository) GetInsuranceByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Insurance, error) {
 	var item domain.Insurance
 	if err := r.db.WithContext(ctx).Preload("Files").First(&item, "id = ? AND user_id = ?", id, uid).Error; err != nil {

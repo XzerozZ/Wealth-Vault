@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "wealth-vault/pkg/pb";
+
+message AssetPreview {
+  oneof asset {
+    BuildingPreview building = 1;
+    AccountPreview account = 2;
+    CashPreview cash = 3;
+    InsurancePreview insurance = 4;
+    InvestmentPreview investment = 5;
+    LandPreview land = 6;
+    LiabilityPreview liability = 7;
+  }
+}
+
+message BuildingPreview {
+  string id = 1;
+  string name = 2;
+  double amount = 3;   
+  string location_text = 4;
+  string type_name = 5;
+}
+
+message AccountPreview {
+  string id = 1;
+  string name = 2;        
+  string bank_name = 3;  
+  string account_number = 4;
+  double amount = 5;  
+}
+
+message CashPreview {
+  string id = 1;
+  string name = 2;
+  double amount = 3;
+}
+
+message InsurancePreview {
+  string id = 1;
+  string company_name = 2;
+  string type_name = 3;   
+  string pol_num = 4;
+  double coverage_amount = 5; 
+  string exp_date_text = 6; 
+}
+
+message InvestmentPreview {
+  string id = 1;
+  string name = 2;
+  string symbol = 3;     
+  string type_name = 4;  
+}
+
+message LandPreview {
+  string id = 1;
+  string name = 2;
+  string deed_num = 3;
+  double area = 4;     
+  double amount = 5;   
+  string location_text = 6;
+}
+
+message LiabilityPreview {
+  string id = 1;
+  string name = 2;
+  string creditor = 3;
+  double principal = 4;  
+  string type_name = 5;
+}

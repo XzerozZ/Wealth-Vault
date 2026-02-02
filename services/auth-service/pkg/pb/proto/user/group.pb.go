@@ -459,6 +459,178 @@ func (x *UpdateGroupRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+type AddMemberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       string                 `protobuf:"bytes,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TargetUserIds []string               `protobuf:"bytes,3,rep,name=target_user_ids,json=targetUserIds,proto3" json:"target_user_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddMemberRequest) Reset() {
+	*x = AddMemberRequest{}
+	mi := &file_proto_user_group_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddMemberRequest) ProtoMessage() {}
+
+func (x *AddMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_group_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddMemberRequest.ProtoReflect.Descriptor instead.
+func (*AddMemberRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_group_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AddMemberRequest) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
+}
+
+func (x *AddMemberRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *AddMemberRequest) GetTargetUserIds() []string {
+	if x != nil {
+		return x.TargetUserIds
+	}
+	return nil
+}
+
+type GrantAccessRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       string                 `protobuf:"bytes,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	TargetUserId  string                 `protobuf:"bytes,2,opt,name=target_user_id,json=targetUserId,proto3" json:"target_user_id,omitempty"`
+	GroupItemIds  []string               `protobuf:"bytes,3,rep,name=group_item_ids,json=groupItemIds,proto3" json:"group_item_ids,omitempty"`
+	OwnerUserId   string                 `protobuf:"bytes,4,opt,name=owner_user_id,json=ownerUserId,proto3" json:"owner_user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GrantAccessRequest) Reset() {
+	*x = GrantAccessRequest{}
+	mi := &file_proto_user_group_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GrantAccessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantAccessRequest) ProtoMessage() {}
+
+func (x *GrantAccessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_group_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GrantAccessRequest.ProtoReflect.Descriptor instead.
+func (*GrantAccessRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_group_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GrantAccessRequest) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
+}
+
+func (x *GrantAccessRequest) GetTargetUserId() string {
+	if x != nil {
+		return x.TargetUserId
+	}
+	return ""
+}
+
+func (x *GrantAccessRequest) GetGroupItemIds() []string {
+	if x != nil {
+		return x.GroupItemIds
+	}
+	return nil
+}
+
+func (x *GrantAccessRequest) GetOwnerUserId() string {
+	if x != nil {
+		return x.OwnerUserId
+	}
+	return ""
+}
+
+type ActionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ActionResponse) Reset() {
+	*x = ActionResponse{}
+	mi := &file_proto_user_group_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActionResponse) ProtoMessage() {}
+
+func (x *ActionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_group_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActionResponse.ProtoReflect.Descriptor instead.
+func (*ActionResponse) Descriptor() ([]byte, []int) {
+	return file_proto_user_group_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ActionResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_proto_user_group_proto protoreflect.FileDescriptor
 
 const file_proto_user_group_proto_rawDesc = "" +
@@ -499,7 +671,18 @@ const file_proto_user_group_proto_rawDesc = "" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x18\n" +
 	"\aprofile\x18\x04 \x01(\tR\aprofile\x12;\n" +
 	"\vupdate_mask\x18\x05 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
-	"updateMaskB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"updateMask\"n\n" +
+	"\x10AddMemberRequest\x12\x19\n" +
+	"\bgroup_id\x18\x01 \x01(\tR\agroupId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12&\n" +
+	"\x0ftarget_user_ids\x18\x03 \x03(\tR\rtargetUserIds\"\x9f\x01\n" +
+	"\x12GrantAccessRequest\x12\x19\n" +
+	"\bgroup_id\x18\x01 \x01(\tR\agroupId\x12$\n" +
+	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId\x12$\n" +
+	"\x0egroup_item_ids\x18\x03 \x03(\tR\fgroupItemIds\x12\"\n" +
+	"\rowner_user_id\x18\x04 \x01(\tR\vownerUserId\"*\n" +
+	"\x0eActionResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccessB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_user_group_proto_rawDescOnce sync.Once
@@ -513,7 +696,7 @@ func file_proto_user_group_proto_rawDescGZIP() []byte {
 	return file_proto_user_group_proto_rawDescData
 }
 
-var file_proto_user_group_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_user_group_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_proto_user_group_proto_goTypes = []any{
 	(*Group)(nil),                   // 0: user.Group
 	(*CreateGroupRequest)(nil),      // 1: user.CreateGroupRequest
@@ -522,21 +705,24 @@ var file_proto_user_group_proto_goTypes = []any{
 	(*GetGroupRequest)(nil),         // 4: user.GetGroupRequest
 	(*GetGroupMembersResponse)(nil), // 5: user.GetGroupMembersResponse
 	(*UpdateGroupRequest)(nil),      // 6: user.UpdateGroupRequest
-	(*timestamppb.Timestamp)(nil),   // 7: google.protobuf.Timestamp
-	(*User)(nil),                    // 8: user.User
-	(*fieldmaskpb.FieldMask)(nil),   // 9: google.protobuf.FieldMask
+	(*AddMemberRequest)(nil),        // 7: user.AddMemberRequest
+	(*GrantAccessRequest)(nil),      // 8: user.GrantAccessRequest
+	(*ActionResponse)(nil),          // 9: user.ActionResponse
+	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
+	(*User)(nil),                    // 11: user.User
+	(*fieldmaskpb.FieldMask)(nil),   // 12: google.protobuf.FieldMask
 }
 var file_proto_user_group_proto_depIdxs = []int32{
-	7, // 0: user.Group.created_at:type_name -> google.protobuf.Timestamp
-	7, // 1: user.Group.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 2: user.GroupResponse.group:type_name -> user.Group
-	8, // 3: user.GetGroupMembersResponse.members:type_name -> user.User
-	9, // 4: user.UpdateGroupRequest.update_mask:type_name -> google.protobuf.FieldMask
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	10, // 0: user.Group.created_at:type_name -> google.protobuf.Timestamp
+	10, // 1: user.Group.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 2: user.GroupResponse.group:type_name -> user.Group
+	11, // 3: user.GetGroupMembersResponse.members:type_name -> user.User
+	12, // 4: user.UpdateGroupRequest.update_mask:type_name -> google.protobuf.FieldMask
+	5,  // [5:5] is the sub-list for method output_type
+	5,  // [5:5] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_proto_user_group_proto_init() }
@@ -551,7 +737,7 @@ func file_proto_user_group_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_user_group_proto_rawDesc), len(file_proto_user_group_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

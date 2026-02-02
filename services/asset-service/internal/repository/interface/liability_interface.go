@@ -10,6 +10,7 @@ import (
 type LiabilityRepository interface {
 	CreateLiability(ctx context.Context, asset *domain.Liability) error
 	GetLiability(ctx context.Context, uid uuid.UUID) ([]*domain.Liability, error)
+	GetLiabilityByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Liability, error)
 	GetLiabilityByID(ctx context.Context, id uuid.UUID, uid uuid.UUID) (*domain.Liability, error)
 	UpdateLiability(ctx context.Context, lia *domain.Liability) (*domain.Liability, error)
 	DeleteLiability(ctx context.Context, id uuid.UUID, uid uuid.UUID) error

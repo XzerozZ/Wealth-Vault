@@ -33,6 +33,17 @@ func ToBuildingDomain(p *pb.Building) *domain.Building {
 		}
 	}
 
+	var ins []domain.InsInfo
+	if len(p.Ins) > 0 {
+		ins = make([]domain.InsInfo, len(p.Ins))
+		for i, f := range p.Ins {
+			ins[i] = domain.InsInfo{
+				ID:   f.Id,
+				Name: f.Name,
+			}
+		}
+	}
+
 	return &domain.Building{
 		ID:          p.Id,
 		Name:        p.Name,
@@ -42,6 +53,7 @@ func ToBuildingDomain(p *pb.Building) *domain.Building {
 		Description: p.Description,
 		Location:    *ToLocationDomain(p.Location),
 		Ref:         ref,
+		Ins:         ins,
 		UserID:      p.UserId,
 		Files:       domainFiles,
 		CreatedAt:   p.CreatedAt.AsTime(),

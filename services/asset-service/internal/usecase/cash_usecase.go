@@ -83,6 +83,29 @@ func (u *CashUsecase) GetCash(ctx context.Context, req *pb.GetAssetRequest) (*pb
 	}, nil
 }
 
+func (u *CashUsecase) GetCashByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.CashArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.cashRepo.GetCashByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbCash []*pb.Cash
+	for _, a := range bu {
+		pbCash = append(pbCash, mapper.ToCashProto(a))
+	}
+
+	return &pb.CashArrayResponse{
+		Cash: pbCash,
+	}, nil
+}
+
 func (u *CashUsecase) GetCashByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.CashResponse, error) {
 	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
 	if err != nil {

@@ -2,9 +2,15 @@ package domain
 
 import "time"
 
+type InsInfo struct {
+	ID   string `json:"ins_id"`
+	Name string `json:"ins_name"`
+}
+
 type Insurance struct {
 	ID             string     `json:"id"`
 	UserID         string     `json:"user_id"`
+	Name           string     `json:"name"`
 	PolicyNumber   string     `json:"policy_number"`
 	Type           string     `json:"type"`
 	CompanyName    string     `json:"company_name"`
@@ -20,6 +26,7 @@ type Insurance struct {
 
 type CreateInsuranceRequest struct {
 	Type           string `json:"type" form:"type"`
+	Name           string `json:"name" form:"name"`
 	PolicyNumber   string `json:"policy_number" form:"policy_number"`
 	CompanyName    string `json:"company_name" form:"company_name"`
 	CoveragePeriod string `json:"coverage_period" form:"coverage_period"`
@@ -30,6 +37,7 @@ type CreateInsuranceRequest struct {
 }
 
 type UpdateInsuranceRequest struct {
+	Name           string   `json:"name"    form:"name"    mask:"name"`
 	PolicyNumber   string   `json:"policy_number"    form:"policy_number"    mask:"policy_number"`
 	CompanyName    string   `json:"company_name" form:"company_name" mask:"company_name"`
 	CoveragePeriod string   `json:"coverage_period" form:"coverage_period" mask:"coverage_period"`

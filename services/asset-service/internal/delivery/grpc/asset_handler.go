@@ -8,6 +8,7 @@ import (
 
 type AssetGRPCHandler struct {
 	pb.UnimplementedAssetServiceServer
+	assetusecase usecase.AssetUsecase
 	accusecase   usecase.AccountUsecase
 	cashusecase  usecase.CashUsecase
 	inusecase    usecase.InvestmentUsecase
@@ -18,6 +19,7 @@ type AssetGRPCHandler struct {
 }
 
 func NewAssetGRPCHandler(
+	as usecase.AssetUsecase,
 	ac usecase.AccountUsecase,
 	cu usecase.CashUsecase,
 	iu usecase.InvestmentUsecase,
@@ -27,6 +29,7 @@ func NewAssetGRPCHandler(
 	lu usecase.LiabilityUsecase,
 ) *AssetGRPCHandler {
 	return &AssetGRPCHandler{
+		assetusecase: as,
 		accusecase:   ac,
 		cashusecase:  cu,
 		inusecase:    iu,
@@ -35,6 +38,15 @@ func NewAssetGRPCHandler(
 		insusecase:   in,
 		liausecase:   lu,
 	}
+}
+
+func (h *AssetGRPCHandler) CheckAssetExists(ctx context.Context, req *pb.CheckAssetRequest) (*pb.CheckAssetResponse, error) {
+	res, err := h.assetusecase.CheckExists(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (h *AssetGRPCHandler) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.AccountResponse, error) {
@@ -348,4 +360,67 @@ func (h *AssetGRPCHandler) DeleteLiability(ctx context.Context, req *pb.DeleteLi
 	}
 
 	return lia, nil
+}
+
+func (h *AssetGRPCHandler) GetBatchAccount(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.AccountArrayResponse, error) {
+	res, err := h.accusecase.GetAccountByIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *AssetGRPCHandler) GetBatchBuilding(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.BuildingArrayResponse, error) {
+	res, err := h.buildusecase.GetBuildingByIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *AssetGRPCHandler) GetBatchCash(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.CashArrayResponse, error) {
+	res, err := h.cashusecase.GetCashByIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *AssetGRPCHandler) GetBatchInsurance(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.InsuranceArrayResponse, error) {
+	res, err := h.insusecase.GetInsuranceByIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *AssetGRPCHandler) GetBatchInvestment(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.InvestmentArrayResponse, error) {
+	res, err := h.inusecase.GetInvestmentByIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *AssetGRPCHandler) GetBatchLand(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LandArrayResponse, error) {
+	res, err := h.landusecase.GetLandByIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *AssetGRPCHandler) GetBatchLiability(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LiabilityArrayResponse, error) {
+	res, err := h.liausecase.GetLiabilityByIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

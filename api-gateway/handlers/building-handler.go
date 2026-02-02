@@ -88,6 +88,7 @@ func (h *BuildingHandler) CreateBuilding(c *fiber.Ctx) error {
 		},
 		NewFiles: pbFiles,
 		LandIds:  req.ReferenceIDs,
+		InsIds:   req.InsIDs,
 	}
 
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
@@ -236,6 +237,8 @@ func (h *BuildingHandler) UpdateBuilding(c *fiber.Ctx) error {
 		NewFiles:      newPbFiles,
 		LandIds:       req.ReferenceIDs,
 		DeleteLandIds: req.DeleteReferenceIDs,
+		InsIds:        req.InsIDs,
+		DeleteInsIds:  req.DeleteInsIDs,
 		DeleteFileIds: req.DeleteFileIDs,
 	}
 

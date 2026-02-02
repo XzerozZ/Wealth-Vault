@@ -11,6 +11,9 @@ type Configs struct {
 	GRPC       GRPC
 	PostgreSQL PostgreSQL
 	SUPA       SUPA
+	AssetGRPC  AssetGRPC
+	Mail       Mail
+	NATS       NATS
 }
 
 type GRPC struct {
@@ -29,6 +32,23 @@ type PostgreSQL struct {
 	Username string
 	Password string
 	Database string
+}
+
+type AssetGRPC struct {
+	Host string
+	Port string
+}
+
+type Mail struct {
+	Host   string
+	Port   string
+	Sender string
+	Key    string
+}
+
+type NATS struct {
+	Host string
+	Port string
 }
 
 func LoadConfigs() *Configs {
@@ -60,6 +80,20 @@ func LoadConfigs() *Configs {
 			Key:    requireEnv("SUPABASE_KEY"),
 			URL:    requireEnv("SUPABASE_URL"),
 			Bucket: requireEnv("BUCKET_NAME"),
+		},
+		AssetGRPC: AssetGRPC{
+			Host: requireEnv("ASSET_HOST"),
+			Port: requireEnv("ASSET_PORT"),
+		},
+		Mail: Mail{
+			Host:   requireEnv("EMAIL_HOST"),
+			Port:   requireEnv("EMAIL_PORT"),
+			Sender: requireEnv("EMAIL_USER"),
+			Key:    requireEnv("EMAIL_PASS"),
+		},
+		NATS: NATS{
+			Host: requireEnv("NATS_HOST"),
+			Port: requireEnv("NATS_PORT"),
 		},
 	}
 }

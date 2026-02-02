@@ -217,3 +217,68 @@ func (h *GroupHandler) UpdateGroup(c *fiber.Ctx) error {
 		"data":   groupInfo,
 	})
 }
+
+func (h *GroupHandler) AddMember(c *fiber.Ctx) error {
+	id := c.Params("id")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	var req domain.AddMemberRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.AddGroupMember(ctx, &pb.AddMemberRequest{
+		GroupId:       id,
+		UserId:        userID,
+		TargetUserIds: req.TargetUserIDS,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "add member(s) success",
+		"data":    res.Success,
+	})
+}
+
+func (h *GroupHandler) GrantAccess(c *fiber.Ctx) error {
+	id := c.Params("id")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	var req domain.GrantAccessRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.GrantGroupItemAccess(ctx, &pb.GrantAccessRequest{
+		GroupId:      id,
+		OwnerUserId:  userID,
+		TargetUserId: req.TargetUserID,
+		GroupItemIds: req.ItemIDS,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "grant access success",
+		"data":    res.Success,
+	})
+}

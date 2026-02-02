@@ -8,8 +8,11 @@ import (
 	"time"
 	"wealth-vault/auth-service/internal/domain"
 	repo "wealth-vault/auth-service/internal/repository/interface"
+	authPb "wealth-vault/auth-service/pkg/pb/proto/auth"
 	pb "wealth-vault/auth-service/pkg/pb/proto/user"
 	"wealth-vault/auth-service/pkg/token"
+	"wealth-vault/auth-service/pkg/utils"
+	"wealth-vault/auth-service/pkg/utils/mail"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -19,17 +22,20 @@ type AuthUsecase struct {
 	authRepo   repo.AuthRepository
 	userClient pb.UserServiceClient
 	token      token.Generator
+	mailclient mail.NotificationClient
 }
 
 func NewAuthUsecase(
 	r repo.AuthRepository,
 	userClient pb.UserServiceClient,
 	t token.Generator,
+	mail mail.NotificationClient,
 ) AuthUsecase {
 	return AuthUsecase{
 		authRepo:   r,
 		userClient: userClient,
 		token:      t,
+		mailclient: mail,
 	}
 }
 
@@ -191,4 +197,119 @@ func (u *AuthUsecase) CleanupSessions(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (u *AuthUsecase) DeleteExpiredOTPs(ctx context.Context) error {
+	if err := u.authRepo.DeleteExpiredOTPs(ctx); err != nil {
+		return fmt.Errorf("failed to cleanup sessions: %w", err)
+	}
+
+	return nil
+}
+
+func (u *AuthUsecase) ForgotPassword(ctx context.Context, req *authPb.ForgotPasswordRequest) (*authPb.ForgotPasswordResponse, error) {
+	account, err := u.authRepo.FindByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	if account.Provider != "local" {
+		return nil, errors.New("cannot reset password for social login account")
+	}
+
+	otpCode, err := utils.GenerateOTP(6)
+	if err != nil {
+		return nil, err
+	}
+
+	otp := &domain.AuthOTP{
+		UserID:    account.UserID,
+		OTP:       otpCode,
+		ExpiredAt: time.Now().Add(5 * time.Minute),
+	}
+
+	otpEmail := domain.SendEmailRequest{
+		ToEmail:   account.Email,
+		OTP:       otpCode,
+		ExpiredAt: "5 นาที",
+	}
+
+	err = u.authRepo.SaveOTP(ctx, otp)
+	if err != nil {
+		return nil, err
+	}
+
+	go u.mailclient.SendOTP(ctx, otpEmail)
+
+	return &authPb.ForgotPasswordResponse{
+		Success: true,
+	}, nil
+}
+
+func (u *AuthUsecase) VerifyForgotPasswordOTP(ctx context.Context, req *authPb.VerifyOTPRequest) (*authPb.VerifyOTPResponse, error) {
+	account, err := u.authRepo.FindByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	_, err = u.authRepo.GetValidOTP(ctx, account.UserID, req.Otp)
+	if err != nil {
+		return nil, errors.New("invalid or expired OTP")
+	}
+
+	resetToken, err := u.token.CreateToken(account.UserID.String(), account.Email, "reset", 5*time.Minute)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create reset token: %w", err)
+	}
+
+	_ = u.authRepo.DeleteOTP(ctx, account.ID)
+
+	return &authPb.VerifyOTPResponse{
+		Success:    true,
+		ResetToken: resetToken,
+	}, nil
+}
+
+func (u *AuthUsecase) ResetPassword(ctx context.Context, req *authPb.ResetPasswordRequest) (*authPb.ResetPasswordResponse, error) {
+	claims, err := u.token.VerifyToken(req.ResetToken)
+	if err != nil {
+		return nil, fmt.Errorf("invalid refresh token: %w", err)
+	}
+
+	tokenType, ok := claims["type"].(string)
+	if !ok || tokenType != "reset" {
+		return nil, fmt.Errorf("invalid token type: expected reset token")
+	}
+
+	email, ok := claims["email"].(string)
+	if !ok {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+
+	account, err := u.authRepo.FindByEmail(ctx, email)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	if account.Password != "" {
+		err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(req.NewPassword))
+		if err == nil {
+			return nil, errors.New("new password cannot be the same as the old password")
+		}
+	}
+
+	hashedPwd := ""
+	bytes, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	hashedPwd = string(bytes)
+
+	if err := u.authRepo.UpdatePassword(ctx, account.UserID, hashedPwd); err != nil {
+		return nil, err
+	}
+
+	return &authPb.ResetPasswordResponse{
+		Success: true,
+	}, nil
 }

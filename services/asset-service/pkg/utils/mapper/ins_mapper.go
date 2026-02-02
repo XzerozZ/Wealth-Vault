@@ -35,6 +35,7 @@ func ToInsuranceProto(d *domain.Insurance) *pb.Insurance {
 	res := &pb.Insurance{
 		Id:             d.ID.String(),
 		UserId:         d.UserID.String(),
+		Name:           d.Name,
 		PolNum:         d.PolicyNumber,
 		CompanyName:    d.CompanyName,
 		Type:           inTypeEnum,

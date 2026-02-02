@@ -29,6 +29,7 @@ func (r *UserRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain.Use
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
+
 	return &user, nil
 }
 

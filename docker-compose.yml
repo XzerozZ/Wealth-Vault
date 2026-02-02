@@ -25,6 +25,13 @@ services:
     depends_on:
       - postgres
 
+  nats-server:
+    image: nats:2.10
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-js"]
+
   user-service:
     build:
       context: ./services/user-service  
@@ -45,6 +52,7 @@ services:
     container_name: auth-service
     restart: always
     depends_on:
+      - nats-server
       - postgres
     env_file:
       - ./services/auth-service/.auth.env
@@ -64,6 +72,20 @@ services:
     ports:
       - "50053:50053"
 
+  notification-service:
+    build:
+      context: ./services/notification-service  
+      dockerfile: dockerfile 
+    container_name: notification-service
+    restart: always
+    depends_on:
+      - nats-server
+      - postgres
+    env_file:
+      - ./services/notification-service/.noti.env
+    ports:
+      - "50054:50054"
+
   api-gateway:
     build:
       context: ./api-gateway              
@@ -71,6 +93,7 @@ services:
     container_name: api-gateway
     restart: always
     depends_on:
+      - notification-service
       - user-service
       - auth-service
       - asset-service
