@@ -66,3 +66,46 @@ type ItemWithDetail struct {
 	Cash       *CashPreview
 	Liability  *LiabilityPreview
 }
+
+type SharedItemSummary struct {
+	EntityID   string
+	EntityType string
+}
+
+type BatchShareRequest struct {
+	OwnerID       uuid.UUID
+	TargetID      uuid.UUID
+	AccountIDs    []string
+	BuildingIDs   []string
+	LandIDs       []string
+	CashIDs       []string
+	InsuranceIDs  []string
+	InvestmentIDs []string
+	LiabilityIDs  []string
+}
+
+type SharedTargetsResult struct {
+	Groups  []SharedGroupTarget
+	Friends []SharedFriendTarget
+	Emails  []SharedEmailTarget
+}
+
+type SharedGroupTarget struct {
+	GroupID    string
+	GroupName  string
+	GroupImage string
+	SharedAt   time.Time
+}
+
+type SharedFriendTarget struct {
+	FriendID     string
+	Username     string
+	ProfileImage string
+	SharedAt     time.Time
+}
+
+type SharedEmailTarget struct {
+	Email    string
+	SharedAt time.Time
+	IsSent   bool
+}

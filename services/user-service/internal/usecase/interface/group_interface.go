@@ -10,4 +10,5 @@ type GroupUsecase interface {
 	GetMember(ctx context.Context, req *pb.GetGroupMembersRequest) (*pb.GetGroupMembersResponse, error)
 	GetGroup(ctx context.Context, req *pb.GetGroupRequest) (*pb.GroupResponse, error)
 	UpdateGroup(ctx context.Context, req *pb.UpdateGroupRequest) (*pb.GroupResponse, error)
+	RemoveMember(ctx context.Context, req *pb.RemoveMemberRequest) (*pb.ActionResponse, error)
 }

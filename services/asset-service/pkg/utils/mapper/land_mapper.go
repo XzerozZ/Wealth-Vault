@@ -21,6 +21,7 @@ func ToLandProto(d *domain.Land) *pb.Land {
 		Ref:         ToRefBuildingProto(d.Buildings),
 		CreatedAt:   timestamppb.New(d.CreatedAt),
 		UpdatedAt:   timestamppb.New(d.UpdatedAt),
+		DeletedAt:   timestamppb.New(d.DeletedAt.Time),
 	}
 
 	return res

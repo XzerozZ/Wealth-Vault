@@ -19,22 +19,33 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_CreateUser_FullMethodName            = "/user.UserService/CreateUser"
-	UserService_GetUser_FullMethodName               = "/user.UserService/GetUser"
-	UserService_UpdateUser_FullMethodName            = "/user.UserService/UpdateUser"
-	UserService_GetFriendList_FullMethodName         = "/user.UserService/GetFriendList"
-	UserService_AddFriend_FullMethodName             = "/user.UserService/AddFriend"
-	UserService_CreateGroup_FullMethodName           = "/user.UserService/CreateGroup"
-	UserService_GetGroup_FullMethodName              = "/user.UserService/GetGroup"
-	UserService_GetMember_FullMethodName             = "/user.UserService/GetMember"
-	UserService_UpdateGroup_FullMethodName           = "/user.UserService/UpdateGroup"
-	UserService_AddGroupMember_FullMethodName        = "/user.UserService/AddGroupMember"
-	UserService_GrantGroupItemAccess_FullMethodName  = "/user.UserService/GrantGroupItemAccess"
-	UserService_ShareItem_FullMethodName             = "/user.UserService/ShareItem"
-	UserService_GetSharedItem_FullMethodName         = "/user.UserService/GetSharedItem"
-	UserService_GetSharedIteminFriend_FullMethodName = "/user.UserService/GetSharedIteminFriend"
-	UserService_UnsharedItem_FullMethodName          = "/user.UserService/UnsharedItem"
-	UserService_UnsharedIteminFriend_FullMethodName  = "/user.UserService/UnsharedIteminFriend"
+	UserService_CreateUser_FullMethodName                    = "/user.UserService/CreateUser"
+	UserService_GetUser_FullMethodName                       = "/user.UserService/GetUser"
+	UserService_UpdateUser_FullMethodName                    = "/user.UserService/UpdateUser"
+	UserService_GetFriendList_FullMethodName                 = "/user.UserService/GetFriendList"
+	UserService_GetPendingRequests_FullMethodName            = "/user.UserService/GetPendingRequests"
+	UserService_AddFriend_FullMethodName                     = "/user.UserService/AddFriend"
+	UserService_AcceptFriend_FullMethodName                  = "/user.UserService/AcceptFriend"
+	UserService_SetCloseFriend_FullMethodName                = "/user.UserService/SetCloseFriend"
+	UserService_GetCloseFriends_FullMethodName               = "/user.UserService/GetCloseFriends"
+	UserService_CreateGroup_FullMethodName                   = "/user.UserService/CreateGroup"
+	UserService_GetGroup_FullMethodName                      = "/user.UserService/GetGroup"
+	UserService_GetMember_FullMethodName                     = "/user.UserService/GetMember"
+	UserService_UpdateGroup_FullMethodName                   = "/user.UserService/UpdateGroup"
+	UserService_AddGroupMember_FullMethodName                = "/user.UserService/AddGroupMember"
+	UserService_GrantGroupItemAccess_FullMethodName          = "/user.UserService/GrantGroupItemAccess"
+	UserService_RemoveMember_FullMethodName                  = "/user.UserService/RemoveMember"
+	UserService_LeaveGroup_FullMethodName                    = "/user.UserService/LeaveGroup"
+	UserService_DeleteGroup_FullMethodName                   = "/user.UserService/DeleteGroup"
+	UserService_ShareItem_FullMethodName                     = "/user.UserService/ShareItem"
+	UserService_GetSharedItem_FullMethodName                 = "/user.UserService/GetSharedItem"
+	UserService_GetSharedIteminFriend_FullMethodName         = "/user.UserService/GetSharedIteminFriend"
+	UserService_UnsharedItem_FullMethodName                  = "/user.UserService/UnsharedItem"
+	UserService_UnsharedIteminFriend_FullMethodName          = "/user.UserService/UnsharedIteminFriend"
+	UserService_DeleteAllReferencesByEntityID_FullMethodName = "/user.UserService/DeleteAllReferencesByEntityID"
+	UserService_GetItemSharedTargets_FullMethodName          = "/user.UserService/GetItemSharedTargets"
+	UserService_GetGroupMessages_FullMethodName              = "/user.UserService/GetGroupMessages"
+	UserService_GetPrivateMessages_FullMethodName            = "/user.UserService/GetPrivateMessages"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -45,18 +56,29 @@ type UserServiceClient interface {
 	GetUser(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetFriendList(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*FriendListResponse, error)
+	GetPendingRequests(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*FriendListResponse, error)
 	AddFriend(ctx context.Context, in *FriendRequest, opts ...grpc.CallOption) (*FriendResponse, error)
+	AcceptFriend(ctx context.Context, in *AcceptFriendRequest, opts ...grpc.CallOption) (*FriendResponse, error)
+	SetCloseFriend(ctx context.Context, in *SetCloseFriendRequest, opts ...grpc.CallOption) (*SetCloseFriendResponse, error)
+	GetCloseFriends(ctx context.Context, in *GetCloseFriendsRequest, opts ...grpc.CallOption) (*GetCloseFriendsResponse, error)
 	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*GroupResponse, error)
 	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GroupResponse, error)
 	GetMember(ctx context.Context, in *GetGroupMembersRequest, opts ...grpc.CallOption) (*GetGroupMembersResponse, error)
 	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...grpc.CallOption) (*GroupResponse, error)
 	AddGroupMember(ctx context.Context, in *AddMemberRequest, opts ...grpc.CallOption) (*ActionResponse, error)
 	GrantGroupItemAccess(ctx context.Context, in *GrantAccessRequest, opts ...grpc.CallOption) (*ActionResponse, error)
+	RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*ActionResponse, error)
+	LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opts ...grpc.CallOption) (*ActionResponse, error)
+	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...grpc.CallOption) (*ActionResponse, error)
 	ShareItem(ctx context.Context, in *ShareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error)
 	GetSharedItem(ctx context.Context, in *GetGroupItemsRequest, opts ...grpc.CallOption) (*GetGroupItemsResponse, error)
 	GetSharedIteminFriend(ctx context.Context, in *GetFriendItemRequest, opts ...grpc.CallOption) (*GetFriendItemsResponse, error)
 	UnsharedItem(ctx context.Context, in *UnshareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error)
 	UnsharedIteminFriend(ctx context.Context, in *UnshareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error)
+	DeleteAllReferencesByEntityID(ctx context.Context, in *DeleteByEntityRequest, opts ...grpc.CallOption) (*DeleteByEntityResponse, error)
+	GetItemSharedTargets(ctx context.Context, in *GetItemSharedTargetsRequest, opts ...grpc.CallOption) (*GetItemSharedTargetsResponse, error)
+	GetGroupMessages(ctx context.Context, in *GetGroupMessagesRequest, opts ...grpc.CallOption) (*GetGroupMessagesResponse, error)
+	GetPrivateMessages(ctx context.Context, in *GetPrivateMessagesRequest, opts ...grpc.CallOption) (*GetPrivateMessagesResponse, error)
 }
 
 type userServiceClient struct {
@@ -107,10 +129,50 @@ func (c *userServiceClient) GetFriendList(ctx context.Context, in *GetUserByIDRe
 	return out, nil
 }
 
+func (c *userServiceClient) GetPendingRequests(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*FriendListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FriendListResponse)
+	err := c.cc.Invoke(ctx, UserService_GetPendingRequests_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) AddFriend(ctx context.Context, in *FriendRequest, opts ...grpc.CallOption) (*FriendResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(FriendResponse)
 	err := c.cc.Invoke(ctx, UserService_AddFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) AcceptFriend(ctx context.Context, in *AcceptFriendRequest, opts ...grpc.CallOption) (*FriendResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FriendResponse)
+	err := c.cc.Invoke(ctx, UserService_AcceptFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) SetCloseFriend(ctx context.Context, in *SetCloseFriendRequest, opts ...grpc.CallOption) (*SetCloseFriendResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetCloseFriendResponse)
+	err := c.cc.Invoke(ctx, UserService_SetCloseFriend_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetCloseFriends(ctx context.Context, in *GetCloseFriendsRequest, opts ...grpc.CallOption) (*GetCloseFriendsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCloseFriendsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetCloseFriends_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +239,36 @@ func (c *userServiceClient) GrantGroupItemAccess(ctx context.Context, in *GrantA
 	return out, nil
 }
 
+func (c *userServiceClient) RemoveMember(ctx context.Context, in *RemoveMemberRequest, opts ...grpc.CallOption) (*ActionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ActionResponse)
+	err := c.cc.Invoke(ctx, UserService_RemoveMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) LeaveGroup(ctx context.Context, in *LeaveGroupRequest, opts ...grpc.CallOption) (*ActionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ActionResponse)
+	err := c.cc.Invoke(ctx, UserService_LeaveGroup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...grpc.CallOption) (*ActionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ActionResponse)
+	err := c.cc.Invoke(ctx, UserService_DeleteGroup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) ShareItem(ctx context.Context, in *ShareItemRequest, opts ...grpc.CallOption) (*ShareItemResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ShareItemResponse)
@@ -227,6 +319,46 @@ func (c *userServiceClient) UnsharedIteminFriend(ctx context.Context, in *Unshar
 	return out, nil
 }
 
+func (c *userServiceClient) DeleteAllReferencesByEntityID(ctx context.Context, in *DeleteByEntityRequest, opts ...grpc.CallOption) (*DeleteByEntityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteByEntityResponse)
+	err := c.cc.Invoke(ctx, UserService_DeleteAllReferencesByEntityID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetItemSharedTargets(ctx context.Context, in *GetItemSharedTargetsRequest, opts ...grpc.CallOption) (*GetItemSharedTargetsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetItemSharedTargetsResponse)
+	err := c.cc.Invoke(ctx, UserService_GetItemSharedTargets_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetGroupMessages(ctx context.Context, in *GetGroupMessagesRequest, opts ...grpc.CallOption) (*GetGroupMessagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetGroupMessagesResponse)
+	err := c.cc.Invoke(ctx, UserService_GetGroupMessages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetPrivateMessages(ctx context.Context, in *GetPrivateMessagesRequest, opts ...grpc.CallOption) (*GetPrivateMessagesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetPrivateMessagesResponse)
+	err := c.cc.Invoke(ctx, UserService_GetPrivateMessages_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -235,18 +367,29 @@ type UserServiceServer interface {
 	GetUser(context.Context, *GetUserByIDRequest) (*UserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
 	GetFriendList(context.Context, *GetUserByIDRequest) (*FriendListResponse, error)
+	GetPendingRequests(context.Context, *GetUserByIDRequest) (*FriendListResponse, error)
 	AddFriend(context.Context, *FriendRequest) (*FriendResponse, error)
+	AcceptFriend(context.Context, *AcceptFriendRequest) (*FriendResponse, error)
+	SetCloseFriend(context.Context, *SetCloseFriendRequest) (*SetCloseFriendResponse, error)
+	GetCloseFriends(context.Context, *GetCloseFriendsRequest) (*GetCloseFriendsResponse, error)
 	CreateGroup(context.Context, *CreateGroupRequest) (*GroupResponse, error)
 	GetGroup(context.Context, *GetGroupRequest) (*GroupResponse, error)
 	GetMember(context.Context, *GetGroupMembersRequest) (*GetGroupMembersResponse, error)
 	UpdateGroup(context.Context, *UpdateGroupRequest) (*GroupResponse, error)
 	AddGroupMember(context.Context, *AddMemberRequest) (*ActionResponse, error)
 	GrantGroupItemAccess(context.Context, *GrantAccessRequest) (*ActionResponse, error)
+	RemoveMember(context.Context, *RemoveMemberRequest) (*ActionResponse, error)
+	LeaveGroup(context.Context, *LeaveGroupRequest) (*ActionResponse, error)
+	DeleteGroup(context.Context, *DeleteGroupRequest) (*ActionResponse, error)
 	ShareItem(context.Context, *ShareItemRequest) (*ShareItemResponse, error)
 	GetSharedItem(context.Context, *GetGroupItemsRequest) (*GetGroupItemsResponse, error)
 	GetSharedIteminFriend(context.Context, *GetFriendItemRequest) (*GetFriendItemsResponse, error)
 	UnsharedItem(context.Context, *UnshareItemRequest) (*ShareItemResponse, error)
 	UnsharedIteminFriend(context.Context, *UnshareItemRequest) (*ShareItemResponse, error)
+	DeleteAllReferencesByEntityID(context.Context, *DeleteByEntityRequest) (*DeleteByEntityResponse, error)
+	GetItemSharedTargets(context.Context, *GetItemSharedTargetsRequest) (*GetItemSharedTargetsResponse, error)
+	GetGroupMessages(context.Context, *GetGroupMessagesRequest) (*GetGroupMessagesResponse, error)
+	GetPrivateMessages(context.Context, *GetPrivateMessagesRequest) (*GetPrivateMessagesResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -269,8 +412,20 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq
 func (UnimplementedUserServiceServer) GetFriendList(context.Context, *GetUserByIDRequest) (*FriendListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetFriendList not implemented")
 }
+func (UnimplementedUserServiceServer) GetPendingRequests(context.Context, *GetUserByIDRequest) (*FriendListResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPendingRequests not implemented")
+}
 func (UnimplementedUserServiceServer) AddFriend(context.Context, *FriendRequest) (*FriendResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AddFriend not implemented")
+}
+func (UnimplementedUserServiceServer) AcceptFriend(context.Context, *AcceptFriendRequest) (*FriendResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AcceptFriend not implemented")
+}
+func (UnimplementedUserServiceServer) SetCloseFriend(context.Context, *SetCloseFriendRequest) (*SetCloseFriendResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetCloseFriend not implemented")
+}
+func (UnimplementedUserServiceServer) GetCloseFriends(context.Context, *GetCloseFriendsRequest) (*GetCloseFriendsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCloseFriends not implemented")
 }
 func (UnimplementedUserServiceServer) CreateGroup(context.Context, *CreateGroupRequest) (*GroupResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateGroup not implemented")
@@ -290,6 +445,15 @@ func (UnimplementedUserServiceServer) AddGroupMember(context.Context, *AddMember
 func (UnimplementedUserServiceServer) GrantGroupItemAccess(context.Context, *GrantAccessRequest) (*ActionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GrantGroupItemAccess not implemented")
 }
+func (UnimplementedUserServiceServer) RemoveMember(context.Context, *RemoveMemberRequest) (*ActionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RemoveMember not implemented")
+}
+func (UnimplementedUserServiceServer) LeaveGroup(context.Context, *LeaveGroupRequest) (*ActionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LeaveGroup not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteGroup(context.Context, *DeleteGroupRequest) (*ActionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteGroup not implemented")
+}
 func (UnimplementedUserServiceServer) ShareItem(context.Context, *ShareItemRequest) (*ShareItemResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ShareItem not implemented")
 }
@@ -304,6 +468,18 @@ func (UnimplementedUserServiceServer) UnsharedItem(context.Context, *UnshareItem
 }
 func (UnimplementedUserServiceServer) UnsharedIteminFriend(context.Context, *UnshareItemRequest) (*ShareItemResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UnsharedIteminFriend not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteAllReferencesByEntityID(context.Context, *DeleteByEntityRequest) (*DeleteByEntityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteAllReferencesByEntityID not implemented")
+}
+func (UnimplementedUserServiceServer) GetItemSharedTargets(context.Context, *GetItemSharedTargetsRequest) (*GetItemSharedTargetsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetItemSharedTargets not implemented")
+}
+func (UnimplementedUserServiceServer) GetGroupMessages(context.Context, *GetGroupMessagesRequest) (*GetGroupMessagesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetGroupMessages not implemented")
+}
+func (UnimplementedUserServiceServer) GetPrivateMessages(context.Context, *GetPrivateMessagesRequest) (*GetPrivateMessagesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPrivateMessages not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -398,6 +574,24 @@ func _UserService_GetFriendList_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetPendingRequests_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetPendingRequests(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetPendingRequests_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetPendingRequests(ctx, req.(*GetUserByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_AddFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FriendRequest)
 	if err := dec(in); err != nil {
@@ -412,6 +606,60 @@ func _UserService_AddFriend_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).AddFriend(ctx, req.(*FriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_AcceptFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcceptFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).AcceptFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_AcceptFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).AcceptFriend(ctx, req.(*AcceptFriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_SetCloseFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetCloseFriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).SetCloseFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_SetCloseFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).SetCloseFriend(ctx, req.(*SetCloseFriendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetCloseFriends_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCloseFriendsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetCloseFriends(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetCloseFriends_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetCloseFriends(ctx, req.(*GetCloseFriendsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -524,6 +772,60 @@ func _UserService_GrantGroupItemAccess_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_RemoveMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RemoveMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).RemoveMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_RemoveMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).RemoveMember(ctx, req.(*RemoveMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_LeaveGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).LeaveGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_LeaveGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).LeaveGroup(ctx, req.(*LeaveGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_DeleteGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteGroupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteGroup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteGroup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteGroup(ctx, req.(*DeleteGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_ShareItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ShareItemRequest)
 	if err := dec(in); err != nil {
@@ -614,6 +916,78 @@ func _UserService_UnsharedIteminFriend_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_DeleteAllReferencesByEntityID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteByEntityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteAllReferencesByEntityID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteAllReferencesByEntityID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteAllReferencesByEntityID(ctx, req.(*DeleteByEntityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetItemSharedTargets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetItemSharedTargetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetItemSharedTargets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetItemSharedTargets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetItemSharedTargets(ctx, req.(*GetItemSharedTargetsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetGroupMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetGroupMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetGroupMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetGroupMessages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetGroupMessages(ctx, req.(*GetGroupMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetPrivateMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPrivateMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetPrivateMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetPrivateMessages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetPrivateMessages(ctx, req.(*GetPrivateMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -638,8 +1012,24 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetFriendList_Handler,
 		},
 		{
+			MethodName: "GetPendingRequests",
+			Handler:    _UserService_GetPendingRequests_Handler,
+		},
+		{
 			MethodName: "AddFriend",
 			Handler:    _UserService_AddFriend_Handler,
+		},
+		{
+			MethodName: "AcceptFriend",
+			Handler:    _UserService_AcceptFriend_Handler,
+		},
+		{
+			MethodName: "SetCloseFriend",
+			Handler:    _UserService_SetCloseFriend_Handler,
+		},
+		{
+			MethodName: "GetCloseFriends",
+			Handler:    _UserService_GetCloseFriends_Handler,
 		},
 		{
 			MethodName: "CreateGroup",
@@ -666,6 +1056,18 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GrantGroupItemAccess_Handler,
 		},
 		{
+			MethodName: "RemoveMember",
+			Handler:    _UserService_RemoveMember_Handler,
+		},
+		{
+			MethodName: "LeaveGroup",
+			Handler:    _UserService_LeaveGroup_Handler,
+		},
+		{
+			MethodName: "DeleteGroup",
+			Handler:    _UserService_DeleteGroup_Handler,
+		},
+		{
 			MethodName: "ShareItem",
 			Handler:    _UserService_ShareItem_Handler,
 		},
@@ -684,6 +1086,22 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UnsharedIteminFriend",
 			Handler:    _UserService_UnsharedIteminFriend_Handler,
+		},
+		{
+			MethodName: "DeleteAllReferencesByEntityID",
+			Handler:    _UserService_DeleteAllReferencesByEntityID_Handler,
+		},
+		{
+			MethodName: "GetItemSharedTargets",
+			Handler:    _UserService_GetItemSharedTargets_Handler,
+		},
+		{
+			MethodName: "GetGroupMessages",
+			Handler:    _UserService_GetGroupMessages_Handler,
+		},
+		{
+			MethodName: "GetPrivateMessages",
+			Handler:    _UserService_GetPrivateMessages_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Land struct {
@@ -19,5 +20,6 @@ type Land struct {
 	Buildings   []Building `gorm:"many2many:building_land;joinForeignKey:land_id;joinReferences:house_id"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt  `gorm:"index"`
 	Files       []FileAssociate `gorm:"polymorphic:Entity;polymorphicValue:land"`
 }

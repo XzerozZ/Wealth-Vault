@@ -13,6 +13,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 			GroupItemID: item.GroupItemId,
 			SharedBy:    item.SharedBy,
 			SharedAt:    item.SharedAt.AsTime(),
+			Type:        item.Type,
 		}
 
 		if item.AssetDetail != nil {
@@ -103,6 +104,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 			ItemID:   item.FriendItemId,
 			SharedBy: item.SharedBy,
 			SharedAt: item.SharedAt.AsTime(),
+			Type:     item.Type,
 		}
 
 		if item.AssetDetail != nil {
@@ -175,6 +177,14 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					Creditor:  v.Liability.Creditor,
 					Principal: v.Liability.Principal,
 					TypeName:  v.Liability.TypeName,
+				}
+
+			case *pb.AssetPreview_Deleted:
+				dtoItem.Type = v.Deleted.OriginalType
+				dtoItem.AssetDetail = domain.DeletedDetail{
+					ID:      v.Deleted.Id,
+					Name:    v.Deleted.OriginalName,
+					Message: v.Deleted.Message,
 				}
 			}
 		}

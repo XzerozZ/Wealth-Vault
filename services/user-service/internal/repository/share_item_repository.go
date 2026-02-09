@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 	"wealth-vault/user-service/internal/domain"
 
@@ -52,6 +53,30 @@ func (r *ShareItemRepository) ShareItemtoEmail(ctx context.Context, items []doma
 	}
 
 	return nil
+}
+
+func (r *ShareItemRepository) GetExistingSharedMap(ctx context.Context, ownerID, friendID uuid.UUID) (map[string]bool, error) {
+	type Result struct {
+		EntityID   uuid.UUID
+		EntityType string
+	}
+	var results []Result
+	err := r.db.WithContext(ctx).Table("friend_items").
+		Select("entity_id, entity_type").
+		Where("owner_id = ? AND friend_id = ?", ownerID, friendID).
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	m := make(map[string]bool)
+	for _, res := range results {
+		key := fmt.Sprintf("%s:%s", res.EntityType, res.EntityID.String())
+		m[key] = true
+	}
+
+	return m, nil
 }
 
 func (r *ShareItemRepository) IsItemSharedtoGroup(ctx context.Context, groupID, entityID uuid.UUID, entityType string) (bool, error) {
@@ -168,6 +193,16 @@ func (r *ShareItemRepository) CountItemsByOwner(ctx context.Context, itemIDs []s
 	return count, nil
 }
 
+func (r *ShareItemRepository) GetOwnedItemIDs(ctx context.Context, itemIDs []string, ownerID uuid.UUID) ([]uuid.UUID, error) {
+	var validIDs []uuid.UUID
+	err := r.db.Table("group_items").
+		Where("id IN ? AND owner_id = ?", itemIDs, ownerID).
+		Pluck("id", &validIDs).
+		Error
+
+	return validIDs, err
+}
+
 func (r *ShareItemRepository) AddMember(ctx context.Context, members []domain.GroupMember) error {
 	if len(members) == 0 {
 		return nil
@@ -223,4 +258,22 @@ func (r *ShareItemRepository) GetItemOwnersInGroup(ctx context.Context, groupID 
 	}
 
 	return ownerIDs, nil
+}
+
+func (r *ShareItemRepository) DeleteAllReferencesByEntityID(ctx context.Context, entityID uuid.UUID) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("entity_id = ?", entityID).Delete(&domain.GroupItem{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("entity_id = ?", entityID).Delete(&domain.FriendItem{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("entity_id = ?", entityID).Delete(&domain.EmailItem{}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

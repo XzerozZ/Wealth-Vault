@@ -11,13 +11,15 @@ type UserGRPCHandler struct {
 	usecase   usecase.UserUsecase
 	gusecase  usecase.GroupUsecase
 	giusecase usecase.ShareItemUsecase
+	musecase  usecase.MessageUsecase
 }
 
-func NewUserGRPCHandler(u usecase.UserUsecase, g usecase.GroupUsecase, i usecase.ShareItemUsecase) *UserGRPCHandler {
+func NewUserGRPCHandler(u usecase.UserUsecase, g usecase.GroupUsecase, i usecase.ShareItemUsecase, m usecase.MessageUsecase) *UserGRPCHandler {
 	return &UserGRPCHandler{
 		usecase:   u,
 		gusecase:  g,
 		giusecase: i,
+		musecase:  m,
 	}
 }
 
@@ -147,6 +149,15 @@ func (h *UserGRPCHandler) UnsharedIteminFriend(ctx context.Context, req *pb.Unsh
 	return res, nil
 }
 
+func (h *UserGRPCHandler) DeleteAllReferencesByEntityID(ctx context.Context, req *pb.DeleteByEntityRequest) (*pb.DeleteByEntityResponse, error) {
+	res, err := h.giusecase.DeleteAllReferencesByEntityID(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (h *UserGRPCHandler) AddGroupMember(ctx context.Context, req *pb.AddMemberRequest) (*pb.ActionResponse, error) {
 	res, err := h.giusecase.AddMemberToGroup(ctx, req)
 	if err != nil {
@@ -158,6 +169,78 @@ func (h *UserGRPCHandler) AddGroupMember(ctx context.Context, req *pb.AddMemberR
 
 func (h *UserGRPCHandler) GrantGroupItemAccess(ctx context.Context, req *pb.GrantAccessRequest) (*pb.ActionResponse, error) {
 	res, err := h.giusecase.GrantAccess(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetPendingRequests(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.FriendListResponse, error) {
+	res, err := h.usecase.GetPendingRequests(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) AcceptFriend(ctx context.Context, req *pb.AcceptFriendRequest) (*pb.FriendResponse, error) {
+	res, err := h.usecase.AcceptFriend(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) SetCloseFriend(ctx context.Context, req *pb.SetCloseFriendRequest) (*pb.SetCloseFriendResponse, error) {
+	res, err := h.usecase.SetCloseFriend(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetCloseFriends(ctx context.Context, req *pb.GetCloseFriendsRequest) (*pb.GetCloseFriendsResponse, error) {
+	res, err := h.usecase.GetCloseFriends(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) RemoveMember(ctx context.Context, req *pb.RemoveMemberRequest) (*pb.ActionResponse, error) {
+	res, err := h.gusecase.RemoveMember(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) LeaveGroup(ctx context.Context, req *pb.LeaveGroupRequest) (*pb.ActionResponse, error) {
+	res, err := h.gusecase.LeaveGroup(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetGroupMessages(ctx context.Context, req *pb.GetGroupMessagesRequest) (*pb.GetGroupMessagesResponse, error) {
+	res, err := h.musecase.GetGroupMessages(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetPrivateMessages(ctx context.Context, req *pb.GetPrivateMessagesRequest) (*pb.GetPrivateMessagesResponse, error) {
+	res, err := h.musecase.GetPrivateMessages(ctx, req)
 	if err != nil {
 		return nil, err
 	}

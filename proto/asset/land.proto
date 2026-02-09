@@ -22,6 +22,7 @@ message Land {
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
   repeated Reference ref = 12;
+  google.protobuf.Timestamp deleted_at = 20;
 }
 
 message CreateLandRequest { 

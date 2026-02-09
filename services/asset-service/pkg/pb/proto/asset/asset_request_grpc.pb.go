@@ -63,6 +63,7 @@ const (
 	AssetService_GetBatchLand_FullMethodName       = "/asset.AssetService/GetBatchLand"
 	AssetService_GetBatchLiability_FullMethodName  = "/asset.AssetService/GetBatchLiability"
 	AssetService_GetNetWorth_FullMethodName        = "/asset.AssetService/GetNetWorth"
+	AssetService_GetAllAssetIDs_FullMethodName     = "/asset.AssetService/GetAllAssetIDs"
 )
 
 // AssetServiceClient is the client API for AssetService service.
@@ -121,6 +122,7 @@ type AssetServiceClient interface {
 	GetBatchLand(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*LandArrayResponse, error)
 	GetBatchLiability(ctx context.Context, in *GetBatchIdsRequest, opts ...grpc.CallOption) (*LiabilityArrayResponse, error)
 	GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error)
+	GetAllAssetIDs(ctx context.Context, in *GetMyAssetsRequest, opts ...grpc.CallOption) (*GetMyAssetsResponse, error)
 }
 
 type assetServiceClient struct {
@@ -571,6 +573,16 @@ func (c *assetServiceClient) GetNetWorth(ctx context.Context, in *GetNetWorthReq
 	return out, nil
 }
 
+func (c *assetServiceClient) GetAllAssetIDs(ctx context.Context, in *GetMyAssetsRequest, opts ...grpc.CallOption) (*GetMyAssetsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMyAssetsResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetAllAssetIDs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AssetServiceServer is the server API for AssetService service.
 // All implementations must embed UnimplementedAssetServiceServer
 // for forward compatibility.
@@ -627,6 +639,7 @@ type AssetServiceServer interface {
 	GetBatchLand(context.Context, *GetBatchIdsRequest) (*LandArrayResponse, error)
 	GetBatchLiability(context.Context, *GetBatchIdsRequest) (*LiabilityArrayResponse, error)
 	GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error)
+	GetAllAssetIDs(context.Context, *GetMyAssetsRequest) (*GetMyAssetsResponse, error)
 	mustEmbedUnimplementedAssetServiceServer()
 }
 
@@ -768,6 +781,9 @@ func (UnimplementedAssetServiceServer) GetBatchLiability(context.Context, *GetBa
 }
 func (UnimplementedAssetServiceServer) GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNetWorth not implemented")
+}
+func (UnimplementedAssetServiceServer) GetAllAssetIDs(context.Context, *GetMyAssetsRequest) (*GetMyAssetsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllAssetIDs not implemented")
 }
 func (UnimplementedAssetServiceServer) mustEmbedUnimplementedAssetServiceServer() {}
 func (UnimplementedAssetServiceServer) testEmbeddedByValue()                      {}
@@ -1582,6 +1598,24 @@ func _AssetService_GetNetWorth_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AssetService_GetAllAssetIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMyAssetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetAllAssetIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetAllAssetIDs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetAllAssetIDs(ctx, req.(*GetMyAssetsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AssetService_ServiceDesc is the grpc.ServiceDesc for AssetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1764,6 +1798,10 @@ var AssetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetNetWorth",
 			Handler:    _AssetService_GetNetWorth_Handler,
+		},
+		{
+			MethodName: "GetAllAssetIDs",
+			Handler:    _AssetService_GetAllAssetIDs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

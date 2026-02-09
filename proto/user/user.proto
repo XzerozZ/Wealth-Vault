@@ -16,8 +16,10 @@ message User {
   string profile = 6;
   string phonenumber = 7;
   google.protobuf.Timestamp birthday = 8;
-  google.protobuf.Timestamp created_at = 9;
-  google.protobuf.Timestamp updated_at = 10;
+  int32 sharedage = 9 ;
+  bool sharedenabled = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
 }
 
 message CreateUserRequest {
@@ -37,7 +39,9 @@ message UpdateUserRequest {
   string profile = 5;
   string phonenumber = 6;
   google.protobuf.Timestamp birthday = 7;
-  google.protobuf.FieldMask update_mask = 8;   
+  optional int32 sharedage = 8;   
+  optional bool sharedenabled = 9;
+  google.protobuf.FieldMask update_mask = 10;   
 }
 
 message UserResponse {
@@ -50,12 +54,34 @@ message FriendRequest {
   string user_id = 2;
 }
 
+message AcceptFriendRequest {
+  string user_id = 1;      
+  string requester_id = 2; 
+  string action = 3;   
+}
+
 message FriendResponse {
   bool success = 1;
 }
 
 message FriendListResponse {
+  repeated User friends = 1;
+}
+
+message SetCloseFriendRequest {
+  string user_id = 1;   
+  string friend_id = 2;
+  bool is_close = 3;    
+}
+
+message SetCloseFriendResponse {
   bool success = 1;
-  User user = 2;
-  repeated User friends = 3;
+}
+
+message GetCloseFriendsRequest {
+  string user_id = 1;
+}
+
+message GetCloseFriendsResponse {
+  repeated User friends  = 1;
 }

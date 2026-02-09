@@ -3,9 +3,11 @@ package usecase
 import (
 	"context"
 	"errors"
+	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -14,16 +16,18 @@ import (
 )
 
 type CashUsecase struct {
-	cashRepo repo.CashRepository
-	fileRepo repo.FileRepository
-	storage  *utils.StorageClient
+	cashRepo   repo.CashRepository
+	fileRepo   repo.FileRepository
+	storage    *utils.StorageClient
+	userClient userPb.UserServiceClient
 }
 
-func NewCashUsecase(r repo.CashRepository, fr repo.FileRepository, s *utils.StorageClient) CashUsecase {
+func NewCashUsecase(r repo.CashRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) CashUsecase {
 	return CashUsecase{
-		cashRepo: r,
-		fileRepo: fr,
-		storage:  s,
+		cashRepo:   r,
+		fileRepo:   fr,
+		storage:    s,
+		userClient: userClient,
 	}
 }
 
@@ -106,13 +110,36 @@ func (u *CashUsecase) GetCashByIDs(ctx context.Context, req *pb.GetBatchIdsReque
 	}, nil
 }
 
-func (u *CashUsecase) GetCashByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.CashResponse, error) {
-	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
+func (u *CashUsecase) GetBatchCashByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.CashArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.cashRepo.GetBatchCashByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	cash, err := u.cashRepo.GetCashByID(ctx, id, uid)
+	var pbCash []*pb.Cash
+	for _, a := range bu {
+		pbCash = append(pbCash, mapper.ToCashProto(a))
+	}
+
+	return &pb.CashArrayResponse{
+		Cash: pbCash,
+	}, nil
+}
+
+func (u *CashUsecase) GetCashByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.CashResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	cash, err := u.cashRepo.GetCashByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +156,7 @@ func (u *CashUsecase) UpdateCash(ctx context.Context, req *pb.UpdateCashRequest)
 		return nil, err
 	}
 
-	cash, err := u.cashRepo.GetCashByID(ctx, id, uid)
+	cash, err := u.cashRepo.GetCashByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -168,25 +195,43 @@ func (u *CashUsecase) DeleteCash(ctx context.Context, req *pb.DeleteAssetRequest
 		return nil, err
 	}
 
-	existingAcc, err := u.cashRepo.GetCashByID(ctx, id, uid)
+	_, err = u.cashRepo.GetCashByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := u.cashRepo.DeleteCash(ctx, id, uid); err != nil {
+	if err := u.cashRepo.SoftDeleteCash(ctx, id, uid); err != nil {
 		return nil, err
-	}
-
-	if len(existingAcc.Files) > 0 {
-		fileURLs := make([]string, len(existingAcc.Files))
-		for i, f := range existingAcc.Files {
-			fileURLs[i] = f.Link
-		}
-
-		helper.DeleteFilesAsync(u.storage, fileURLs)
 	}
 
 	return &pb.DeleteAssetResponse{
 		Success: true,
 	}, nil
+}
+
+func (u *CashUsecase) CleanupExpiredCashes(ctx context.Context) error {
+	cutoffTime := time.Now().AddDate(0, 0, -7)
+	GetExpiredCash, err := u.cashRepo.GetExpiredCash(ctx, cutoffTime)
+	if err != nil {
+		return err
+	}
+
+	if len(GetExpiredCash) == 0 {
+		return err
+	}
+
+	for _, c := range GetExpiredCash {
+		helper.CleanupAssetResource(
+			ctx,
+			c.ID,
+			c.Files,
+			u.storage,
+			u.userClient,
+			func(id uuid.UUID) error {
+				return u.cashRepo.HardDeleteCash(ctx, id)
+			},
+		)
+	}
+
+	return nil
 }

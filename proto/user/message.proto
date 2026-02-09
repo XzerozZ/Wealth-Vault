@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "wealth-vault/pkg/pb";
+
+import "google/protobuf/timestamp.proto";
+
+message GetGroupMessagesRequest {
+  string group_id = 1;
+  string user_id = 2; 
+  int32 limit = 3;   
+  int32 offset = 4;
+}
+
+message GetPrivateMessagesRequest {
+  string user_id = 1; 
+  string friend_id = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+message GetGroupMessagesResponse {
+  repeated MessageDetail messages = 1;
+}
+
+message GetPrivateMessagesResponse {
+  repeated MessageDetail messages = 1;
+}
+
+message MessageDetail {
+  string id = 1;
+  string sender_id = 2;
+  string msg_type = 3;    // TEXT, IMAGE, ASSET_CARD
+  string content = 4;
+  string metadata = 5;    
+  google.protobuf.Timestamp created_at = 6;
+  string sender_name = 7;
+  string sender_image = 8;
+  bool is_me = 9;      
+}

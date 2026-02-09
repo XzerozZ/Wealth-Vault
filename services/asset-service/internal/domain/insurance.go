@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type InsuranceType string
@@ -30,6 +31,7 @@ type Insurance struct {
 	Description    string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt  `gorm:"index"`
 	Files          []FileAssociate `gorm:"polymorphic:Entity;polymorphicValue:insurance"`
 	Buildings      []Building      `gorm:"many2many:building_insurance;joinForeignKey:ins_id;joinReferences:house_id"`
 }

@@ -10,5 +10,10 @@ type UserUsecase interface {
 	GetUser(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.UserResponse, error)
 	UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error)
 	GetFriendList(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.FriendListResponse, error)
+	GetPendingRequests(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.FriendListResponse, error)
 	AddFriend(ctx context.Context, req *pb.FriendRequest) (*pb.FriendResponse, error)
+	AcceptFriend(ctx context.Context, req *pb.AcceptFriendRequest) (*pb.FriendResponse, error)
+	SetCloseFriend(ctx context.Context, req *pb.SetCloseFriendRequest) (*pb.SetCloseFriendResponse, error)
+	GetCloseFriends(ctx context.Context, req *pb.GetCloseFriendsRequest) (*pb.GetCloseFriendsResponse, error)
+	ProcessLegacyAutoShare(ctx context.Context) error
 }

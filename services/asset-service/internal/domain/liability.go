@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type LiabilityType string
@@ -26,5 +27,6 @@ type Liability struct {
 	Description  string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	DeletedAt    gorm.DeletedAt  `gorm:"index"`
 	Files        []FileAssociate `gorm:"polymorphic:Entity;polymorphicValue:liability"`
 }

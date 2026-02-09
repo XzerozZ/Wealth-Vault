@@ -10,11 +10,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/proxy"
 
-	// 1. อันนี้ของ Fiber (เอาไว้คุยกับ Frontend)
-	"github.com/gofiber/websocket/v2"
-
-	// 2. ✅ เพิ่มอันนี้! (เอาไว้โทรหา Backend Notification Service)
 	fasthttpws "github.com/fasthttp/websocket"
+	"github.com/gofiber/websocket/v2"
 )
 
 type NotificationHandler struct {
@@ -28,54 +25,60 @@ func NewNotificationHandler(cfg *configs.Configs) *NotificationHandler {
 }
 
 func (h *NotificationHandler) ProxyWebSocket(c *websocket.Conn) {
-	userID, ok := c.Locals("user_id").(string)
-	if !ok || userID == "" {
-		log.Println("❌ user_id not found")
+	userID, _ := c.Locals("user_id").(string)
+	if userID == "" {
 		return
 	}
 
-	targetURL := fmt.Sprintf(
-		"ws://%s:%s/ws?user_id=%s",
-		h.cfg.NotiService.Host,
-		h.cfg.NotiService.Port,
-		userID,
-	)
+	targetURL := fmt.Sprintf("ws://%s:%s/ws?user_id=%s",
+		h.cfg.NotiService.Host, h.cfg.NotiService.Port, userID)
 
-	upstream, _, err := fasthttpws.DefaultDialer.Dial(targetURL, nil)
+	h.bridgeWS(c, targetURL, userID)
+}
+
+func (h *NotificationHandler) bridgeWS(c *websocket.Conn, targetURL string, userID string) {
+	dialer := fasthttpws.DefaultDialer
+	upstream, _, err := dialer.Dial(targetURL, nil)
 	if err != nil {
-		log.Println("❌ cannot connect to notification service:", err)
+		log.Printf("❌ Gateway Dial Error [%s]: %v", userID, err)
 		return
 	}
 	defer upstream.Close()
 
-	log.Println("🔗 WS bridge connected:", userID)
+	log.Printf("🔗 Connected: %s", userID)
 
-	done := make(chan struct{})
+	errChan := make(chan error, 1)
+
 	go func() {
-		defer close(done)
 		for {
 			mt, msg, err := c.ReadMessage()
 			if err != nil {
+				errChan <- err
 				return
 			}
 			if err := upstream.WriteMessage(mt, msg); err != nil {
+				errChan <- err
 				return
 			}
 		}
 	}()
 
-	for {
-		mt, msg, err := upstream.ReadMessage()
-		if err != nil {
-			break
+	go func() {
+		for {
+			mt, msg, err := upstream.ReadMessage()
+			if err != nil {
+				errChan <- err
+				return
+			}
+			if err := c.WriteMessage(mt, msg); err != nil {
+				errChan <- err
+				return
+			}
 		}
+	}()
 
-		log.Printf("⬅️ Gateway received from Service: %s", string(msg))
-
-		if err := c.WriteMessage(mt, msg); err != nil {
-			break
-		}
-	}
+	<-errChan
+	log.Printf("🔌 Disconnected: %s", userID)
 }
 
 func (h *NotificationHandler) ProxyAPI(c *fiber.Ctx) error {

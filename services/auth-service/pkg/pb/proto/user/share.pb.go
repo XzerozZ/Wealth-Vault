@@ -355,7 +355,8 @@ type GroupItemDetail struct {
 	GroupItemId   string                 `protobuf:"bytes,1,opt,name=group_item_id,json=groupItemId,proto3" json:"group_item_id,omitempty"`
 	SharedBy      string                 `protobuf:"bytes,2,opt,name=shared_by,json=sharedBy,proto3" json:"shared_by,omitempty"`
 	SharedAt      *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=shared_at,json=sharedAt,proto3" json:"shared_at,omitempty"`
-	AssetDetail   *AssetPreview          `protobuf:"bytes,4,opt,name=asset_detail,json=assetDetail,proto3" json:"asset_detail,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	AssetDetail   *AssetPreview          `protobuf:"bytes,5,opt,name=asset_detail,json=assetDetail,proto3" json:"asset_detail,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -409,6 +410,13 @@ func (x *GroupItemDetail) GetSharedAt() *timestamppb.Timestamp {
 		return x.SharedAt
 	}
 	return nil
+}
+
+func (x *GroupItemDetail) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
 }
 
 func (x *GroupItemDetail) GetAssetDetail() *AssetPreview {
@@ -467,7 +475,8 @@ type FriendItemDetail struct {
 	FriendItemId  string                 `protobuf:"bytes,1,opt,name=friend_item_id,json=friendItemId,proto3" json:"friend_item_id,omitempty"`
 	SharedBy      string                 `protobuf:"bytes,2,opt,name=shared_by,json=sharedBy,proto3" json:"shared_by,omitempty"`
 	SharedAt      *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=shared_at,json=sharedAt,proto3" json:"shared_at,omitempty"`
-	AssetDetail   *AssetPreview          `protobuf:"bytes,4,opt,name=asset_detail,json=assetDetail,proto3" json:"asset_detail,omitempty"`
+	Type          string                 `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	AssetDetail   *AssetPreview          `protobuf:"bytes,5,opt,name=asset_detail,json=assetDetail,proto3" json:"asset_detail,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -521,6 +530,13 @@ func (x *FriendItemDetail) GetSharedAt() *timestamppb.Timestamp {
 		return x.SharedAt
 	}
 	return nil
+}
+
+func (x *FriendItemDetail) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
 }
 
 func (x *FriendItemDetail) GetAssetDetail() *AssetPreview {
@@ -582,6 +598,410 @@ func (x *UnshareItemRequest) GetUserId() string {
 	return ""
 }
 
+type DeleteByEntityRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EntityId      string                 `protobuf:"bytes,1,opt,name=entity_id,json=entityId,proto3" json:"entity_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteByEntityRequest) Reset() {
+	*x = DeleteByEntityRequest{}
+	mi := &file_proto_user_share_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteByEntityRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteByEntityRequest) ProtoMessage() {}
+
+func (x *DeleteByEntityRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteByEntityRequest.ProtoReflect.Descriptor instead.
+func (*DeleteByEntityRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeleteByEntityRequest) GetEntityId() string {
+	if x != nil {
+		return x.EntityId
+	}
+	return ""
+}
+
+type DeleteByEntityResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteByEntityResponse) Reset() {
+	*x = DeleteByEntityResponse{}
+	mi := &file_proto_user_share_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteByEntityResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteByEntityResponse) ProtoMessage() {}
+
+func (x *DeleteByEntityResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteByEntityResponse.ProtoReflect.Descriptor instead.
+func (*DeleteByEntityResponse) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteByEntityResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+type GetItemSharedTargetsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	ItemId        string                 `protobuf:"bytes,2,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	ItemType      string                 `protobuf:"bytes,3,opt,name=item_type,json=itemType,proto3" json:"item_type,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetItemSharedTargetsRequest) Reset() {
+	*x = GetItemSharedTargetsRequest{}
+	mi := &file_proto_user_share_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetItemSharedTargetsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetItemSharedTargetsRequest) ProtoMessage() {}
+
+func (x *GetItemSharedTargetsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetItemSharedTargetsRequest.ProtoReflect.Descriptor instead.
+func (*GetItemSharedTargetsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetItemSharedTargetsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *GetItemSharedTargetsRequest) GetItemId() string {
+	if x != nil {
+		return x.ItemId
+	}
+	return ""
+}
+
+func (x *GetItemSharedTargetsRequest) GetItemType() string {
+	if x != nil {
+		return x.ItemType
+	}
+	return ""
+}
+
+type SharedGroupInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       string                 `protobuf:"bytes,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	GroupName     string                 `protobuf:"bytes,2,opt,name=group_name,json=groupName,proto3" json:"group_name,omitempty"`
+	GroupImage    string                 `protobuf:"bytes,3,opt,name=group_image,json=groupImage,proto3" json:"group_image,omitempty"`
+	SharedAt      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=shared_at,json=sharedAt,proto3" json:"shared_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SharedGroupInfo) Reset() {
+	*x = SharedGroupInfo{}
+	mi := &file_proto_user_share_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SharedGroupInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedGroupInfo) ProtoMessage() {}
+
+func (x *SharedGroupInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedGroupInfo.ProtoReflect.Descriptor instead.
+func (*SharedGroupInfo) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SharedGroupInfo) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
+}
+
+func (x *SharedGroupInfo) GetGroupName() string {
+	if x != nil {
+		return x.GroupName
+	}
+	return ""
+}
+
+func (x *SharedGroupInfo) GetGroupImage() string {
+	if x != nil {
+		return x.GroupImage
+	}
+	return ""
+}
+
+func (x *SharedGroupInfo) GetSharedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SharedAt
+	}
+	return nil
+}
+
+type SharedFriendInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FriendId      string                 `protobuf:"bytes,1,opt,name=friend_id,json=friendId,proto3" json:"friend_id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	ProfileImage  string                 `protobuf:"bytes,3,opt,name=profile_image,json=profileImage,proto3" json:"profile_image,omitempty"`
+	SharedAt      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=shared_at,json=sharedAt,proto3" json:"shared_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SharedFriendInfo) Reset() {
+	*x = SharedFriendInfo{}
+	mi := &file_proto_user_share_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SharedFriendInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedFriendInfo) ProtoMessage() {}
+
+func (x *SharedFriendInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedFriendInfo.ProtoReflect.Descriptor instead.
+func (*SharedFriendInfo) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *SharedFriendInfo) GetFriendId() string {
+	if x != nil {
+		return x.FriendId
+	}
+	return ""
+}
+
+func (x *SharedFriendInfo) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *SharedFriendInfo) GetProfileImage() string {
+	if x != nil {
+		return x.ProfileImage
+	}
+	return ""
+}
+
+func (x *SharedFriendInfo) GetSharedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SharedAt
+	}
+	return nil
+}
+
+type SharedEmailInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	SharedAt      *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=shared_at,json=sharedAt,proto3" json:"shared_at,omitempty"`
+	IsSent        bool                   `protobuf:"varint,3,opt,name=is_sent,json=isSent,proto3" json:"is_sent,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SharedEmailInfo) Reset() {
+	*x = SharedEmailInfo{}
+	mi := &file_proto_user_share_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SharedEmailInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SharedEmailInfo) ProtoMessage() {}
+
+func (x *SharedEmailInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SharedEmailInfo.ProtoReflect.Descriptor instead.
+func (*SharedEmailInfo) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *SharedEmailInfo) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *SharedEmailInfo) GetSharedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SharedAt
+	}
+	return nil
+}
+
+func (x *SharedEmailInfo) GetIsSent() bool {
+	if x != nil {
+		return x.IsSent
+	}
+	return false
+}
+
+type GetItemSharedTargetsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Groups        []*SharedGroupInfo     `protobuf:"bytes,1,rep,name=groups,proto3" json:"groups,omitempty"`
+	Friends       []*SharedFriendInfo    `protobuf:"bytes,2,rep,name=friends,proto3" json:"friends,omitempty"`
+	Emails        []*SharedEmailInfo     `protobuf:"bytes,3,rep,name=emails,proto3" json:"emails,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetItemSharedTargetsResponse) Reset() {
+	*x = GetItemSharedTargetsResponse{}
+	mi := &file_proto_user_share_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetItemSharedTargetsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetItemSharedTargetsResponse) ProtoMessage() {}
+
+func (x *GetItemSharedTargetsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetItemSharedTargetsResponse.ProtoReflect.Descriptor instead.
+func (*GetItemSharedTargetsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *GetItemSharedTargetsResponse) GetGroups() []*SharedGroupInfo {
+	if x != nil {
+		return x.Groups
+	}
+	return nil
+}
+
+func (x *GetItemSharedTargetsResponse) GetFriends() []*SharedFriendInfo {
+	if x != nil {
+		return x.Friends
+	}
+	return nil
+}
+
+func (x *GetItemSharedTargetsResponse) GetEmails() []*SharedEmailInfo {
+	if x != nil {
+		return x.Emails
+	}
+	return nil
+}
+
 var File_proto_user_share_proto protoreflect.FileDescriptor
 
 const file_proto_user_share_proto_rawDesc = "" +
@@ -607,22 +1027,52 @@ const file_proto_user_share_proto_rawDesc = "" +
 	"\tfriend_id\x18\x01 \x01(\tR\bfriendId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\"D\n" +
 	"\x15GetGroupItemsResponse\x12+\n" +
-	"\x05items\x18\x01 \x03(\v2\x15.user.GroupItemDetailR\x05items\"\xc2\x01\n" +
+	"\x05items\x18\x01 \x03(\v2\x15.user.GroupItemDetailR\x05items\"\xd6\x01\n" +
 	"\x0fGroupItemDetail\x12\"\n" +
 	"\rgroup_item_id\x18\x01 \x01(\tR\vgroupItemId\x12\x1b\n" +
 	"\tshared_by\x18\x02 \x01(\tR\bsharedBy\x127\n" +
-	"\tshared_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bsharedAt\x125\n" +
-	"\fasset_detail\x18\x04 \x01(\v2\x12.user.AssetPreviewR\vassetDetail\"F\n" +
+	"\tshared_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bsharedAt\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x125\n" +
+	"\fasset_detail\x18\x05 \x01(\v2\x12.user.AssetPreviewR\vassetDetail\"F\n" +
 	"\x16GetFriendItemsResponse\x12,\n" +
-	"\x05items\x18\x01 \x03(\v2\x16.user.FriendItemDetailR\x05items\"\xc5\x01\n" +
+	"\x05items\x18\x01 \x03(\v2\x16.user.FriendItemDetailR\x05items\"\xd9\x01\n" +
 	"\x10FriendItemDetail\x12$\n" +
 	"\x0efriend_item_id\x18\x01 \x01(\tR\ffriendItemId\x12\x1b\n" +
 	"\tshared_by\x18\x02 \x01(\tR\bsharedBy\x127\n" +
-	"\tshared_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bsharedAt\x125\n" +
-	"\fasset_detail\x18\x04 \x01(\v2\x12.user.AssetPreviewR\vassetDetail\"F\n" +
+	"\tshared_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\bsharedAt\x12\x12\n" +
+	"\x04type\x18\x04 \x01(\tR\x04type\x125\n" +
+	"\fasset_detail\x18\x05 \x01(\v2\x12.user.AssetPreviewR\vassetDetail\"F\n" +
 	"\x12UnshareItemRequest\x12\x17\n" +
 	"\aitem_id\x18\x01 \x01(\tR\x06itemId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userIdB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"4\n" +
+	"\x15DeleteByEntityRequest\x12\x1b\n" +
+	"\tentity_id\x18\x01 \x01(\tR\bentityId\"2\n" +
+	"\x16DeleteByEntityResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"l\n" +
+	"\x1bGetItemSharedTargetsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x17\n" +
+	"\aitem_id\x18\x02 \x01(\tR\x06itemId\x12\x1b\n" +
+	"\titem_type\x18\x03 \x01(\tR\bitemType\"\xa5\x01\n" +
+	"\x0fSharedGroupInfo\x12\x19\n" +
+	"\bgroup_id\x18\x01 \x01(\tR\agroupId\x12\x1d\n" +
+	"\n" +
+	"group_name\x18\x02 \x01(\tR\tgroupName\x12\x1f\n" +
+	"\vgroup_image\x18\x03 \x01(\tR\n" +
+	"groupImage\x127\n" +
+	"\tshared_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bsharedAt\"\xa9\x01\n" +
+	"\x10SharedFriendInfo\x12\x1b\n" +
+	"\tfriend_id\x18\x01 \x01(\tR\bfriendId\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12#\n" +
+	"\rprofile_image\x18\x03 \x01(\tR\fprofileImage\x127\n" +
+	"\tshared_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\bsharedAt\"y\n" +
+	"\x0fSharedEmailInfo\x12\x14\n" +
+	"\x05email\x18\x01 \x01(\tR\x05email\x127\n" +
+	"\tshared_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\bsharedAt\x12\x17\n" +
+	"\ais_sent\x18\x03 \x01(\bR\x06isSent\"\xae\x01\n" +
+	"\x1cGetItemSharedTargetsResponse\x12-\n" +
+	"\x06groups\x18\x01 \x03(\v2\x15.user.SharedGroupInfoR\x06groups\x120\n" +
+	"\afriends\x18\x02 \x03(\v2\x16.user.SharedFriendInfoR\afriends\x12-\n" +
+	"\x06emails\x18\x03 \x03(\v2\x15.user.SharedEmailInfoR\x06emailsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_user_share_proto_rawDescOnce sync.Once
@@ -636,37 +1086,50 @@ func file_proto_user_share_proto_rawDescGZIP() []byte {
 	return file_proto_user_share_proto_rawDescData
 }
 
-var file_proto_user_share_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_proto_user_share_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_proto_user_share_proto_goTypes = []any{
-	(*ShareTarget)(nil),            // 0: user.ShareTarget
-	(*ShareItemRequest)(nil),       // 1: user.ShareItemRequest
-	(*ShareItemResponse)(nil),      // 2: user.ShareItemResponse
-	(*GetGroupItemsRequest)(nil),   // 3: user.GetGroupItemsRequest
-	(*GetFriendItemRequest)(nil),   // 4: user.GetFriendItemRequest
-	(*GetGroupItemsResponse)(nil),  // 5: user.GetGroupItemsResponse
-	(*GroupItemDetail)(nil),        // 6: user.GroupItemDetail
-	(*GetFriendItemsResponse)(nil), // 7: user.GetFriendItemsResponse
-	(*FriendItemDetail)(nil),       // 8: user.FriendItemDetail
-	(*UnshareItemRequest)(nil),     // 9: user.UnshareItemRequest
-	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
-	(*AssetPreview)(nil),           // 11: user.AssetPreview
+	(*ShareTarget)(nil),                  // 0: user.ShareTarget
+	(*ShareItemRequest)(nil),             // 1: user.ShareItemRequest
+	(*ShareItemResponse)(nil),            // 2: user.ShareItemResponse
+	(*GetGroupItemsRequest)(nil),         // 3: user.GetGroupItemsRequest
+	(*GetFriendItemRequest)(nil),         // 4: user.GetFriendItemRequest
+	(*GetGroupItemsResponse)(nil),        // 5: user.GetGroupItemsResponse
+	(*GroupItemDetail)(nil),              // 6: user.GroupItemDetail
+	(*GetFriendItemsResponse)(nil),       // 7: user.GetFriendItemsResponse
+	(*FriendItemDetail)(nil),             // 8: user.FriendItemDetail
+	(*UnshareItemRequest)(nil),           // 9: user.UnshareItemRequest
+	(*DeleteByEntityRequest)(nil),        // 10: user.DeleteByEntityRequest
+	(*DeleteByEntityResponse)(nil),       // 11: user.DeleteByEntityResponse
+	(*GetItemSharedTargetsRequest)(nil),  // 12: user.GetItemSharedTargetsRequest
+	(*SharedGroupInfo)(nil),              // 13: user.SharedGroupInfo
+	(*SharedFriendInfo)(nil),             // 14: user.SharedFriendInfo
+	(*SharedEmailInfo)(nil),              // 15: user.SharedEmailInfo
+	(*GetItemSharedTargetsResponse)(nil), // 16: user.GetItemSharedTargetsResponse
+	(*timestamppb.Timestamp)(nil),        // 17: google.protobuf.Timestamp
+	(*AssetPreview)(nil),                 // 18: user.AssetPreview
 }
 var file_proto_user_share_proto_depIdxs = []int32{
-	10, // 0: user.ShareTarget.share_at:type_name -> google.protobuf.Timestamp
+	17, // 0: user.ShareTarget.share_at:type_name -> google.protobuf.Timestamp
 	0,  // 1: user.ShareItemRequest.groups:type_name -> user.ShareTarget
 	0,  // 2: user.ShareItemRequest.friends:type_name -> user.ShareTarget
 	0,  // 3: user.ShareItemRequest.emails:type_name -> user.ShareTarget
 	6,  // 4: user.GetGroupItemsResponse.items:type_name -> user.GroupItemDetail
-	10, // 5: user.GroupItemDetail.shared_at:type_name -> google.protobuf.Timestamp
-	11, // 6: user.GroupItemDetail.asset_detail:type_name -> user.AssetPreview
+	17, // 5: user.GroupItemDetail.shared_at:type_name -> google.protobuf.Timestamp
+	18, // 6: user.GroupItemDetail.asset_detail:type_name -> user.AssetPreview
 	8,  // 7: user.GetFriendItemsResponse.items:type_name -> user.FriendItemDetail
-	10, // 8: user.FriendItemDetail.shared_at:type_name -> google.protobuf.Timestamp
-	11, // 9: user.FriendItemDetail.asset_detail:type_name -> user.AssetPreview
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	17, // 8: user.FriendItemDetail.shared_at:type_name -> google.protobuf.Timestamp
+	18, // 9: user.FriendItemDetail.asset_detail:type_name -> user.AssetPreview
+	17, // 10: user.SharedGroupInfo.shared_at:type_name -> google.protobuf.Timestamp
+	17, // 11: user.SharedFriendInfo.shared_at:type_name -> google.protobuf.Timestamp
+	17, // 12: user.SharedEmailInfo.shared_at:type_name -> google.protobuf.Timestamp
+	13, // 13: user.GetItemSharedTargetsResponse.groups:type_name -> user.SharedGroupInfo
+	14, // 14: user.GetItemSharedTargetsResponse.friends:type_name -> user.SharedFriendInfo
+	15, // 15: user.GetItemSharedTargetsResponse.emails:type_name -> user.SharedEmailInfo
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_proto_user_share_proto_init() }
@@ -681,7 +1144,7 @@ func file_proto_user_share_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_user_share_proto_rawDesc), len(file_proto_user_share_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

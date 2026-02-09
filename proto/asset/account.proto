@@ -27,6 +27,7 @@ message Account {
   repeated FileInfo files = 9;
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
+  google.protobuf.Timestamp deleted_at = 20;
 }
 
 message CreateAccountRequest { 

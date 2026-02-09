@@ -587,6 +587,170 @@ func (x *GrantAccessRequest) GetOwnerUserId() string {
 	return ""
 }
 
+type RemoveMemberRequest struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	GroupId        string                 `protobuf:"bytes,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId         string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TargetMemberId string                 `protobuf:"bytes,3,opt,name=target_member_id,json=targetMemberId,proto3" json:"target_member_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RemoveMemberRequest) Reset() {
+	*x = RemoveMemberRequest{}
+	mi := &file_proto_user_group_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RemoveMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RemoveMemberRequest) ProtoMessage() {}
+
+func (x *RemoveMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_group_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RemoveMemberRequest.ProtoReflect.Descriptor instead.
+func (*RemoveMemberRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_group_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *RemoveMemberRequest) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
+}
+
+func (x *RemoveMemberRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *RemoveMemberRequest) GetTargetMemberId() string {
+	if x != nil {
+		return x.TargetMemberId
+	}
+	return ""
+}
+
+type LeaveGroupRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       string                 `protobuf:"bytes,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LeaveGroupRequest) Reset() {
+	*x = LeaveGroupRequest{}
+	mi := &file_proto_user_group_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LeaveGroupRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LeaveGroupRequest) ProtoMessage() {}
+
+func (x *LeaveGroupRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_group_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LeaveGroupRequest.ProtoReflect.Descriptor instead.
+func (*LeaveGroupRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_group_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *LeaveGroupRequest) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
+}
+
+func (x *LeaveGroupRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type DeleteGroupRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       string                 `protobuf:"bytes,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteGroupRequest) Reset() {
+	*x = DeleteGroupRequest{}
+	mi := &file_proto_user_group_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteGroupRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteGroupRequest) ProtoMessage() {}
+
+func (x *DeleteGroupRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_group_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteGroupRequest.ProtoReflect.Descriptor instead.
+func (*DeleteGroupRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_group_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteGroupRequest) GetGroupId() string {
+	if x != nil {
+		return x.GroupId
+	}
+	return ""
+}
+
+func (x *DeleteGroupRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 type ActionResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -596,7 +760,7 @@ type ActionResponse struct {
 
 func (x *ActionResponse) Reset() {
 	*x = ActionResponse{}
-	mi := &file_proto_user_group_proto_msgTypes[9]
+	mi := &file_proto_user_group_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -608,7 +772,7 @@ func (x *ActionResponse) String() string {
 func (*ActionResponse) ProtoMessage() {}
 
 func (x *ActionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_user_group_proto_msgTypes[9]
+	mi := &file_proto_user_group_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -621,7 +785,7 @@ func (x *ActionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActionResponse.ProtoReflect.Descriptor instead.
 func (*ActionResponse) Descriptor() ([]byte, []int) {
-	return file_proto_user_group_proto_rawDescGZIP(), []int{9}
+	return file_proto_user_group_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ActionResponse) GetSuccess() bool {
@@ -680,7 +844,17 @@ const file_proto_user_group_proto_rawDesc = "" +
 	"\bgroup_id\x18\x01 \x01(\tR\agroupId\x12$\n" +
 	"\x0etarget_user_id\x18\x02 \x01(\tR\ftargetUserId\x12$\n" +
 	"\x0egroup_item_ids\x18\x03 \x03(\tR\fgroupItemIds\x12\"\n" +
-	"\rowner_user_id\x18\x04 \x01(\tR\vownerUserId\"*\n" +
+	"\rowner_user_id\x18\x04 \x01(\tR\vownerUserId\"s\n" +
+	"\x13RemoveMemberRequest\x12\x19\n" +
+	"\bgroup_id\x18\x01 \x01(\tR\agroupId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12(\n" +
+	"\x10target_member_id\x18\x03 \x01(\tR\x0etargetMemberId\"G\n" +
+	"\x11LeaveGroupRequest\x12\x19\n" +
+	"\bgroup_id\x18\x01 \x01(\tR\agroupId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"H\n" +
+	"\x12DeleteGroupRequest\x12\x19\n" +
+	"\bgroup_id\x18\x01 \x01(\tR\agroupId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"*\n" +
 	"\x0eActionResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccessB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
@@ -696,7 +870,7 @@ func file_proto_user_group_proto_rawDescGZIP() []byte {
 	return file_proto_user_group_proto_rawDescData
 }
 
-var file_proto_user_group_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_proto_user_group_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_proto_user_group_proto_goTypes = []any{
 	(*Group)(nil),                   // 0: user.Group
 	(*CreateGroupRequest)(nil),      // 1: user.CreateGroupRequest
@@ -707,17 +881,20 @@ var file_proto_user_group_proto_goTypes = []any{
 	(*UpdateGroupRequest)(nil),      // 6: user.UpdateGroupRequest
 	(*AddMemberRequest)(nil),        // 7: user.AddMemberRequest
 	(*GrantAccessRequest)(nil),      // 8: user.GrantAccessRequest
-	(*ActionResponse)(nil),          // 9: user.ActionResponse
-	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
-	(*User)(nil),                    // 11: user.User
-	(*fieldmaskpb.FieldMask)(nil),   // 12: google.protobuf.FieldMask
+	(*RemoveMemberRequest)(nil),     // 9: user.RemoveMemberRequest
+	(*LeaveGroupRequest)(nil),       // 10: user.LeaveGroupRequest
+	(*DeleteGroupRequest)(nil),      // 11: user.DeleteGroupRequest
+	(*ActionResponse)(nil),          // 12: user.ActionResponse
+	(*timestamppb.Timestamp)(nil),   // 13: google.protobuf.Timestamp
+	(*User)(nil),                    // 14: user.User
+	(*fieldmaskpb.FieldMask)(nil),   // 15: google.protobuf.FieldMask
 }
 var file_proto_user_group_proto_depIdxs = []int32{
-	10, // 0: user.Group.created_at:type_name -> google.protobuf.Timestamp
-	10, // 1: user.Group.updated_at:type_name -> google.protobuf.Timestamp
+	13, // 0: user.Group.created_at:type_name -> google.protobuf.Timestamp
+	13, // 1: user.Group.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: user.GroupResponse.group:type_name -> user.Group
-	11, // 3: user.GetGroupMembersResponse.members:type_name -> user.User
-	12, // 4: user.UpdateGroupRequest.update_mask:type_name -> google.protobuf.FieldMask
+	14, // 3: user.GetGroupMembersResponse.members:type_name -> user.User
+	15, // 4: user.UpdateGroupRequest.update_mask:type_name -> google.protobuf.FieldMask
 	5,  // [5:5] is the sub-list for method output_type
 	5,  // [5:5] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
@@ -737,7 +914,7 @@ func file_proto_user_group_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_user_group_proto_rawDesc), len(file_proto_user_group_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

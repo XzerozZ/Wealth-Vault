@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type BankType string
@@ -25,5 +26,6 @@ type Account struct {
 	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt  `gorm:"index"`
 	Files       []FileAssociate `gorm:"polymorphic:Entity;polymorphicValue:account"`
 }

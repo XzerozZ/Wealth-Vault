@@ -89,6 +89,7 @@ type Liability struct {
 	Files                []*FileInfo            `protobuf:"bytes,12,rep,name=files,proto3" json:"files,omitempty"`
 	CreatedAt            *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt            *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	DeletedAt            *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -217,6 +218,13 @@ func (x *Liability) GetCreatedAt() *timestamppb.Timestamp {
 func (x *Liability) GetUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *Liability) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
 	}
 	return nil
 }
@@ -713,7 +721,7 @@ var File_proto_asset_liability_proto protoreflect.FileDescriptor
 
 const file_proto_asset_liability_proto_rawDesc = "" +
 	"\n" +
-	"\x1bproto/asset/liability.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xb8\x04\n" +
+	"\x1bproto/asset/liability.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xf3\x04\n" +
 	"\tLiability\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
@@ -732,7 +740,9 @@ const file_proto_asset_liability_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x88\x03\n" +
+	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"\n" +
+	"deleted_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\x88\x03\n" +
 	"\x16CreateLiabilityRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
@@ -809,20 +819,21 @@ var file_proto_asset_liability_proto_depIdxs = []int32{
 	11, // 3: asset.Liability.files:type_name -> asset.FileInfo
 	10, // 4: asset.Liability.created_at:type_name -> google.protobuf.Timestamp
 	10, // 5: asset.Liability.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 6: asset.CreateLiabilityRequest.type:type_name -> asset.LiabilityType
-	10, // 7: asset.CreateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
-	10, // 8: asset.CreateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
-	11, // 9: asset.CreateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	1,  // 10: asset.UpdateLiabilityRequest.liability:type_name -> asset.Liability
-	11, // 11: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
-	12, // 12: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,  // 13: asset.LiabilityArrayResponse.liability:type_name -> asset.Liability
-	1,  // 14: asset.LiabilityResponse.liability:type_name -> asset.Liability
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	10, // 6: asset.Liability.deleted_at:type_name -> google.protobuf.Timestamp
+	0,  // 7: asset.CreateLiabilityRequest.type:type_name -> asset.LiabilityType
+	10, // 8: asset.CreateLiabilityRequest.start_at:type_name -> google.protobuf.Timestamp
+	10, // 9: asset.CreateLiabilityRequest.end_at:type_name -> google.protobuf.Timestamp
+	11, // 10: asset.CreateLiabilityRequest.new_files:type_name -> asset.FileInfo
+	1,  // 11: asset.UpdateLiabilityRequest.liability:type_name -> asset.Liability
+	11, // 12: asset.UpdateLiabilityRequest.new_files:type_name -> asset.FileInfo
+	12, // 13: asset.UpdateLiabilityRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 14: asset.LiabilityArrayResponse.liability:type_name -> asset.Liability
+	1,  // 15: asset.LiabilityResponse.liability:type_name -> asset.Liability
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_liability_proto_init() }

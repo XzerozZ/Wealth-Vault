@@ -24,6 +24,7 @@ func Setup(
 	groupHandler *handlers.GroupHandler,
 	groupitemHandler *handlers.GroupItemHandler,
 	notificationHandler *handlers.NotificationHandler,
+	msgHandler *handlers.MessageHandler,
 ) {
 	api := app.Group("/api")
 
@@ -37,11 +38,17 @@ func Setup(
 
 	api.Get("/user", middleware.JWTMiddleware(jwt), userHandler.GetUser)
 	api.Patch("/user", middleware.JWTMiddleware(jwt), userHandler.UpdateUser)
-	api.Post("/friend/:friendID", middleware.JWTMiddleware(jwt), userHandler.AddFriend)
+	api.Post("/friend", middleware.JWTMiddleware(jwt), userHandler.AddFriend)
+	api.Post("/friend/accept", middleware.JWTMiddleware(jwt), userHandler.AcceptFriend)
 	api.Get("/friend", middleware.JWTMiddleware(jwt), userHandler.GetFriendList)
+	api.Get("/friend/pending", middleware.JWTMiddleware(jwt), userHandler.GetPendingRequests)
+	api.Post("/closefriend", middleware.JWTMiddleware(jwt), userHandler.ToggleCloseFriend)
+	api.Get("/closefriend", middleware.JWTMiddleware(jwt), userHandler.GetCloseFriends)
 	api.Get("/friend/:id/item", middleware.JWTMiddleware(jwt), groupitemHandler.GetFriendItems)
 	api.Post("/group/:id/addmember", middleware.JWTMiddleware(jwt), groupHandler.AddMember)
 	api.Post("/group/:id/grantaccess", middleware.JWTMiddleware(jwt), groupHandler.GrantAccess)
+	api.Delete("/group/:id/removemember", middleware.JWTMiddleware(jwt), groupHandler.RemoveMember)
+	api.Delete("/group/:id/leave", middleware.JWTMiddleware(jwt), groupHandler.LeaveGroup)
 
 	api.Post("/group", middleware.JWTMiddleware(jwt), groupHandler.CreateGroup)
 	api.Get("/group/detail/:id", middleware.JWTMiddleware(jwt), groupHandler.GetGroup)
@@ -96,4 +103,7 @@ func Setup(
 
 	api.Get("/ws", middleware.TokenFromQuery, middleware.JWTMiddleware(jwt), websocket.New(notificationHandler.ProxyWebSocket))
 	api.All("/notifications/*", middleware.JWTMiddleware(jwt), notificationHandler.ProxyAPI)
+
+	api.Get("/group/:id/msg", middleware.JWTMiddleware(jwt), msgHandler.GetGroupMessages)
+	api.Get("/friend/:id/msg", middleware.JWTMiddleware(jwt), msgHandler.GetPrivateMessages)
 }

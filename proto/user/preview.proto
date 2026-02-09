@@ -13,6 +13,7 @@ message AssetPreview {
     InvestmentPreview investment = 5;
     LandPreview land = 6;
     LiabilityPreview liability = 7;
+    DeletedPreview deleted = 8;
   }
 }
 
@@ -69,4 +70,11 @@ message LiabilityPreview {
   string creditor = 3;
   double principal = 4;  
   string type_name = 5;
+}
+
+message DeletedPreview {
+  string id = 1;
+  string original_name = 2;
+  string original_type = 3; 
+  string message = 4;       
 }

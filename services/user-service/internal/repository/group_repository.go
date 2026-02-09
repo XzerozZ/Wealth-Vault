@@ -102,7 +102,7 @@ func (r *GroupRepository) IsUserMember(ctx context.Context, id uuid.UUID, userID
 	return count > 0, nil
 }
 
-func (r *GroupRepository) UpdateGroup(ctx context.Context, group *domain.Group, mask []string) (*domain.Group, int64, error) {
+func (r *GroupRepository) UpdateGroup(ctx context.Context, group *domain.Group, mask []string, logEntry *domain.GroupLog) (*domain.Group, int64, error) {
 	var total int64
 	query := r.db.Model(&domain.User{}).
 		Joins("JOIN group_members ON group_members.user_id = users.id").
@@ -121,9 +121,39 @@ func (r *GroupRepository) UpdateGroup(ctx context.Context, group *domain.Group, 
 		return nil, 0, err
 	}
 
+	if err := tx.Create(logEntry).Error; err != nil {
+		return nil, 0, err
+	}
+
 	if err := r.db.First(group, "id = ?", group.ID).Error; err != nil {
 		return nil, 0, err
 	}
 
 	return group, total, nil
+}
+
+func (r *GroupRepository) RemoveMemberAndTheirSharedItems(ctx context.Context, groupID, memberID uuid.UUID, logEntry *domain.GroupLog) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("group_id = ? AND owner_id = ?", groupID, memberID).Delete(&domain.GroupItem{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("group_id = ? AND user_id = ?", groupID, memberID).Delete(&domain.GroupMember{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(logEntry).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func (r *GroupRepository) DeleteGroup(ctx context.Context, groupID uuid.UUID) error {
+	return r.db.WithContext(ctx).Where("id = ?", groupID).Delete(&domain.Group{}).Error
+}
+
+func (r *GroupRepository) CreateLog(ctx context.Context, log *domain.GroupLog) error {
+	return r.db.WithContext(ctx).Create(log).Error
 }

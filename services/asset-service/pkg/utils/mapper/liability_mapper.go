@@ -34,6 +34,7 @@ func ToLiabilityProto(d *domain.Liability) *pb.Liability {
 		CreatedAt:    timestamppb.New(d.CreatedAt),
 		UpdatedAt:    timestamppb.New(d.UpdatedAt),
 		Files:        ToPbFiles(d.Files),
+		DeletedAt:    timestamppb.New(d.DeletedAt.Time),
 	}
 
 	return res

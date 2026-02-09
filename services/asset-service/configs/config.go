@@ -11,6 +11,8 @@ type Configs struct {
 	GRPC       GRPC
 	PostgreSQL PostgreSQL
 	SUPA       SUPA
+	NATS       NATS
+	UserGRPC   UserGRPC
 }
 
 type GRPC struct {
@@ -29,6 +31,16 @@ type PostgreSQL struct {
 	Username string
 	Password string
 	Database string
+}
+
+type NATS struct {
+	Host string
+	Port string
+}
+
+type UserGRPC struct {
+	Host string
+	Port string
 }
 
 func LoadConfigs() *Configs {
@@ -60,6 +72,14 @@ func LoadConfigs() *Configs {
 			Key:    requireEnv("SUPABASE_KEY"),
 			URL:    requireEnv("SUPABASE_URL"),
 			Bucket: requireEnv("BUCKET_NAME"),
+		},
+		NATS: NATS{
+			Host: requireEnv("NATS_HOST"),
+			Port: requireEnv("NATS_PORT"),
+		},
+		UserGRPC: UserGRPC{
+			Host: requireEnv("User_HOST"),
+			Port: requireEnv("User_PORT"),
 		},
 	}
 }
