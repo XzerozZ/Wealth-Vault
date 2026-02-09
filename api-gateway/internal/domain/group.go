@@ -27,6 +27,10 @@ type AddMemberRequest struct {
 	TargetUserIDS []string `json:"target_ids" form:"target_ids"`
 }
 
+type RemoveMemberRequest struct {
+	TargetUserID string `json:"target_id" form:"target_id"`
+}
+
 type GrantAccessRequest struct {
 	TargetUserID string   `json:"target_id" form:"target_id"`
 	ItemIDS      []string `json:"item_ids" form:"item_ids"`

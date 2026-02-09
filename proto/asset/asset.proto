@@ -46,3 +46,17 @@ message CheckAssetRequest {
 message CheckAssetResponse {
   bool exists = 1;
 }
+
+message GetMyAssetsRequest {
+  string user_id = 1;
+}
+
+message GetMyAssetsResponse {
+  repeated string account_ids = 1;
+  repeated string building_ids = 2;
+  repeated string cash_ids = 3;
+  repeated string insurance_ids = 4;
+  repeated string investment_ids = 5;
+  repeated string land_ids = 6;
+  repeated string liability_ids = 7;
+}

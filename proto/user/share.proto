@@ -43,7 +43,8 @@ message GroupItemDetail {
   string group_item_id = 1;
   string shared_by = 2; 
   google.protobuf.Timestamp shared_at = 3;
-  AssetPreview asset_detail = 4;
+  string type = 4;
+  AssetPreview asset_detail = 5;
 }
 
 message GetFriendItemsResponse {
@@ -54,10 +55,51 @@ message FriendItemDetail {
   string friend_item_id = 1; 
   string shared_by = 2;     
   google.protobuf.Timestamp shared_at = 3;
-  AssetPreview asset_detail = 4;
+  string type = 4;
+  AssetPreview asset_detail = 5;
 }
 
 message UnshareItemRequest {
   string item_id  = 1; 
   string user_id = 2;    
+}
+
+message DeleteByEntityRequest {
+  string entity_id = 1;
+}
+
+message DeleteByEntityResponse {
+  bool success = 1;
+}
+
+message GetItemSharedTargetsRequest {
+  string user_id = 1;    
+  string item_id = 2;    
+  string item_type = 3; 
+}
+
+message SharedGroupInfo {
+  string group_id = 1;
+  string group_name = 2;
+  string group_image = 3;
+  google.protobuf.Timestamp shared_at = 4; 
+}
+
+message SharedFriendInfo {
+  string friend_id = 1;
+  string username = 2;
+  string profile_image = 3;
+  google.protobuf.Timestamp shared_at = 4;
+}
+
+message SharedEmailInfo {
+  string email = 1;
+  google.protobuf.Timestamp shared_at = 2;
+  bool is_sent = 3;
+}
+
+message GetItemSharedTargetsResponse {
+  repeated SharedGroupInfo groups = 1;
+  repeated SharedFriendInfo friends = 2;
+  repeated SharedEmailInfo emails = 3;
 }

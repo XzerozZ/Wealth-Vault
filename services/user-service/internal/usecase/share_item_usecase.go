@@ -2,8 +2,12 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"strings"
+	"sync"
 	"time"
 	"wealth-vault/user-service/internal/domain"
 	"wealth-vault/user-service/internal/event"
@@ -12,6 +16,7 @@ import (
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 	"wealth-vault/user-service/pkg/utils"
 	"wealth-vault/user-service/pkg/utils/mail"
+	"wealth-vault/user-service/pkg/utils/mapper"
 
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -21,6 +26,7 @@ type ShareItemUsecase struct {
 	itemRepo    repo.ShareItemRepository
 	groupRepo   repo.GroupRepository
 	userRepo    repo.UserRepository
+	msgRepo     repo.MsgRepository
 	assetClient assetPb.AssetServiceClient
 	mailclient  mail.NotificationClient
 	publisher   *event.Publisher
@@ -30,6 +36,7 @@ func NewShareItemUsecase(
 	r repo.ShareItemRepository,
 	g repo.GroupRepository,
 	u repo.UserRepository,
+	m repo.MsgRepository,
 	assetClient assetPb.AssetServiceClient,
 	mail mail.NotificationClient,
 	e *event.Publisher,
@@ -41,6 +48,7 @@ func NewShareItemUsecase(
 		assetClient: assetClient,
 		mailclient:  mail,
 		publisher:   e,
+		msgRepo:     m,
 	}
 }
 
@@ -52,22 +60,23 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 		return nil, errors.New("mismatch between item_ids and types length")
 	}
 
-	userID, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
-	}
-
+	userID, _ := uuid.Parse(req.UserId)
 	senderName := "Unknown"
 	if userProfile, err := u.userRepo.GetUser(ctx, userID); err == nil {
 		senderName = userProfile.Username
 	}
 
 	now := time.Now()
-
 	var (
-		groupItemsToCreate                  []domain.GroupItem
-		friendItemsToCreate                 []domain.FriendItem
-		emailItemsToCreate, emailsToSendNow []domain.EmailItem
+		groupItemsToCreate  []domain.GroupItem
+		friendItemsToCreate []domain.FriendItem
+		emailItemsToCreate  []domain.EmailItem
+		emailsToSendNow     []domain.EmailItem
+		groupLogsToCreate   []domain.GroupLog
+		friendLogsToCreate  []domain.FriendLog
+		groupActivities     []domain.GroupActivityEvent
+		groupMsgsToCreate   []domain.GroupMessage
+		privateMsgsToCreate []domain.PrivateMessage
 	)
 
 	for i, idStr := range req.ItemIds {
@@ -83,16 +92,13 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 			UserId: req.UserId,
 			Type:   entityType,
 		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to verify asset %s: %v", idStr, err)
-		}
-		if !res.Exists {
+		if err != nil || !res.Exists {
 			return nil, fmt.Errorf("asset not found: %s", idStr)
 		}
 
+		assetDisplayName := fmt.Sprintf("%s shared item", entityType)
 		for _, target := range req.Groups {
 			groupID, _ := uuid.Parse(target.Id)
-
 			shareTime := now
 			if target.ShareAt != nil {
 				shareTime = target.ShareAt.AsTime()
@@ -116,22 +122,59 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 							GroupItemID: newItem.ID,
 							ViewerID:    member.ID,
 						})
-
 						if member.ID != userID {
 							assetNotifyMap[member.ID.String()] = true
 						}
 					}
-
 					newItem.Viewers = viewers
 				}
-
 				groupItemsToCreate = append(groupItemsToCreate, newItem)
+
+				logMeta := map[string]string{
+					"action":    "share_item",
+					"item_type": entityType,
+					"item_id":   entityID.String(),
+					"shared_at": shareTime.Format(time.RFC3339),
+				}
+				logMetaJSON, _ := json.Marshal(logMeta)
+
+				groupLogsToCreate = append(groupLogsToCreate, domain.GroupLog{
+					GroupID:   groupID,
+					LogType:   "ACTIVITY",
+					Messages:  fmt.Sprintf("%s ได้แชร์ %s รายการใหม่เข้ากลุ่ม", senderName, entityType),
+					Metadata:  string(logMetaJSON),
+					CreatedBy: userID,
+				})
+
+				groupActivities = append(groupActivities, domain.GroupActivityEvent{
+					GroupID:      target.Id,
+					ActivityType: "ITEM_SHARED",
+					Payload:      fmt.Sprintf("%s แชร์ %s ใหม่", senderName, entityType),
+					ActorID:      req.UserId,
+					OccurredAt:   now.Unix(),
+				})
+
+				cardMeta := map[string]interface{}{
+					"asset_id":       entityID.String(),
+					"asset_type":     entityType,
+					"snapshot_title": assetDisplayName,
+					"action_url":     fmt.Sprintf("/asset/%s/%s", entityType, entityID),
+				}
+
+				cardMetaJSON, _ := json.Marshal(cardMeta)
+				groupMsgsToCreate = append(groupMsgsToCreate, domain.GroupMessage{
+					GroupID:   groupID,
+					SenderID:  userID,
+					MsgType:   "ASSET_CARD",
+					Content:   "",
+					Metadata:  string(cardMetaJSON),
+					CreatedAt: now,
+				})
 			}
 		}
 
 		for _, target := range req.Friends {
 			friendID, _ := uuid.Parse(target.Id)
-
 			shareTime := now
 			if target.ShareAt != nil {
 				shareTime = target.ShareAt.AsTime()
@@ -146,8 +189,39 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 					EntityID:   entityID,
 					ShareAt:    shareTime,
 				})
-			}
 
+				logMeta := map[string]string{
+					"action":    "share_to_friend",
+					"item_type": entityType,
+					"item_id":   entityID.String(),
+				}
+
+				logMetaJSON, _ := json.Marshal(logMeta)
+				friendLogsToCreate = append(friendLogsToCreate, domain.FriendLog{
+					OwnerID:   userID,
+					FriendID:  friendID,
+					LogType:   "ACTIVITY",
+					Messages:  fmt.Sprintf("คุณได้แชร์ %s รายการใหม่ให้กับเพื่อน", entityType),
+					Metadata:  string(logMetaJSON),
+					CreatedBy: userID,
+				})
+
+				cardMeta := map[string]interface{}{
+					"asset_id":       entityID.String(),
+					"asset_type":     entityType,
+					"snapshot_title": assetDisplayName,
+				}
+
+				cardMetaJSON, _ := json.Marshal(cardMeta)
+				privateMsgsToCreate = append(privateMsgsToCreate, domain.PrivateMessage{
+					SenderID:   userID,
+					ReceiverID: friendID,
+					MsgType:    "ASSET_CARD",
+					Content:    "",
+					Metadata:   string(cardMetaJSON),
+					CreatedAt:  now,
+				})
+			}
 			assetNotifyMap[target.Id] = true
 		}
 
@@ -158,7 +232,6 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 			}
 
 			shouldSendNow := shareTime.IsZero() || shareTime.Before(time.Now().Add(1*time.Minute))
-
 			emailItem := domain.EmailItem{
 				OwnerID:    userID,
 				Email:      target.Id,
@@ -169,7 +242,6 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 			}
 
 			emailItemsToCreate = append(emailItemsToCreate, emailItem)
-
 			if shouldSendNow {
 				emailsToSendNow = append(emailsToSendNow, emailItem)
 			}
@@ -197,27 +269,31 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 		if err := u.itemRepo.ShareItemtoGroup(ctx, groupItemsToCreate); err != nil {
 			return nil, err
 		}
+
+		go u.asyncSaveGroupLogs(groupLogsToCreate)
+		go u.asyncBroadcastGroupActivities(groupActivities)
+		go u.asyncSaveGroupMessages(groupMsgsToCreate)
 	}
 
 	if len(friendItemsToCreate) > 0 {
 		if err := u.itemRepo.ShareItemtoFriend(ctx, friendItemsToCreate); err != nil {
 			return nil, err
 		}
+
+		go u.asyncSaveFriendLogs(friendLogsToCreate)
+		go u.asyncSavePrivateMessages(privateMsgsToCreate)
 	}
 
 	if len(emailItemsToCreate) > 0 {
 		if err := u.itemRepo.ShareItemtoEmail(ctx, emailItemsToCreate); err != nil {
 			return nil, err
 		}
-
 		if len(emailsToSendNow) > 0 {
 			go u.SendEmailInvitations(emailsToSendNow)
 		}
 	}
 
-	return &pb.ShareItemResponse{
-		Finish: true,
-	}, nil
+	return &pb.ShareItemResponse{Finish: true}, nil
 }
 
 func (u *ShareItemUsecase) SendEmailInvitations(items []domain.EmailItem) {
@@ -393,252 +469,37 @@ func (u *ShareItemUsecase) SendEmailInvitations(items []domain.EmailItem) {
 }
 
 func (u *ShareItemUsecase) GetSharedIteminGroup(ctx context.Context, req *pb.GetGroupItemsRequest) (*pb.GetGroupItemsResponse, error) {
-	groupID, err := uuid.Parse(req.GroupId)
-	if err != nil {
-		return nil, errors.New("invalid group id")
-	}
-
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
-	}
+	groupID, _ := uuid.Parse(req.GroupId)
+	uid, _ := uuid.Parse(req.UserId)
 
 	items, err := u.itemRepo.GetSharedIteminGroup(ctx, groupID, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	var buildingIDs, landIDs, accountIDs, cashIDs, insuranceIDs, investmentIDs, liabilityIDs []string
-
-	itemMap := make(map[string]*domain.GroupItem)
-
-	for _, item := range items {
-		idStr := item.EntityID.String()
-		itemMap[idStr] = &item
-
-		switch item.EntityType {
-		case "building":
-			buildingIDs = append(buildingIDs, idStr)
-		case "land":
-			landIDs = append(landIDs, idStr)
-		case "account":
-			accountIDs = append(accountIDs, idStr)
-		case "cash":
-			cashIDs = append(cashIDs, idStr)
-		case "insurance":
-			insuranceIDs = append(insuranceIDs, idStr)
-		case "investment":
-			investmentIDs = append(investmentIDs, idStr)
-		case "liability":
-			liabilityIDs = append(liabilityIDs, idStr)
+	summaries := make([]domain.SharedItemSummary, len(items))
+	for i, item := range items {
+		summaries[i] = domain.SharedItemSummary{
+			EntityID:   item.EntityID.String(),
+			EntityType: item.EntityType,
 		}
 	}
 
-	var buildings []*assetPb.Building
-	if len(buildingIDs) > 0 {
-		res, err := u.assetClient.GetBatchBuilding(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: buildingIDs,
-		})
-		if err == nil && res != nil {
-			buildings = res.Building
-		}
-	}
-
-	var lands []*assetPb.Land
-	if len(landIDs) > 0 {
-		res, err := u.assetClient.GetBatchLand(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: landIDs,
-		})
-		if err == nil && res != nil {
-			lands = res.Land
-		}
-	}
-
-	var accounts []*assetPb.Account
-	if len(accountIDs) > 0 {
-		res, err := u.assetClient.GetBatchAccount(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: accountIDs,
-		})
-		if err == nil && res != nil {
-			accounts = res.Account
-		}
-	}
-
-	var cashes []*assetPb.Cash
-	if len(cashIDs) > 0 {
-		res, err := u.assetClient.GetBatchCash(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: cashIDs,
-		})
-		if err == nil && res != nil {
-			cashes = res.Cash
-		}
-	}
-
-	var insurances []*assetPb.Insurance
-	if len(insuranceIDs) > 0 {
-		res, err := u.assetClient.GetBatchInsurance(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: insuranceIDs,
-		})
-		if err == nil && res != nil {
-			insurances = res.Insurance
-		}
-	}
-
-	var investments []*assetPb.Investment
-	if len(investmentIDs) > 0 {
-		res, err := u.assetClient.GetBatchInvestment(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: investmentIDs,
-		})
-		if err == nil && res != nil {
-			investments = res.Invest
-		}
-	}
-
-	var liabilities []*assetPb.Liability
-	if len(liabilityIDs) > 0 {
-		res, err := u.assetClient.GetBatchLiability(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: liabilityIDs,
-		})
-		if err == nil && res != nil {
-			liabilities = res.Liability
-		}
+	previewMap, err := u.fetchAssetPreviews(ctx, summaries)
+	if err != nil {
+		log.Printf("Failed to fetch asset previews: %v", err)
 	}
 
 	var responseItems []*pb.GroupItemDetail
-	createBaseDetail := func(assetID string) *pb.GroupItemDetail {
-		if origin, ok := itemMap[assetID]; ok {
-			return &pb.GroupItemDetail{
-				GroupItemId: origin.ID.String(),
-				SharedBy:    origin.OwnerID.String(),
-				SharedAt:    timestamppb.New(origin.CreatedAt),
-			}
-		}
-		return nil
-	}
-
-	for _, b := range buildings {
-		if detail := createBaseDetail(b.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Building{
-					Building: &pb.BuildingPreview{
-						Id:           b.Id,
-						Name:         b.Name,
-						Amount:       b.Amount,
-						LocationText: fmt.Sprintf("%s, %s", b.Location.District, b.Location.Province),
-						TypeName:     b.Type.String(),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, l := range lands {
-		if detail := createBaseDetail(l.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Land{
-					Land: &pb.LandPreview{
-						Id:           l.Id,
-						Name:         l.Name,
-						DeedNum:      l.DeedNum,
-						Area:         l.Area,
-						Amount:       l.Amount,
-						LocationText: fmt.Sprintf("%s, %s", l.Location.District, l.Location.Province),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, a := range accounts {
-		if detail := createBaseDetail(a.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Account{
-					Account: &pb.AccountPreview{
-						Id:            a.Id,
-						Name:          a.Name,
-						BankName:      a.BankName,
-						Amount:        a.Amount,
-						AccountNumber: utils.MaskBankAccount(a.BankAcc),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, c := range cashes {
-		if detail := createBaseDetail(c.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Cash{
-					Cash: &pb.CashPreview{
-						Id:     c.Id,
-						Name:   c.Name,
-						Amount: c.Amount,
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, i := range insurances {
-		if detail := createBaseDetail(i.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Insurance{
-					Insurance: &pb.InsurancePreview{
-						Id:             i.Id,
-						TypeName:       i.Type.String(),
-						CompanyName:    i.CompanyName,
-						PolNum:         i.PolNum,
-						CoverageAmount: i.CoverageAmount,
-						ExpDateText:    i.ExpDate.AsTime().String(),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, inv := range investments {
-		if detail := createBaseDetail(inv.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Investment{
-					Investment: &pb.InvestmentPreview{
-						Id:       inv.Id,
-						Name:     inv.Name,
-						TypeName: inv.Type.String(),
-						Symbol:   inv.Symbol,
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, lia := range liabilities {
-		if detail := createBaseDetail(lia.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Liability{
-					Liability: &pb.LiabilityPreview{
-						Id:        lia.Id,
-						Name:      lia.Name,
-						TypeName:  lia.Type.String(),
-						Creditor:  lia.Creditor,
-						Principal: lia.Principal,
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
+	for _, item := range items {
+		preview := previewMap[item.EntityID.String()]
+		responseItems = append(responseItems, &pb.GroupItemDetail{
+			GroupItemId: item.ID.String(),
+			SharedBy:    item.OwnerID.String(),
+			SharedAt:    timestamppb.New(item.CreatedAt),
+			Type:        item.EntityType,
+			AssetDetail: preview,
+		})
 	}
 
 	return &pb.GetGroupItemsResponse{
@@ -647,252 +508,37 @@ func (u *ShareItemUsecase) GetSharedIteminGroup(ctx context.Context, req *pb.Get
 }
 
 func (u *ShareItemUsecase) GetSharedIteminFriend(ctx context.Context, req *pb.GetFriendItemRequest) (*pb.GetFriendItemsResponse, error) {
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
-	}
-
-	fid, err := uuid.Parse(req.FriendId)
-	if err != nil {
-		return nil, errors.New("invalid friend id")
-	}
+	uid, _ := uuid.Parse(req.UserId)
+	fid, _ := uuid.Parse(req.FriendId)
 
 	items, err := u.itemRepo.GetSharedIteminFriend(ctx, fid, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	var buildingIDs, landIDs, accountIDs, cashIDs, insuranceIDs, investmentIDs, liabilityIDs []string
-
-	itemMap := make(map[string]*domain.FriendItem)
-
-	for _, item := range items {
-		idStr := item.EntityID.String()
-		itemMap[idStr] = &item
-
-		switch item.EntityType {
-		case "building":
-			buildingIDs = append(buildingIDs, idStr)
-		case "land":
-			landIDs = append(landIDs, idStr)
-		case "account":
-			accountIDs = append(accountIDs, idStr)
-		case "cash":
-			cashIDs = append(cashIDs, idStr)
-		case "insurance":
-			insuranceIDs = append(insuranceIDs, idStr)
-		case "investment":
-			investmentIDs = append(investmentIDs, idStr)
-		case "liability":
-			liabilityIDs = append(liabilityIDs, idStr)
+	summaries := make([]domain.SharedItemSummary, len(items))
+	for i, item := range items {
+		summaries[i] = domain.SharedItemSummary{
+			EntityID:   item.EntityID.String(),
+			EntityType: item.EntityType,
 		}
 	}
 
-	var buildings []*assetPb.Building
-	if len(buildingIDs) > 0 {
-		res, err := u.assetClient.GetBatchBuilding(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: buildingIDs,
-		})
-		if err == nil && res != nil {
-			buildings = res.Building
-		}
-	}
-
-	var lands []*assetPb.Land
-	if len(landIDs) > 0 {
-		res, err := u.assetClient.GetBatchLand(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: landIDs,
-		})
-		if err == nil && res != nil {
-			lands = res.Land
-		}
-	}
-
-	var accounts []*assetPb.Account
-	if len(accountIDs) > 0 {
-		res, err := u.assetClient.GetBatchAccount(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: accountIDs,
-		})
-		if err == nil && res != nil {
-			accounts = res.Account
-		}
-	}
-
-	var cashes []*assetPb.Cash
-	if len(cashIDs) > 0 {
-		res, err := u.assetClient.GetBatchCash(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: cashIDs,
-		})
-		if err == nil && res != nil {
-			cashes = res.Cash
-		}
-	}
-
-	var insurances []*assetPb.Insurance
-	if len(insuranceIDs) > 0 {
-		res, err := u.assetClient.GetBatchInsurance(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: insuranceIDs,
-		})
-		if err == nil && res != nil {
-			insurances = res.Insurance
-		}
-	}
-
-	var investments []*assetPb.Investment
-	if len(investmentIDs) > 0 {
-		res, err := u.assetClient.GetBatchInvestment(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: investmentIDs,
-		})
-		if err == nil && res != nil {
-			investments = res.Invest
-		}
-	}
-
-	var liabilities []*assetPb.Liability
-	if len(liabilityIDs) > 0 {
-		res, err := u.assetClient.GetBatchLiability(ctx, &assetPb.GetBatchIdsRequest{
-			Ids: liabilityIDs,
-		})
-		if err == nil && res != nil {
-			liabilities = res.Liability
-		}
+	previewMap, err := u.fetchAssetPreviews(ctx, summaries)
+	if err != nil {
+		return nil, err
 	}
 
 	var responseItems []*pb.FriendItemDetail
-	createBaseDetail := func(assetID string) *pb.FriendItemDetail {
-		if origin, ok := itemMap[assetID]; ok {
-			return &pb.FriendItemDetail{
-				FriendItemId: origin.ID.String(),
-				SharedBy:     origin.OwnerID.String(),
-				SharedAt:     timestamppb.New(origin.CreatedAt),
-			}
-		}
-		return nil
-	}
-
-	for _, b := range buildings {
-		if detail := createBaseDetail(b.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Building{
-					Building: &pb.BuildingPreview{
-						Id:           b.Id,
-						Name:         b.Name,
-						Amount:       b.Amount,
-						LocationText: fmt.Sprintf("%s, %s", b.Location.District, b.Location.Province),
-						TypeName:     b.Type.String(),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, l := range lands {
-		if detail := createBaseDetail(l.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Land{
-					Land: &pb.LandPreview{
-						Id:           l.Id,
-						Name:         l.Name,
-						DeedNum:      l.DeedNum,
-						Area:         l.Area,
-						Amount:       l.Amount,
-						LocationText: fmt.Sprintf("%s, %s", l.Location.District, l.Location.Province),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, a := range accounts {
-		if detail := createBaseDetail(a.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Account{
-					Account: &pb.AccountPreview{
-						Id:            a.Id,
-						Name:          a.Name,
-						BankName:      a.BankName,
-						Amount:        a.Amount,
-						AccountNumber: utils.MaskBankAccount(a.BankAcc),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, c := range cashes {
-		if detail := createBaseDetail(c.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Cash{
-					Cash: &pb.CashPreview{
-						Id:     c.Id,
-						Name:   c.Name,
-						Amount: c.Amount,
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, i := range insurances {
-		if detail := createBaseDetail(i.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Insurance{
-					Insurance: &pb.InsurancePreview{
-						Id:             i.Id,
-						TypeName:       i.Type.String(),
-						CompanyName:    i.CompanyName,
-						PolNum:         i.PolNum,
-						CoverageAmount: i.CoverageAmount,
-						ExpDateText:    i.ExpDate.AsTime().String(),
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, inv := range investments {
-		if detail := createBaseDetail(inv.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Investment{
-					Investment: &pb.InvestmentPreview{
-						Id:       inv.Id,
-						Name:     inv.Name,
-						TypeName: inv.Type.String(),
-						Symbol:   inv.Symbol,
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
-	}
-
-	for _, lia := range liabilities {
-		if detail := createBaseDetail(lia.Id); detail != nil {
-			detail.AssetDetail = &pb.AssetPreview{
-				Asset: &pb.AssetPreview_Liability{
-					Liability: &pb.LiabilityPreview{
-						Id:        lia.Id,
-						Name:      lia.Name,
-						TypeName:  lia.Type.String(),
-						Creditor:  lia.Creditor,
-						Principal: lia.Principal,
-					},
-				},
-			}
-
-			responseItems = append(responseItems, detail)
-		}
+	for _, item := range items {
+		preview := previewMap[item.EntityID.String()]
+		responseItems = append(responseItems, &pb.FriendItemDetail{
+			FriendItemId: item.ID.String(),
+			SharedBy:     item.OwnerID.String(),
+			SharedAt:     timestamppb.New(item.CreatedAt),
+			Type:         item.EntityType,
+			AssetDetail:  preview,
+		})
 	}
 
 	return &pb.GetFriendItemsResponse{
@@ -900,18 +546,156 @@ func (u *ShareItemUsecase) GetSharedIteminFriend(ctx context.Context, req *pb.Ge
 	}, nil
 }
 
+func (u *ShareItemUsecase) fetchAssetPreviews(ctx context.Context, items []domain.SharedItemSummary) (map[string]*pb.AssetPreview, error) {
+	idsByType := make(map[string][]string)
+	for _, item := range items {
+		key := strings.ToLower(item.EntityType)
+		idsByType[key] = append(idsByType[key], item.EntityID)
+	}
+
+	previewMap := make(map[string]*pb.AssetPreview)
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	fetch := func(assetType string, fetcher func() error) {
+		ids := idsByType[assetType]
+		if len(ids) == 0 {
+			return
+		}
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := fetcher(); err != nil {
+				log.Printf("⚠️ Failed to fetch %s assets: %v", assetType, err)
+			}
+		}()
+	}
+
+	fetch("building", func() error {
+		res, err := u.assetClient.GetBatchBuilding(ctx, &assetPb.GetBatchIdsRequest{Ids: idsByType["building"]})
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		defer mu.Unlock()
+		if res != nil {
+			for _, b := range res.Building {
+				previewMap[b.Id] = mapper.MapBuildingToPreview(b)
+			}
+		}
+		return nil
+	})
+
+	fetch("land", func() error {
+		res, err := u.assetClient.GetBatchLand(ctx, &assetPb.GetBatchIdsRequest{Ids: idsByType["land"]})
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		defer mu.Unlock()
+		if res != nil {
+			for _, l := range res.Land {
+				previewMap[l.Id] = mapper.MapLandToPreview(l)
+			}
+		}
+		return nil
+	})
+
+	fetch("account", func() error {
+		res, err := u.assetClient.GetBatchAccount(ctx, &assetPb.GetBatchIdsRequest{Ids: idsByType["account"]})
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		defer mu.Unlock()
+		if res != nil {
+			for _, a := range res.Account {
+				mappedData := mapper.MapAccountToPreview(a)
+				log.Printf("➡️ Mapping Account: ID='%s', ResultIsNil=%v", a.Id, mappedData == nil)
+
+				previewMap[a.Id] = mappedData
+			}
+		}
+		return nil
+	})
+
+	fetch("cash", func() error {
+		res, err := u.assetClient.GetBatchCash(ctx, &assetPb.GetBatchIdsRequest{Ids: idsByType["cash"]})
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		defer mu.Unlock()
+		if res != nil {
+			for _, c := range res.Cash {
+				previewMap[c.Id] = mapper.MapCashToPreview(c)
+			}
+		}
+		return nil
+	})
+
+	fetch("insurance", func() error {
+		res, err := u.assetClient.GetBatchInsurance(ctx, &assetPb.GetBatchIdsRequest{Ids: idsByType["insurance"]})
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		defer mu.Unlock()
+		if res != nil {
+			for _, i := range res.Insurance {
+				previewMap[i.Id] = mapper.MapInsuranceToPreview(i)
+			}
+		}
+		return nil
+	})
+
+	fetch("investment", func() error {
+		res, err := u.assetClient.GetBatchInvestment(ctx, &assetPb.GetBatchIdsRequest{Ids: idsByType["investment"]})
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		defer mu.Unlock()
+		if res != nil {
+			for _, inv := range res.Invest {
+				previewMap[inv.Id] = mapper.MapInvestmentToPreview(inv)
+			}
+		}
+		return nil
+	})
+
+	fetch("liability", func() error {
+		res, err := u.assetClient.GetBatchLiability(ctx, &assetPb.GetBatchIdsRequest{Ids: idsByType["liability"]})
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		defer mu.Unlock()
+		if res != nil {
+			for _, l := range res.Liability {
+				previewMap[l.Id] = mapper.MapLiabilityToPreview(l)
+			}
+		}
+		return nil
+	})
+
+	wg.Wait()
+
+	return previewMap, nil
+}
+
 func (u *ShareItemUsecase) UnsharedIteminGroup(ctx context.Context, req *pb.UnshareItemRequest) (*pb.ShareItemResponse, error) {
-	itemID, err := uuid.Parse(req.ItemId)
-	if err != nil {
-		return nil, errors.New("invalid item id")
-	}
+	itemID, _ := uuid.Parse(req.ItemId)
+	userID, _ := uuid.Parse(req.UserId)
 
-	userID, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
-	}
-
-	if err = u.itemRepo.DeleteIteminGroup(ctx, itemID, userID); err != nil {
+	if err := u.itemRepo.DeleteIteminGroup(ctx, itemID, userID); err != nil {
 		return nil, err
 	}
 
@@ -921,17 +705,10 @@ func (u *ShareItemUsecase) UnsharedIteminGroup(ctx context.Context, req *pb.Unsh
 }
 
 func (u *ShareItemUsecase) UnsharedIteminFriend(ctx context.Context, req *pb.UnshareItemRequest) (*pb.ShareItemResponse, error) {
-	itemID, err := uuid.Parse(req.ItemId)
-	if err != nil {
-		return nil, errors.New("invalid item id")
-	}
+	itemID, _ := uuid.Parse(req.ItemId)
+	userID, _ := uuid.Parse(req.UserId)
 
-	userID, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
-	}
-
-	if err = u.itemRepo.DeleteIteminFriend(ctx, itemID, userID); err != nil {
+	if err := u.itemRepo.DeleteIteminFriend(ctx, itemID, userID); err != nil {
 		return nil, err
 	}
 
@@ -966,21 +743,32 @@ func (u *ShareItemUsecase) ProcessScheduledEmails(ctx context.Context) error {
 }
 
 func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemberRequest) (*pb.ActionResponse, error) {
-	groupID, err := uuid.Parse(req.GroupId)
-	if err != nil {
-		return nil, errors.New("invalid group id")
-	}
+	groupID, _ := uuid.Parse(req.GroupId)
+	senderID, _ := uuid.Parse(req.UserId)
 
 	if len(req.TargetUserIds) == 0 {
 		return nil, errors.New("no users specified")
 	}
 
+	senderName := "Unknown"
+	if sender, err := u.userRepo.GetUser(ctx, senderID); err == nil {
+		senderName = sender.Username
+	}
+
 	var newMembers []domain.GroupMember
 	var targetUUIDs []uuid.UUID
+	var addedNames []string
+
 	for _, userIDStr := range req.TargetUserIds {
 		uid, err := uuid.Parse(userIDStr)
 		if err == nil {
+			userName := "Someone"
+			if user, err := u.userRepo.GetUser(ctx, uid); err == nil {
+				userName = user.Username
+			}
+			addedNames = append(addedNames, userName)
 			targetUUIDs = append(targetUUIDs, uid)
+
 			newMembers = append(newMembers, domain.GroupMember{
 				GroupID:  groupID,
 				UserID:   uid,
@@ -996,27 +784,84 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 		}
 	}
 
+	logMeta := map[string]interface{}{
+		"action":      "add_member",
+		"target_ids":  req.TargetUserIds,
+		"added_count": len(newMembers),
+	}
+	logMetaJSON, _ := json.Marshal(logMeta)
+
+	groupLog := domain.GroupLog{
+		GroupID:   groupID,
+		LogType:   "SYSTEM",
+		Messages:  fmt.Sprintf("%s เพิ่มสมาชิกใหม่ %d คน", senderName, len(newMembers)),
+		Metadata:  string(logMetaJSON),
+		CreatedBy: senderID,
+	}
+
+	go func() {
+		if err := u.groupRepo.CreateLog(context.Background(), &groupLog); err != nil {
+			log.Printf("⚠️ Failed to create group log: %v", err)
+		}
+	}()
+
+	msgContent := fmt.Sprintf("%s เพิ่ม %s เข้ากลุ่ม", senderName, strings.Join(addedNames, ", "))
+	sysMsg := domain.GroupMessage{
+		GroupID:   groupID,
+		SenderID:  senderID,
+		MsgType:   "SYSTEM_ALERT",
+		Content:   msgContent,
+		Metadata:  "{}",
+		CreatedAt: time.Now(),
+	}
+
+	go func() {
+		if err := u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{sysMsg}); err != nil {
+			log.Printf("⚠️ Failed to create system message: %v", err)
+		}
+	}()
+
+	notifyTargetMap := make(map[string]bool)
 	ownerUUIDs, err := u.itemRepo.GetItemOwnersInGroup(ctx, groupID)
 	if err != nil {
 		fmt.Printf("⚠️ Warning: Failed to fetch owners: %v\n", err)
 	}
-
-	var ownerIDStrings []string
 	for _, id := range ownerUUIDs {
-		ownerIDStrings = append(ownerIDStrings, id.String())
+		if id != senderID {
+			notifyTargetMap[id.String()] = true
+		}
+	}
+
+	var notifyTargetIDs []string
+	for id := range notifyTargetMap {
+		notifyTargetIDs = append(notifyTargetIDs, id)
 	}
 
 	evt := domain.GroupMemberAddedEvent{
 		GroupID:       req.GroupId,
 		SenderID:      req.UserId,
 		AddedUserIDs:  req.TargetUserIds,
-		TargetUserIDs: ownerIDStrings,
+		TargetUserIDs: notifyTargetIDs,
 		OccurredAt:    time.Now().Unix(),
 	}
+	go func() {
+		if err := u.publisher.Publish("noti.group.member.added", evt); err != nil {
+			fmt.Printf("⚠️ Failed to publish member added event: %v\n", err)
+		}
+	}()
 
-	if err := u.publisher.Publish(event.GroupMemberAdded, evt); err != nil {
-		fmt.Printf("⚠️ Failed to publish event: %v\n", err)
+	activityEvt := domain.GroupActivityEvent{
+		GroupID:      req.GroupId,
+		ActivityType: "MEMBER_ADDED",
+		Payload:      fmt.Sprintf("%s เพิ่มสมาชิกใหม่", senderName),
+		ActorID:      req.UserId,
+		OccurredAt:   time.Now().Unix(),
 	}
+	go func() {
+		if err := u.publisher.Publish("noti.group.activity", activityEvt); err != nil {
+			log.Printf("⚠️ Failed to publish group activity: %v", err)
+		}
+	}()
 
 	futureItemIDs, err := u.itemRepo.GetFutureItemsInGroup(ctx, groupID)
 	if err != nil {
@@ -1036,7 +881,7 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 		}
 
 		if len(newPermissions) > 0 {
-			_ = u.itemRepo.BatchCreateViewers(ctx, newPermissions)
+			go u.itemRepo.BatchCreateViewers(context.Background(), newPermissions)
 		}
 	}
 
@@ -1046,18 +891,9 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 }
 
 func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessRequest) (*pb.ActionResponse, error) {
-	ownerID, err := uuid.Parse(req.OwnerUserId)
-	if err != nil {
-		return nil, errors.New("invalid owner id")
-	}
-	targetID, err := uuid.Parse(req.TargetUserId)
-	if err != nil {
-		return nil, errors.New("invalid target user id")
-	}
-	groupID, err := uuid.Parse(req.GroupId)
-	if err != nil {
-		return nil, errors.New("invalid group id")
-	}
+	ownerID, _ := uuid.Parse(req.OwnerUserId)
+	targetID, _ := uuid.Parse(req.TargetUserId)
+	groupID, _ := uuid.Parse(req.GroupId)
 
 	if len(req.GroupItemIds) == 0 {
 		return nil, errors.New("no items selected")
@@ -1071,12 +907,13 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 		return nil, errors.New("target user is not a member of this group")
 	}
 
-	count, err := u.itemRepo.CountItemsByOwner(ctx, req.GroupItemIds, ownerID)
+	validItemIDs, err := u.itemRepo.GetOwnedItemIDs(ctx, req.GroupItemIds, ownerID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to verify ownership: %v", err)
 	}
-	if count != int64(len(req.GroupItemIds)) {
-		return nil, errors.New("permission denied: you do not own all selected items or some items do not exist")
+
+	if len(validItemIDs) == 0 {
+		return nil, errors.New("permission denied: you do not own any of the selected items")
 	}
 
 	var viewers []domain.GroupItemViewer
@@ -1093,7 +930,143 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 		return nil, fmt.Errorf("failed to grant access: %v", err)
 	}
 
+	ownerName := "Unknown"
+	targetName := "Member"
+	if u1, err := u.userRepo.GetUser(ctx, ownerID); err == nil {
+		ownerName = u1.Username
+	}
+	if u2, err := u.userRepo.GetUser(ctx, targetID); err == nil {
+		targetName = u2.Username
+	}
+
+	logMeta := map[string]interface{}{
+		"action":     "grant_access",
+		"target_id":  req.TargetUserId,
+		"item_ids":   req.GroupItemIds,
+		"item_count": len(req.GroupItemIds),
+	}
+	logMetaJSON, _ := json.Marshal(logMeta)
+
+	groupLog := domain.GroupLog{
+		GroupID:   groupID,
+		LogType:   "ACTIVITY",
+		Messages:  fmt.Sprintf("%s ให้สิทธิ์ %s ดูรายการย้อนหลัง %d รายการ", ownerName, targetName, len(req.GroupItemIds)),
+		Metadata:  string(logMetaJSON),
+		CreatedBy: ownerID,
+	}
+
+	go func() {
+		if err := u.groupRepo.CreateLog(context.Background(), &groupLog); err != nil {
+			log.Printf("⚠️ Failed to create grant access log: %v", err)
+		}
+	}()
+
+	evt := domain.AccessGrantedEvent{
+		GroupID:      req.GroupId,
+		GrantorID:    req.OwnerUserId,
+		GrantorName:  ownerName,
+		TargetUserID: req.TargetUserId,
+		ItemCount:    len(req.GroupItemIds),
+		OccurredAt:   time.Now().Unix(),
+	}
+
+	go func() {
+		if err := u.publisher.Publish("noti.access.granted", evt); err != nil {
+			log.Printf("⚠️ Failed to publish grant access event: %v", err)
+		}
+	}()
+
+	activityEvt := domain.GroupActivityEvent{
+		GroupID:      req.GroupId,
+		ActivityType: "ACCESS_GRANTED",
+		Payload:      fmt.Sprintf("คุณได้รับสิทธิ์ดูรายการเพิ่ม %d รายการ", len(req.GroupItemIds)),
+		ActorID:      req.OwnerUserId,
+		OccurredAt:   time.Now().Unix(),
+	}
+
+	go func() {
+		if err := u.publisher.Publish("noti.group.activity", activityEvt); err != nil {
+			log.Printf("⚠️ Failed to publish group activity: %v", err)
+		}
+	}()
+
 	return &pb.ActionResponse{
 		Success: true,
 	}, nil
+}
+
+func (u *ShareItemUsecase) DeleteAllReferencesByEntityID(ctx context.Context, req *pb.DeleteByEntityRequest) (*pb.DeleteByEntityResponse, error) {
+	id, _ := uuid.Parse(req.EntityId)
+
+	if err := u.itemRepo.DeleteAllReferencesByEntityID(ctx, id); err != nil {
+		return nil, err
+	}
+
+	return &pb.DeleteByEntityResponse{
+		Success: true,
+	}, nil
+}
+
+func (u *ShareItemUsecase) BatchShareAssets(ctx context.Context, req domain.BatchShareRequest) error {
+	existingMap, err := u.itemRepo.GetExistingSharedMap(ctx, req.OwnerID, req.TargetID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch existing shares: %v", err)
+	}
+
+	var newItems []domain.FriendItem
+	now := time.Now()
+	processIDs := func(ids []string, entityType string) {
+		for _, idStr := range ids {
+			if idStr == "" {
+				continue
+			}
+
+			key := fmt.Sprintf("%s:%s", entityType, idStr)
+			if !existingMap[key] {
+				if uid, err := uuid.Parse(idStr); err == nil {
+					newItems = append(newItems, domain.FriendItem{
+						OwnerID:    req.OwnerID,
+						FriendID:   req.TargetID,
+						EntityType: entityType,
+						EntityID:   uid,
+						ShareAt:    now,
+					})
+				}
+			}
+		}
+	}
+
+	processIDs(req.AccountIDs, "account")
+	processIDs(req.BuildingIDs, "building")
+	processIDs(req.CashIDs, "cash")
+	processIDs(req.InsuranceIDs, "insurance")
+	processIDs(req.InvestmentIDs, "investment")
+	processIDs(req.LandIDs, "land")
+	processIDs(req.LiabilityIDs, "liability")
+
+	if len(newItems) > 0 {
+		if err := u.itemRepo.ShareItemtoFriend(ctx, newItems); err != nil {
+			return fmt.Errorf("failed to batch insert items: %v", err)
+		}
+
+		go func() {
+			bgCtx := context.Background()
+			senderName := "Unknown"
+			if userProfile, err := u.userRepo.GetUser(bgCtx, req.OwnerID); err == nil {
+				senderName = userProfile.Username
+			}
+
+			evt := domain.ItemSharedEvent{
+				AssetID:       "",
+				SenderID:      req.OwnerID.String(),
+				SenderName:    senderName,
+				TargetUserIDs: []string{req.TargetID.String()},
+				OccurredAt:    time.Now().Unix(),
+			}
+
+			u.publisher.Publish("noti.item.shared", evt)
+		}()
+	}
+
+	return nil
 }

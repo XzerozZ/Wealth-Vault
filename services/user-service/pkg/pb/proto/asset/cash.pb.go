@@ -33,6 +33,7 @@ type Cash struct {
 	Files         []*FileInfo            `protobuf:"bytes,6,rep,name=files,proto3" json:"files,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -119,6 +120,13 @@ func (x *Cash) GetCreatedAt() *timestamppb.Timestamp {
 func (x *Cash) GetUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *Cash) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
 	}
 	return nil
 }
@@ -383,7 +391,7 @@ var File_proto_asset_cash_proto protoreflect.FileDescriptor
 
 const file_proto_asset_cash_proto_rawDesc = "" +
 	"\n" +
-	"\x16proto/asset/cash.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\x9a\x02\n" +
+	"\x16proto/asset/cash.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xd5\x02\n" +
 	"\x04Cash\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
@@ -394,7 +402,9 @@ const file_proto_asset_cash_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xa8\x01\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"\n" +
+	"deleted_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\xa8\x01\n" +
 	"\x11CreateCashRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
@@ -439,20 +449,21 @@ var file_proto_asset_cash_proto_goTypes = []any{
 	(*fieldmaskpb.FieldMask)(nil), // 7: google.protobuf.FieldMask
 }
 var file_proto_asset_cash_proto_depIdxs = []int32{
-	5, // 0: asset.Cash.files:type_name -> asset.FileInfo
-	6, // 1: asset.Cash.created_at:type_name -> google.protobuf.Timestamp
-	6, // 2: asset.Cash.updated_at:type_name -> google.protobuf.Timestamp
-	5, // 3: asset.CreateCashRequest.new_files:type_name -> asset.FileInfo
-	0, // 4: asset.UpdateCashRequest.cash:type_name -> asset.Cash
-	5, // 5: asset.UpdateCashRequest.new_files:type_name -> asset.FileInfo
-	7, // 6: asset.UpdateCashRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0, // 7: asset.CashArrayResponse.cash:type_name -> asset.Cash
-	0, // 8: asset.CashResponse.cash:type_name -> asset.Cash
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	5,  // 0: asset.Cash.files:type_name -> asset.FileInfo
+	6,  // 1: asset.Cash.created_at:type_name -> google.protobuf.Timestamp
+	6,  // 2: asset.Cash.updated_at:type_name -> google.protobuf.Timestamp
+	6,  // 3: asset.Cash.deleted_at:type_name -> google.protobuf.Timestamp
+	5,  // 4: asset.CreateCashRequest.new_files:type_name -> asset.FileInfo
+	0,  // 5: asset.UpdateCashRequest.cash:type_name -> asset.Cash
+	5,  // 6: asset.UpdateCashRequest.new_files:type_name -> asset.FileInfo
+	7,  // 7: asset.UpdateCashRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 8: asset.CashArrayResponse.cash:type_name -> asset.Cash
+	0,  // 9: asset.CashResponse.cash:type_name -> asset.Cash
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_cash_proto_init() }

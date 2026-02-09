@@ -14,4 +14,14 @@ type UserRepository interface {
 
 	GetFriendList(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error)
 	AddFriend(ctx context.Context, fri *domain.FriendList) error
+	CreateFriendship(ctx context.Context, fri *domain.FriendList) error
+	RemoveFriend(ctx context.Context, userID, friendID uuid.UUID) error
+	UpdateFriendStatus(ctx context.Context, userID, friendID uuid.UUID, status string) error
+	CheckFriendship(ctx context.Context, userID, friendID uuid.UUID) (bool, string, error)
+	GetIncomingRequests(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error)
+	SetCloseFriendStatus(ctx context.Context, userID, friendID uuid.UUID, isClose bool) error
+	GetCloseFriends(ctx context.Context, userID uuid.UUID) ([]domain.User, error)
+	GetUsersReadyForAutoShare(ctx context.Context) ([]domain.User, error)
+	MarkAutoShareTriggered(ctx context.Context, userID uuid.UUID) error
+	CreateFriendLog(ctx context.Context, log *domain.FriendLog) error
 }

@@ -36,6 +36,7 @@ func ToBuildingProto(d *domain.Building) *pb.Building {
 		Ins:         ToRefInsProto(d.Insurances),
 		CreatedAt:   timestamppb.New(d.CreatedAt),
 		UpdatedAt:   timestamppb.New(d.UpdatedAt),
+		DeletedAt:   timestamppb.New(d.DeletedAt.Time),
 	}
 
 	return res

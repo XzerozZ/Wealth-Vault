@@ -74,4 +74,5 @@ service AssetService {
   rpc GetBatchLiability(GetBatchIdsRequest) returns (LiabilityArrayResponse);
 
   rpc GetNetWorth(GetNetWorthRequest) returns (GetNetWorthResponse);
+  rpc GetAllAssetIDs(GetMyAssetsRequest) returns (GetMyAssetsResponse);
 }

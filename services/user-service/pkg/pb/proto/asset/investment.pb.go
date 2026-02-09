@@ -98,6 +98,7 @@ type Investment struct {
 	Files         []*FileInfo            `protobuf:"bytes,10,rep,name=files,proto3" json:"files,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -212,6 +213,13 @@ func (x *Investment) GetCreatedAt() *timestamppb.Timestamp {
 func (x *Investment) GetUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.UpdatedAt
+	}
+	return nil
+}
+
+func (x *Investment) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
 	}
 	return nil
 }
@@ -508,7 +516,7 @@ var File_proto_asset_investment_proto protoreflect.FileDescriptor
 
 const file_proto_asset_investment_proto_rawDesc = "" +
 	"\n" +
-	"\x1cproto/asset/investment.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xa7\x03\n" +
+	"\x1cproto/asset/investment.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xe2\x03\n" +
 	"\n" +
 	"Investment\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
@@ -527,7 +535,9 @@ const file_proto_asset_investment_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xb5\x02\n" +
+	"updated_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"\n" +
+	"deleted_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\xb5\x02\n" +
 	"\x17CreateInvestmentRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
@@ -592,18 +602,19 @@ var file_proto_asset_investment_proto_depIdxs = []int32{
 	6,  // 1: asset.Investment.files:type_name -> asset.FileInfo
 	7,  // 2: asset.Investment.created_at:type_name -> google.protobuf.Timestamp
 	7,  // 3: asset.Investment.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 4: asset.CreateInvestmentRequest.type:type_name -> asset.InvestmentType
-	6,  // 5: asset.CreateInvestmentRequest.new_files:type_name -> asset.FileInfo
-	1,  // 6: asset.UpdateInvestmentRequest.invest:type_name -> asset.Investment
-	6,  // 7: asset.UpdateInvestmentRequest.new_files:type_name -> asset.FileInfo
-	8,  // 8: asset.UpdateInvestmentRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,  // 9: asset.InvestmentArrayResponse.invest:type_name -> asset.Investment
-	1,  // 10: asset.InvestmentResponse.invest:type_name -> asset.Investment
-	11, // [11:11] is the sub-list for method output_type
-	11, // [11:11] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	7,  // 4: asset.Investment.deleted_at:type_name -> google.protobuf.Timestamp
+	0,  // 5: asset.CreateInvestmentRequest.type:type_name -> asset.InvestmentType
+	6,  // 6: asset.CreateInvestmentRequest.new_files:type_name -> asset.FileInfo
+	1,  // 7: asset.UpdateInvestmentRequest.invest:type_name -> asset.Investment
+	6,  // 8: asset.UpdateInvestmentRequest.new_files:type_name -> asset.FileInfo
+	8,  // 9: asset.UpdateInvestmentRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 10: asset.InvestmentArrayResponse.invest:type_name -> asset.Investment
+	1,  // 11: asset.InvestmentResponse.invest:type_name -> asset.Investment
+	12, // [12:12] is the sub-list for method output_type
+	12, // [12:12] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_investment_proto_init() }

@@ -45,17 +45,24 @@ func main() {
 
 	natsPublisher := event.NewPublisher(nc)
 	mailClient := mailclient.NewMailClient(cfg.Mail)
+
+	// ------ Repository -------
 	urepo := repo.NewUserRepository(db)
 	grepo := repo.NewGroupRepository(db)
 	irepo := repo.NewShareItemRepository(db)
+	mrepo := repo.NewMsgRepository(db)
 
-	uuc := usecase.NewUserUsecase(urepo, supabaseClient)
-	guc := usecase.NewGroupUsecase(grepo, supabaseClient)
-	iuc := usecase.NewShareItemUsecase(irepo, grepo, urepo, assetClient, mailClient, natsPublisher)
+	// ------ Usecase ------
+	guc := usecase.NewGroupUsecase(grepo, urepo, mrepo, supabaseClient, natsPublisher)
+	iuc := usecase.NewShareItemUsecase(irepo, grepo, urepo, mrepo, assetClient, mailClient, natsPublisher)
+	uuc := usecase.NewUserUsecase(urepo, iuc, supabaseClient, natsPublisher, assetClient)
+	muc := usecase.NewMessageUsecase(mrepo, irepo)
 
-	uhandler := handler.NewUserGRPCHandler(uuc, guc, iuc)
-	cronjob := userCron.NewAuthCronJob(iuc)
+	// ------ Handler ------
+	uhandler := handler.NewUserGRPCHandler(uuc, guc, iuc, muc)
 
+	// ------ Cronjob ------
+	cronjob := userCron.NewAuthCronJob(iuc, uuc)
 	cronjob.Start()
 
 	lis, err := net.Listen("tcp", ":"+cfg.GRPC.Port)

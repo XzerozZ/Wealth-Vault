@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"wealth-vault/user-service/internal/domain"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 )
 
@@ -14,4 +15,6 @@ type GroupItemUsecase interface {
 	AddMemberToGroup(ctx context.Context, req *pb.AddMemberRequest) (*pb.ActionResponse, error)
 	GrantAccess(ctx context.Context, req *pb.GrantAccessRequest) (*pb.ActionResponse, error)
 	ProcessScheduledEmails(ctx context.Context) error
+	DeleteAllReferencesByEntityID(ctx context.Context, req *pb.DeleteByEntityRequest) (*pb.DeleteByEntityResponse, error)
+	BatchShareAssets(ctx context.Context, req domain.BatchShareRequest) error
 }

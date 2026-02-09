@@ -466,6 +466,142 @@ func (x *CheckAssetResponse) GetExists() bool {
 	return false
 }
 
+type GetMyAssetsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMyAssetsRequest) Reset() {
+	*x = GetMyAssetsRequest{}
+	mi := &file_proto_asset_asset_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMyAssetsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMyAssetsRequest) ProtoMessage() {}
+
+func (x *GetMyAssetsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMyAssetsRequest.ProtoReflect.Descriptor instead.
+func (*GetMyAssetsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetMyAssetsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetMyAssetsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountIds    []string               `protobuf:"bytes,1,rep,name=account_ids,json=accountIds,proto3" json:"account_ids,omitempty"`
+	BuildingIds   []string               `protobuf:"bytes,2,rep,name=building_ids,json=buildingIds,proto3" json:"building_ids,omitempty"`
+	CashIds       []string               `protobuf:"bytes,3,rep,name=cash_ids,json=cashIds,proto3" json:"cash_ids,omitempty"`
+	InsuranceIds  []string               `protobuf:"bytes,4,rep,name=insurance_ids,json=insuranceIds,proto3" json:"insurance_ids,omitempty"`
+	InvestmentIds []string               `protobuf:"bytes,5,rep,name=investment_ids,json=investmentIds,proto3" json:"investment_ids,omitempty"`
+	LandIds       []string               `protobuf:"bytes,6,rep,name=land_ids,json=landIds,proto3" json:"land_ids,omitempty"`
+	LiabilityIds  []string               `protobuf:"bytes,7,rep,name=liability_ids,json=liabilityIds,proto3" json:"liability_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMyAssetsResponse) Reset() {
+	*x = GetMyAssetsResponse{}
+	mi := &file_proto_asset_asset_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMyAssetsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMyAssetsResponse) ProtoMessage() {}
+
+func (x *GetMyAssetsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMyAssetsResponse.ProtoReflect.Descriptor instead.
+func (*GetMyAssetsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetMyAssetsResponse) GetAccountIds() []string {
+	if x != nil {
+		return x.AccountIds
+	}
+	return nil
+}
+
+func (x *GetMyAssetsResponse) GetBuildingIds() []string {
+	if x != nil {
+		return x.BuildingIds
+	}
+	return nil
+}
+
+func (x *GetMyAssetsResponse) GetCashIds() []string {
+	if x != nil {
+		return x.CashIds
+	}
+	return nil
+}
+
+func (x *GetMyAssetsResponse) GetInsuranceIds() []string {
+	if x != nil {
+		return x.InsuranceIds
+	}
+	return nil
+}
+
+func (x *GetMyAssetsResponse) GetInvestmentIds() []string {
+	if x != nil {
+		return x.InvestmentIds
+	}
+	return nil
+}
+
+func (x *GetMyAssetsResponse) GetLandIds() []string {
+	if x != nil {
+		return x.LandIds
+	}
+	return nil
+}
+
+func (x *GetMyAssetsResponse) GetLiabilityIds() []string {
+	if x != nil {
+		return x.LiabilityIds
+	}
+	return nil
+}
+
 var File_proto_asset_asset_proto protoreflect.FileDescriptor
 
 const file_proto_asset_asset_proto_rawDesc = "" +
@@ -494,7 +630,18 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04type\x18\x03 \x01(\tR\x04type\",\n" +
 	"\x12CheckAssetResponse\x12\x16\n" +
-	"\x06exists\x18\x01 \x01(\bR\x06existsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\x06exists\x18\x01 \x01(\bR\x06exists\"-\n" +
+	"\x12GetMyAssetsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\x80\x02\n" +
+	"\x13GetMyAssetsResponse\x12\x1f\n" +
+	"\vaccount_ids\x18\x01 \x03(\tR\n" +
+	"accountIds\x12!\n" +
+	"\fbuilding_ids\x18\x02 \x03(\tR\vbuildingIds\x12\x19\n" +
+	"\bcash_ids\x18\x03 \x03(\tR\acashIds\x12#\n" +
+	"\rinsurance_ids\x18\x04 \x03(\tR\finsuranceIds\x12%\n" +
+	"\x0einvestment_ids\x18\x05 \x03(\tR\rinvestmentIds\x12\x19\n" +
+	"\bland_ids\x18\x06 \x03(\tR\alandIds\x12#\n" +
+	"\rliability_ids\x18\a \x03(\tR\fliabilityIdsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_asset_asset_proto_rawDescOnce sync.Once
@@ -508,7 +655,7 @@ func file_proto_asset_asset_proto_rawDescGZIP() []byte {
 	return file_proto_asset_asset_proto_rawDescData
 }
 
-var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_proto_asset_asset_proto_goTypes = []any{
 	(*GetAssetRequest)(nil),     // 0: asset.GetAssetRequest
 	(*GetAssetByIDRequest)(nil), // 1: asset.GetAssetByIDRequest
@@ -519,6 +666,8 @@ var file_proto_asset_asset_proto_goTypes = []any{
 	(*DeleteAssetResponse)(nil), // 6: asset.DeleteAssetResponse
 	(*CheckAssetRequest)(nil),   // 7: asset.CheckAssetRequest
 	(*CheckAssetResponse)(nil),  // 8: asset.CheckAssetResponse
+	(*GetMyAssetsRequest)(nil),  // 9: asset.GetMyAssetsRequest
+	(*GetMyAssetsResponse)(nil), // 10: asset.GetMyAssetsResponse
 }
 var file_proto_asset_asset_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -539,7 +688,7 @@ func file_proto_asset_asset_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_asset_asset_proto_rawDesc), len(file_proto_asset_asset_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -65,6 +65,22 @@ message GrantAccessRequest {
   string owner_user_id = 4;     
 }
 
+message RemoveMemberRequest {
+  string group_id = 1;
+  string user_id = 2;        
+  string target_member_id = 3; 
+}
+
+message LeaveGroupRequest {
+  string group_id = 1;
+  string user_id = 2;        
+}
+
+message DeleteGroupRequest {
+  string group_id = 1;
+  string user_id = 2;       
+}
+
 message ActionResponse {
   bool success = 1;
 }

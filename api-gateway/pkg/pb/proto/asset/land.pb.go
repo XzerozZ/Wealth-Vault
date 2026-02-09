@@ -37,6 +37,7 @@ type Land struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Ref           []*Reference           `protobuf:"bytes,12,rep,name=ref,proto3" json:"ref,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -151,6 +152,13 @@ func (x *Land) GetUpdatedAt() *timestamppb.Timestamp {
 func (x *Land) GetRef() []*Reference {
 	if x != nil {
 		return x.Ref
+	}
+	return nil
+}
+
+func (x *Land) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
 	}
 	return nil
 }
@@ -463,7 +471,7 @@ var File_proto_asset_land_proto protoreflect.FileDescriptor
 
 const file_proto_asset_land_proto_rawDesc = "" +
 	"\n" +
-	"\x16proto/asset/land.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1aproto/asset/location.proto\x1a\x16proto/asset/file.proto\"\x9a\x03\n" +
+	"\x16proto/asset/land.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1aproto/asset/location.proto\x1a\x16proto/asset/file.proto\"\xd5\x03\n" +
 	"\x04Land\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
@@ -479,7 +487,9 @@ const file_proto_asset_land_proto_rawDesc = "" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\"\n" +
-	"\x03ref\x18\f \x03(\v2\x10.asset.ReferenceR\x03ref\"\xa7\x02\n" +
+	"\x03ref\x18\f \x03(\v2\x10.asset.ReferenceR\x03ref\x129\n" +
+	"\n" +
+	"deleted_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\xa7\x02\n" +
 	"\x11CreateLandRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
@@ -537,18 +547,19 @@ var file_proto_asset_land_proto_depIdxs = []int32{
 	7,  // 2: asset.Land.created_at:type_name -> google.protobuf.Timestamp
 	7,  // 3: asset.Land.updated_at:type_name -> google.protobuf.Timestamp
 	8,  // 4: asset.Land.ref:type_name -> asset.Reference
-	5,  // 5: asset.CreateLandRequest.location:type_name -> asset.Location
-	6,  // 6: asset.CreateLandRequest.new_files:type_name -> asset.FileInfo
-	0,  // 7: asset.UpdateLandRequest.land:type_name -> asset.Land
-	6,  // 8: asset.UpdateLandRequest.new_files:type_name -> asset.FileInfo
-	9,  // 9: asset.UpdateLandRequest.update_mask:type_name -> google.protobuf.FieldMask
-	0,  // 10: asset.LandArrayResponse.land:type_name -> asset.Land
-	0,  // 11: asset.LandResponse.land:type_name -> asset.Land
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	7,  // 5: asset.Land.deleted_at:type_name -> google.protobuf.Timestamp
+	5,  // 6: asset.CreateLandRequest.location:type_name -> asset.Location
+	6,  // 7: asset.CreateLandRequest.new_files:type_name -> asset.FileInfo
+	0,  // 8: asset.UpdateLandRequest.land:type_name -> asset.Land
+	6,  // 9: asset.UpdateLandRequest.new_files:type_name -> asset.FileInfo
+	9,  // 10: asset.UpdateLandRequest.update_mask:type_name -> google.protobuf.FieldMask
+	0,  // 11: asset.LandArrayResponse.land:type_name -> asset.Land
+	0,  // 12: asset.LandResponse.land:type_name -> asset.Land
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_land_proto_init() }

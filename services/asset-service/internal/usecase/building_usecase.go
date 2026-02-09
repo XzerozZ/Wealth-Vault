@@ -3,9 +3,11 @@ package usecase
 import (
 	"context"
 	"errors"
+	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -14,16 +16,18 @@ import (
 )
 
 type BuildingUsecase struct {
-	buildRepo repo.BuildingRepository
-	fileRepo  repo.FileRepository
-	storage   *utils.StorageClient
+	buildRepo  repo.BuildingRepository
+	fileRepo   repo.FileRepository
+	storage    *utils.StorageClient
+	userClient userPb.UserServiceClient
 }
 
-func NewBuildingUsecase(r repo.BuildingRepository, fr repo.FileRepository, s *utils.StorageClient) BuildingUsecase {
+func NewBuildingUsecase(r repo.BuildingRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) BuildingUsecase {
 	return BuildingUsecase{
-		buildRepo: r,
-		fileRepo:  fr,
-		storage:   s,
+		buildRepo:  r,
+		fileRepo:   fr,
+		storage:    s,
+		userClient: userClient,
 	}
 }
 
@@ -142,13 +146,36 @@ func (u *BuildingUsecase) GetBuildingByIDs(ctx context.Context, req *pb.GetBatch
 	}, nil
 }
 
-func (u *BuildingUsecase) GetBuildingByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.BuildingResponse, error) {
-	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
+func (u *BuildingUsecase) GetBatchBuildingByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.BuildingArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.buildRepo.GetBatchBuildingByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	building, err := u.buildRepo.GetBuildingByID(ctx, id, uid)
+	var pbBuildings []*pb.Building
+	for _, a := range bu {
+		pbBuildings = append(pbBuildings, mapper.ToBuildingProto(a))
+	}
+
+	return &pb.BuildingArrayResponse{
+		Building: pbBuildings,
+	}, nil
+}
+
+func (u *BuildingUsecase) GetBuildingByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.BuildingResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	building, err := u.buildRepo.GetBuildingByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +192,7 @@ func (u *BuildingUsecase) UpdateBuilding(ctx context.Context, req *pb.UpdateBuil
 		return nil, err
 	}
 
-	building, err := u.buildRepo.GetBuildingByID(ctx, id, uid)
+	building, err := u.buildRepo.GetBuildingByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -237,25 +264,43 @@ func (u *BuildingUsecase) DeleteBuilding(ctx context.Context, req *pb.DeleteAsse
 		return nil, err
 	}
 
-	existingAcc, err := u.buildRepo.GetBuildingByID(ctx, id, uid)
+	_, err = u.buildRepo.GetBuildingByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := u.buildRepo.DeleteBuilding(ctx, id, uid); err != nil {
+	if err := u.buildRepo.SoftDeleteBuilding(ctx, id, uid); err != nil {
 		return nil, err
-	}
-
-	if len(existingAcc.Files) > 0 {
-		fileURLs := make([]string, len(existingAcc.Files))
-		for i, f := range existingAcc.Files {
-			fileURLs[i] = f.Link
-		}
-
-		helper.DeleteFilesAsync(u.storage, fileURLs)
 	}
 
 	return &pb.DeleteAssetResponse{
 		Success: true,
 	}, nil
+}
+
+func (u *BuildingUsecase) CleanupExpiredBuildings(ctx context.Context) error {
+	cutoffTime := time.Now().AddDate(0, 0, -7)
+	expiredBuilding, err := u.buildRepo.GetExpiredBuilding(ctx, cutoffTime)
+	if err != nil {
+		return err
+	}
+
+	if len(expiredBuilding) == 0 {
+		return err
+	}
+
+	for _, b := range expiredBuilding {
+		helper.CleanupAssetResource(
+			ctx,
+			b.ID,
+			b.Files,
+			u.storage,
+			u.userClient,
+			func(id uuid.UUID) error {
+				return u.buildRepo.HardDeleteBuilding(ctx, id)
+			},
+		)
+	}
+
+	return nil
 }

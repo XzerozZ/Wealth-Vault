@@ -17,6 +17,7 @@ func ToCashProto(d *domain.Cash) *pb.Cash {
 		Files:       ToPbFiles(d.Files),
 		CreatedAt:   timestamppb.New(d.CreatedAt),
 		UpdatedAt:   timestamppb.New(d.UpdatedAt),
+		DeletedAt:   timestamppb.New(d.DeletedAt.Time),
 	}
 
 	return res

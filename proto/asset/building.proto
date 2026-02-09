@@ -32,6 +32,7 @@ message Building {
   google.protobuf.Timestamp updated_at = 11;
   repeated Reference ref = 12;
   repeated Reference ins = 13;
+  google.protobuf.Timestamp deleted_at = 20;
 }
 
 message CreateBuildingRequest { 

@@ -1,6 +1,8 @@
 package http
 
 import (
+	"encoding/json"
+	"log"
 	"wealth-vault/notification-service/internal/infra/socket"
 	"wealth-vault/notification-service/internal/usecase"
 
@@ -11,6 +13,11 @@ import (
 type Handler struct {
 	hub *socket.SocketHub
 	uc  *usecase.NotificationUsecase
+}
+
+type ClientCommand struct {
+	Action  string `json:"action"`
+	GroupID string `json:"group_id"`
 }
 
 func NewHandler(hub *socket.SocketHub, uc *usecase.NotificationUsecase) *Handler {
@@ -25,11 +32,34 @@ func (h *Handler) WebSocketEndpoint(c *websocket.Conn) {
 	}
 
 	h.hub.Register(userID, c)
-	defer func() { h.hub.Unregister(userID); c.Close() }()
+	defer func() {
+		h.hub.Unregister(userID)
+		c.Close()
+	}()
 
 	for {
-		if _, _, err := c.ReadMessage(); err != nil {
+		_, msg, err := c.ReadMessage()
+		if err != nil {
 			break
+		}
+
+		var cmd ClientCommand
+		if err := json.Unmarshal(msg, &cmd); err != nil {
+			log.Printf("⚠️ Invalid Command from %s: %v", userID, err)
+			continue
+		}
+
+		switch cmd.Action {
+		case "JOIN":
+			if cmd.GroupID != "" {
+				h.hub.JoinGroup(userID, cmd.GroupID)
+			}
+		case "LEAVE":
+			if cmd.GroupID != "" {
+				h.hub.LeaveGroup(userID, cmd.GroupID)
+			}
+		default:
+			log.Printf("⚠️ Unknown Action: %s", cmd.Action)
 		}
 	}
 }

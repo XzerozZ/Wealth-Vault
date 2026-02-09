@@ -85,3 +85,9 @@ type LiabilityDetail struct {
 	Principal float64 `json:"principal"`
 	TypeName  string  `json:"type"`
 }
+
+type DeletedDetail struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Message string `json:"message"`
+}

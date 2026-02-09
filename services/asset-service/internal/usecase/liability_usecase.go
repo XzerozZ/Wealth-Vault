@@ -7,6 +7,7 @@ import (
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -15,16 +16,18 @@ import (
 )
 
 type LiabilityUsecase struct {
-	liaRepo  repo.LiabilityRepository
-	fileRepo repo.FileRepository
-	storage  *utils.StorageClient
+	liaRepo    repo.LiabilityRepository
+	fileRepo   repo.FileRepository
+	storage    *utils.StorageClient
+	userClient userPb.UserServiceClient
 }
 
-func NewLiabilityUsecase(r repo.LiabilityRepository, fr repo.FileRepository, s *utils.StorageClient) LiabilityUsecase {
+func NewLiabilityUsecase(r repo.LiabilityRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) LiabilityUsecase {
 	return LiabilityUsecase{
-		liaRepo:  r,
-		fileRepo: fr,
-		storage:  s,
+		liaRepo:    r,
+		fileRepo:   fr,
+		storage:    s,
+		userClient: userClient,
 	}
 }
 
@@ -130,13 +133,36 @@ func (u *LiabilityUsecase) GetLiabilityByIDs(ctx context.Context, req *pb.GetBat
 	}, nil
 }
 
-func (u *LiabilityUsecase) GetLiabilityByID(ctx context.Context, req *pb.GetLiabilityByIDRequest) (*pb.LiabilityResponse, error) {
-	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
+func (u *LiabilityUsecase) GetBatchLiabilityByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LiabilityArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.liaRepo.GetBatchLiabilityByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	lia, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
+	var pbLia []*pb.Liability
+	for _, a := range bu {
+		pbLia = append(pbLia, mapper.ToLiabilityProto(a))
+	}
+
+	return &pb.LiabilityArrayResponse{
+		Liability: pbLia,
+	}, nil
+}
+
+func (u *LiabilityUsecase) GetLiabilityByID(ctx context.Context, req *pb.GetLiabilityByIDRequest) (*pb.LiabilityResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	lia, err := u.liaRepo.GetLiabilityByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +179,7 @@ func (u *LiabilityUsecase) UpdateLiability(ctx context.Context, req *pb.UpdateLi
 		return nil, err
 	}
 
-	lia, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
+	lia, err := u.liaRepo.GetLiabilityByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -192,25 +218,43 @@ func (u *LiabilityUsecase) DeleteLiability(ctx context.Context, req *pb.DeleteLi
 		return nil, err
 	}
 
-	existingCash, err := u.liaRepo.GetLiabilityByID(ctx, id, uid)
+	_, err = u.liaRepo.GetLiabilityByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := u.liaRepo.DeleteLiability(ctx, id, uid); err != nil {
+	if err := u.liaRepo.SoftDeleteLiability(ctx, id, uid); err != nil {
 		return nil, err
-	}
-
-	if len(existingCash.Files) > 0 {
-		fileURLs := make([]string, len(existingCash.Files))
-		for i, f := range existingCash.Files {
-			fileURLs[i] = f.Link
-		}
-
-		helper.DeleteFilesAsync(u.storage, fileURLs)
 	}
 
 	return &pb.DeleteLiabilityResponse{
 		Success: true,
 	}, nil
+}
+
+func (u *LiabilityUsecase) CleanupExpiredLiability(ctx context.Context) error {
+	cutoffTime := time.Now().AddDate(0, 0, -7)
+	GetExpiredLia, err := u.liaRepo.GetExpiredLiability(ctx, cutoffTime)
+	if err != nil {
+		return err
+	}
+
+	if len(GetExpiredLia) == 0 {
+		return err
+	}
+
+	for _, l := range GetExpiredLia {
+		helper.CleanupAssetResource(
+			ctx,
+			l.ID,
+			l.Files,
+			u.storage,
+			u.userClient,
+			func(id uuid.UUID) error {
+				return u.liaRepo.HardDeleteLiability(ctx, id)
+			},
+		)
+	}
+
+	return nil
 }

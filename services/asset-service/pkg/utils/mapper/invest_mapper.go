@@ -37,6 +37,7 @@ func ToInvestProto(d *domain.Investment) *pb.Investment {
 		Files:       ToPbFiles(d.Files),
 		CreatedAt:   timestamppb.New(d.CreatedAt),
 		UpdatedAt:   timestamppb.New(d.UpdatedAt),
+		DeletedAt:   timestamppb.New(d.DeletedAt.Time),
 	}
 
 	return res

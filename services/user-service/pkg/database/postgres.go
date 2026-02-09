@@ -38,6 +38,9 @@ func InitDB(config configs.PostgreSQL) {
 		&domain.FriendItem{},
 		&domain.EmailItem{},
 		&domain.GroupLog{},
+		&domain.FriendLog{},
+		&domain.PrivateMessage{},
+		&domain.GroupMessage{},
 	)
 
 	log.Println("Database connection established successfully!")

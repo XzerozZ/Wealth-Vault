@@ -3,9 +3,11 @@ package usecase
 import (
 	"context"
 	"errors"
+	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -14,16 +16,18 @@ import (
 )
 
 type LandUsecase struct {
-	landRepo repo.LandRepository
-	fileRepo repo.FileRepository
-	storage  *utils.StorageClient
+	landRepo   repo.LandRepository
+	fileRepo   repo.FileRepository
+	storage    *utils.StorageClient
+	userClient userPb.UserServiceClient
 }
 
-func NewLandUsecase(r repo.LandRepository, fr repo.FileRepository, s *utils.StorageClient) LandUsecase {
+func NewLandUsecase(r repo.LandRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) LandUsecase {
 	return LandUsecase{
-		landRepo: r,
-		fileRepo: fr,
-		storage:  s,
+		landRepo:   r,
+		fileRepo:   fr,
+		storage:    s,
+		userClient: userClient,
 	}
 }
 
@@ -127,13 +131,36 @@ func (u *LandUsecase) GetLandByIDs(ctx context.Context, req *pb.GetBatchIdsReque
 	}, nil
 }
 
-func (u *LandUsecase) GetLandByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.LandResponse, error) {
-	id, uid, err := utils.ValidateIDs(req.Id, req.UserId)
+func (u *LandUsecase) GetBatchLandByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LandArrayResponse, error) {
+	var ids []uuid.UUID
+	for _, idStr := range req.Ids {
+		if parsedID, err := uuid.Parse(idStr); err == nil {
+			ids = append(ids, parsedID)
+		}
+	}
+
+	bu, err := u.landRepo.GetBatchLandByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	land, err := u.landRepo.GetLandByID(ctx, id, uid)
+	var pbLand []*pb.Land
+	for _, a := range bu {
+		pbLand = append(pbLand, mapper.ToLandProto(a))
+	}
+
+	return &pb.LandArrayResponse{
+		Land: pbLand,
+	}, nil
+}
+
+func (u *LandUsecase) GetLandByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.LandResponse, error) {
+	id, err := uuid.Parse(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	land, err := u.landRepo.GetLandByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +177,7 @@ func (u *LandUsecase) UpdateLand(ctx context.Context, req *pb.UpdateLandRequest)
 		return nil, err
 	}
 
-	land, err := u.landRepo.GetLandByID(ctx, id, uid)
+	land, err := u.landRepo.GetLandByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -207,25 +234,43 @@ func (u *LandUsecase) DeleteLand(ctx context.Context, req *pb.DeleteAssetRequest
 		return nil, err
 	}
 
-	existingLand, err := u.landRepo.GetLandByID(ctx, id, uid)
+	_, err = u.landRepo.GetLandByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := u.landRepo.DeleteLand(ctx, id, uid); err != nil {
+	if err := u.landRepo.SoftDeleteLand(ctx, id, uid); err != nil {
 		return nil, err
-	}
-
-	if len(existingLand.Files) > 0 {
-		fileURLs := make([]string, len(existingLand.Files))
-		for i, f := range existingLand.Files {
-			fileURLs[i] = f.Link
-		}
-
-		helper.DeleteFilesAsync(u.storage, fileURLs)
 	}
 
 	return &pb.DeleteAssetResponse{
 		Success: true,
 	}, nil
+}
+
+func (u *LandUsecase) CleanupExpiredLand(ctx context.Context) error {
+	cutoffTime := time.Now().AddDate(0, 0, -7)
+	GetExpiredLand, err := u.landRepo.GetExpiredLand(ctx, cutoffTime)
+	if err != nil {
+		return err
+	}
+
+	if len(GetExpiredLand) == 0 {
+		return err
+	}
+
+	for _, l := range GetExpiredLand {
+		helper.CleanupAssetResource(
+			ctx,
+			l.ID,
+			l.Files,
+			u.storage,
+			u.userClient,
+			func(id uuid.UUID) error {
+				return u.landRepo.HardDeleteLand(ctx, id)
+			},
+		)
+	}
+
+	return nil
 }

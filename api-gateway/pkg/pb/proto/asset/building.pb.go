@@ -93,6 +93,7 @@ type Building struct {
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Ref           []*Reference           `protobuf:"bytes,12,rep,name=ref,proto3" json:"ref,omitempty"`
 	Ins           []*Reference           `protobuf:"bytes,13,rep,name=ins,proto3" json:"ins,omitempty"`
+	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -214,6 +215,13 @@ func (x *Building) GetRef() []*Reference {
 func (x *Building) GetIns() []*Reference {
 	if x != nil {
 		return x.Ins
+	}
+	return nil
+}
+
+func (x *Building) GetDeletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeletedAt
 	}
 	return nil
 }
@@ -550,7 +558,7 @@ var File_proto_asset_building_proto protoreflect.FileDescriptor
 
 const file_proto_asset_building_proto_rawDesc = "" +
 	"\n" +
-	"\x1aproto/asset/building.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1aproto/asset/location.proto\x1a\x16proto/asset/file.proto\"\xd0\x03\n" +
+	"\x1aproto/asset/building.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1aproto/asset/location.proto\x1a\x16proto/asset/file.proto\"\x8b\x04\n" +
 	"\bBuilding\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
@@ -567,7 +575,9 @@ const file_proto_asset_building_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\"\n" +
 	"\x03ref\x18\f \x03(\v2\x10.asset.ReferenceR\x03ref\x12\"\n" +
-	"\x03ins\x18\r \x03(\v2\x10.asset.ReferenceR\x03ins\"\xca\x02\n" +
+	"\x03ins\x18\r \x03(\v2\x10.asset.ReferenceR\x03ins\x129\n" +
+	"\n" +
+	"deleted_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\xca\x02\n" +
 	"\x15CreateBuildingRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -639,19 +649,20 @@ var file_proto_asset_building_proto_depIdxs = []int32{
 	8,  // 4: asset.Building.updated_at:type_name -> google.protobuf.Timestamp
 	9,  // 5: asset.Building.ref:type_name -> asset.Reference
 	9,  // 6: asset.Building.ins:type_name -> asset.Reference
-	0,  // 7: asset.CreateBuildingRequest.type:type_name -> asset.BuildingType
-	6,  // 8: asset.CreateBuildingRequest.location:type_name -> asset.Location
-	7,  // 9: asset.CreateBuildingRequest.new_files:type_name -> asset.FileInfo
-	1,  // 10: asset.UpdateBuildingRequest.building:type_name -> asset.Building
-	7,  // 11: asset.UpdateBuildingRequest.new_files:type_name -> asset.FileInfo
-	10, // 12: asset.UpdateBuildingRequest.update_mask:type_name -> google.protobuf.FieldMask
-	1,  // 13: asset.BuildingArrayResponse.building:type_name -> asset.Building
-	1,  // 14: asset.BuildingResponse.building:type_name -> asset.Building
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	8,  // 7: asset.Building.deleted_at:type_name -> google.protobuf.Timestamp
+	0,  // 8: asset.CreateBuildingRequest.type:type_name -> asset.BuildingType
+	6,  // 9: asset.CreateBuildingRequest.location:type_name -> asset.Location
+	7,  // 10: asset.CreateBuildingRequest.new_files:type_name -> asset.FileInfo
+	1,  // 11: asset.UpdateBuildingRequest.building:type_name -> asset.Building
+	7,  // 12: asset.UpdateBuildingRequest.new_files:type_name -> asset.FileInfo
+	10, // 13: asset.UpdateBuildingRequest.update_mask:type_name -> google.protobuf.FieldMask
+	1,  // 14: asset.BuildingArrayResponse.building:type_name -> asset.Building
+	1,  // 15: asset.BuildingResponse.building:type_name -> asset.Building
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_building_proto_init() }

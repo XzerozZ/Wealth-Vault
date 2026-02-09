@@ -20,19 +20,32 @@ type Group struct {
 type GroupMember struct {
 	GroupID  uuid.UUID `json:"id" gorm:"primaryKey;default:gen_random_uuid()"`
 	UserID   uuid.UUID `json:"user_id" gorm:"primaryKey;type:uuid"`
-	Role     string    `json:"role" gorm:"default:'member'"` // เช่น 'admin', 'member'
+	Role     string    `json:"role" gorm:"default:'member'"`
 	JoinedAt time.Time `json:"joined_at" gorm:"autoCreateTime"`
 	Group    Group     `gorm:"foreignKey:GroupID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	User     User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type GroupLog struct {
-	ID        uuid.UUID `json:"id" gorm:"primaryKey;default:gen_random_uuid()"`
-	GroupID   string    `json:"group_id" gorm:"not null"`
-	Messages  string    `json:"messages" gorm:"not null"`
-	CreatedBy string    `json:"created_by" gorm:"not null"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        uuid.UUID `gorm:"primaryKey;default:gen_random_uuid()"`
+	GroupID   uuid.UUID `gorm:"not null;index"`
+	LogType   string    `gorm:"not null;default:'SYSTEM'"`
+	Metadata  string    `json:"metadata" gorm:"type:jsonb;default:'{}'"`
+	Messages  string    `gorm:"not null"`
+	CreatedBy uuid.UUID `gorm:"not null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	User      User ` gorm:"foreignKey:CreatedBy;references:ID"`
+}
+
+type GroupMessage struct {
+	ID        uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	GroupID   uuid.UUID `gorm:"type:uuid;not null;index"`
+	SenderID  uuid.UUID `gorm:"type:uuid;not null;index"`
+	MsgType   string    `gorm:"type:varchar(20);default:'TEXT';not null"` // Type:"ASSET_CARD"
+	Content   string    `gorm:"type:text"`
+	Metadata  string    `json:"metadata" gorm:"type:jsonb;default:'{}'"`
+	CreatedAt time.Time `json:"created_at" gorm:"index"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Group     Group     `gorm:"foreignKey:GroupID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	User      User      `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Sender    *User     `json:"sender,omitempty" gorm:"foreignKey:SenderID"`
 }

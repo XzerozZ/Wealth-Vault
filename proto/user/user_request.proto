@@ -7,13 +7,18 @@ option go_package = "wealth-vault/pkg/pb";
 import "proto/user/user.proto";
 import "proto/user/group.proto";
 import "proto/user/share.proto";
+import "proto/user/message.proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
   rpc GetUser(GetUserByIDRequest) returns (UserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc GetFriendList(GetUserByIDRequest) returns (FriendListResponse);
+  rpc GetPendingRequests(GetUserByIDRequest) returns (FriendListResponse);
   rpc AddFriend(FriendRequest) returns (FriendResponse);
+  rpc AcceptFriend(AcceptFriendRequest) returns (FriendResponse);
+  rpc SetCloseFriend(SetCloseFriendRequest) returns (SetCloseFriendResponse);
+  rpc GetCloseFriends(GetCloseFriendsRequest) returns (GetCloseFriendsResponse);
 
   rpc CreateGroup(CreateGroupRequest) returns (GroupResponse);
   rpc GetGroup(GetGroupRequest) returns (GroupResponse);
@@ -21,10 +26,18 @@ service UserService {
   rpc UpdateGroup(UpdateGroupRequest) returns (GroupResponse);
   rpc AddGroupMember(AddMemberRequest) returns (ActionResponse);
   rpc GrantGroupItemAccess(GrantAccessRequest) returns (ActionResponse);
+  rpc RemoveMember(RemoveMemberRequest) returns (ActionResponse);
+  rpc LeaveGroup(LeaveGroupRequest) returns (ActionResponse);
+  rpc DeleteGroup(DeleteGroupRequest) returns (ActionResponse);
 
   rpc ShareItem(ShareItemRequest) returns (ShareItemResponse);
   rpc GetSharedItem(GetGroupItemsRequest) returns (GetGroupItemsResponse);
   rpc GetSharedIteminFriend(GetFriendItemRequest) returns (GetFriendItemsResponse);
   rpc UnsharedItem(UnshareItemRequest) returns (ShareItemResponse);
   rpc UnsharedIteminFriend(UnshareItemRequest) returns (ShareItemResponse);
+  rpc DeleteAllReferencesByEntityID(DeleteByEntityRequest) returns (DeleteByEntityResponse);
+  rpc GetItemSharedTargets(GetItemSharedTargetsRequest) returns (GetItemSharedTargetsResponse);
+
+  rpc GetGroupMessages(GetGroupMessagesRequest) returns (GetGroupMessagesResponse);
+  rpc GetPrivateMessages(GetPrivateMessagesRequest) returns (GetPrivateMessagesResponse);
 }
