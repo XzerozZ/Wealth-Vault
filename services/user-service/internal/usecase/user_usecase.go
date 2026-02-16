@@ -103,7 +103,9 @@ func (u *UserUsecase) GetFriendList(ctx context.Context, req *pb.GetUserByIDRequ
 
 	var friends []*pb.User
 	for _, item := range friendLists {
-		friends = append(friends, utils.ToUserProto(&item.Friend))
+		friendProto := utils.ToUserProto(&item.Friend)
+		friendProto.IsCloseFriend = item.IsCloseFriend
+		friends = append(friends, friendProto)
 	}
 
 	return &pb.FriendListResponse{

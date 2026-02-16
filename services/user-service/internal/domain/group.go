@@ -49,3 +49,8 @@ type GroupMessage struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	Sender    *User     `json:"sender,omitempty" gorm:"foreignKey:SenderID"`
 }
+
+type GroupWithCount struct {
+	Group       `gorm:"embedded"`
+	MemberCount int64
+}

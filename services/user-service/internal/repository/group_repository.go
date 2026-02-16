@@ -88,6 +88,25 @@ func (r *GroupRepository) GetGroup(ctx context.Context, id uuid.UUID) (*domain.G
 	return &group, total, nil
 }
 
+func (r *GroupRepository) AllGetGroup(ctx context.Context, uid uuid.UUID) ([]domain.GroupWithCount, error) {
+	var results []domain.GroupWithCount
+	err := r.db.WithContext(ctx).
+		Table("groups g").
+		Select(`
+			g.*,
+			(SELECT COUNT(*) FROM group_members WHERE group_id = g.id) as member_count
+		`).
+		Joins("JOIN group_members gm ON gm.group_id = g.id").
+		Where("gm.user_id = ?", uid).
+		Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
 func (r *GroupRepository) IsUserMember(ctx context.Context, id uuid.UUID, userID uuid.UUID) (bool, error) {
 	var count int64
 	err := r.db.WithContext(ctx).

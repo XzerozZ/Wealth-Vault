@@ -11,6 +11,7 @@ type Investment struct {
 	BrokerName   string     `json:"broker_name"`
 	Quantity     float64    `json:"quantity"`
 	CostPerPrice float64    `json:"cost_per_price"`
+	Amount       float64    `json:"amount"`
 	Description  string     `json:"description,omitempty"`
 	Files        []FileInfo `json:"files,omitempty"`
 	CreatedAt    time.Time  `json:"created_at"`
@@ -24,6 +25,7 @@ type CreateInvestmentRequest struct {
 	BrokerName   string `json:"broker_name" form:"broker_name"`
 	Quantity     string `json:"quantity" form:"quantity"`
 	CostPerPrice string `json:"cost_per_price" form:"cost_per_price"`
+	Amount       string `json:"amount" form:"amount"`
 	Description  string `json:"desc"    form:"description"`
 }
 
@@ -33,6 +35,7 @@ type UpdateInvestmentRequest struct {
 	BrokerName    string   `json:"broker_name" form:"broker_name" mask:"broker_name"`
 	Quantity      string   `json:"quantity" form:"quantity"  mask:"quantity"`
 	CostPerPrice  string   `json:"cost_per_price" form:"cost_per_price"  mask:"cost_per_price"`
+	Amount        string   `json:"amount" form:"amount"  mask:"amount"`
 	Type          string   `json:"type"    form:"type" mask:"type"`
 	Description   string   `json:"description"    form:"description"    mask:"description"`
 	DeleteFileIDs []string `json:"delete_file_ids" form:"delete_file_ids"`

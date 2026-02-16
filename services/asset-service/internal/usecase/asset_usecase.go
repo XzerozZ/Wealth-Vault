@@ -5,6 +5,7 @@ import (
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 	"wealth-vault/asset-service/pkg/utils"
+	"wealth-vault/asset-service/pkg/utils/mapper"
 
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
@@ -145,4 +146,39 @@ func (u *AssetUsecase) GetAllAssetIDs(ctx context.Context, req *pb.GetMyAssetsRe
 	}
 
 	return resp, nil
+}
+
+func (u *AssetUsecase) GetAllAssets(ctx context.Context, req *pb.GetAllAssetsRequest) (*pb.GetAllAssetsResponse, error) {
+	uid, _ := uuid.Parse(req.UserId)
+	assets, err := u.r.GetAllAssets(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	pbAssets := mapper.ToAssetSummaryProtoList(assets)
+	return &pb.GetAllAssetsResponse{
+		Assets: pbAssets,
+	}, nil
+}
+
+func (u *AssetUsecase) GetNetWorth(ctx context.Context, req *pb.GetNetWorthRequest) (*pb.GetNetWorthResponse, error) {
+	uid, _ := uuid.Parse(req.UserId)
+
+	count, err := u.r.GetAssetCount(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	overview, err := u.r.GetNetWorthOverview(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	netWorth := overview.TotalAssets - overview.TotalLiabilities
+	return &pb.GetNetWorthResponse{
+		ItemCount:        count,
+		AssetsValue:      overview.TotalAssets,
+		LiabilitiesValue: overview.TotalLiabilities,
+		NetWorth:         netWorth,
+	}, nil
 }

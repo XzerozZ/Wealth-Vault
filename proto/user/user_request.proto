@@ -17,10 +17,12 @@ service UserService {
   rpc GetPendingRequests(GetUserByIDRequest) returns (FriendListResponse);
   rpc AddFriend(FriendRequest) returns (FriendResponse);
   rpc AcceptFriend(AcceptFriendRequest) returns (FriendResponse);
+  rpc GetItemsSharedByFriend(GetItemsSharedByFriendRequest) returns (GetItemsSharedByFriendResponse);
   rpc SetCloseFriend(SetCloseFriendRequest) returns (SetCloseFriendResponse);
   rpc GetCloseFriends(GetCloseFriendsRequest) returns (GetCloseFriendsResponse);
 
   rpc CreateGroup(CreateGroupRequest) returns (GroupResponse);
+  rpc GetAllGroup(AllGroupRequest) returns (AllGroupResponse);
   rpc GetGroup(GetGroupRequest) returns (GroupResponse);
   rpc GetMember(GetGroupMembersRequest) returns (GetGroupMembersResponse);
   rpc UpdateGroup(UpdateGroupRequest) returns (GroupResponse);
@@ -37,7 +39,8 @@ service UserService {
   rpc UnsharedIteminFriend(UnshareItemRequest) returns (ShareItemResponse);
   rpc DeleteAllReferencesByEntityID(DeleteByEntityRequest) returns (DeleteByEntityResponse);
   rpc GetItemSharedTargets(GetItemSharedTargetsRequest) returns (GetItemSharedTargetsResponse);
-
+  rpc GetSharedItemIDs(GetSharedItemIDsRequest) returns (GetSharedItemIDsResponse);
+  
   rpc GetGroupMessages(GetGroupMessagesRequest) returns (GetGroupMessagesResponse);
   rpc GetPrivateMessages(GetPrivateMessagesRequest) returns (GetPrivateMessagesResponse);
 }

@@ -19,3 +19,11 @@ func ValidateIDs(idStr, uidStr string) (uuid.UUID, uuid.UUID, error) {
 
 	return id, uid, nil
 }
+
+func ParseID(idStr string) (uuid.UUID, error) {
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return uuid.Nil, errors.New("invalid id format")
+	}
+	return id, nil
+}

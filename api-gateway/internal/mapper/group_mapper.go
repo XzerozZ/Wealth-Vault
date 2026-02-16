@@ -20,3 +20,19 @@ func ToGroupDomain(p *pb.Group) *domain.Group {
 		UpdatedAt:    p.UpdatedAt.AsTime(),
 	}
 }
+
+func ToGroupList(pbList []*pb.Group) []domain.Group {
+	if pbList == nil {
+		return []domain.Group{}
+	}
+
+	entities := make([]domain.Group, 0, len(pbList))
+
+	for _, pbItem := range pbList {
+		if item := ToGroupDomain(pbItem); item != nil {
+			entities = append(entities, *item)
+		}
+	}
+
+	return entities
+}

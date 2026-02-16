@@ -114,6 +114,32 @@ func (h *GroupHandler) GetMember(c *fiber.Ctx) error {
 	})
 }
 
+func (h *GroupHandler) AllGetGroup(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.GetAllGroup(ctx, &pb.AllGroupRequest{
+		UserId: userID,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	groupInfo := mapper.ToGroupList(res.Group)
+
+	return c.JSON(fiber.Map{
+		"status": "get group success",
+		"data":   groupInfo,
+	})
+}
+
 func (h *GroupHandler) GetGroup(c *fiber.Ctx) error {
 	id := c.Params("id")
 	userID, ok := c.Locals("user_id").(string)
@@ -337,6 +363,32 @@ func (h *GroupHandler) GrantAccess(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "grant access success",
+		"data":    res.Success,
+	})
+}
+
+func (h *GroupHandler) DeleteGroup(c *fiber.Ctx) error {
+	id := c.Params("id")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.DeleteGroup(ctx, &pb.DeleteGroupRequest{
+		GroupId: id,
+		UserId:  userID,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "delete group success",
 		"data":    res.Success,
 	})
 }

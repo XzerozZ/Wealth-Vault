@@ -94,10 +94,11 @@ type Investment struct {
 	BrokerName    string                 `protobuf:"bytes,6,opt,name=broker_name,json=brokerName,proto3" json:"broker_name,omitempty"`
 	Quantity      float64                `protobuf:"fixed64,7,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	CostPrice     float64                `protobuf:"fixed64,8,opt,name=cost_price,json=costPrice,proto3" json:"cost_price,omitempty"`
-	Description   string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
-	Files         []*FileInfo            `protobuf:"bytes,10,rep,name=files,proto3" json:"files,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Amount        float64                `protobuf:"fixed64,9,opt,name=amount,proto3" json:"amount,omitempty"`
+	Description   string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+	Files         []*FileInfo            `protobuf:"bytes,11,rep,name=files,proto3" json:"files,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	DeletedAt     *timestamppb.Timestamp `protobuf:"bytes,20,opt,name=deleted_at,json=deletedAt,proto3" json:"deleted_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -189,6 +190,13 @@ func (x *Investment) GetCostPrice() float64 {
 	return 0
 }
 
+func (x *Investment) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
+}
+
 func (x *Investment) GetDescription() string {
 	if x != nil {
 		return x.Description
@@ -233,8 +241,9 @@ type CreateInvestmentRequest struct {
 	BrokerName    string                 `protobuf:"bytes,5,opt,name=broker_name,json=brokerName,proto3" json:"broker_name,omitempty"`
 	Quantity      float64                `protobuf:"fixed64,6,opt,name=quantity,proto3" json:"quantity,omitempty"`
 	CostPrice     float64                `protobuf:"fixed64,7,opt,name=cost_price,json=costPrice,proto3" json:"cost_price,omitempty"`
-	Description   string                 `protobuf:"bytes,8,opt,name=description,proto3" json:"description,omitempty"`
-	NewFiles      []*FileInfo            `protobuf:"bytes,9,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
+	Amount        float64                `protobuf:"fixed64,8,opt,name=amount,proto3" json:"amount,omitempty"`
+	Description   string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
+	NewFiles      []*FileInfo            `protobuf:"bytes,10,rep,name=new_files,json=newFiles,proto3" json:"new_files,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -314,6 +323,13 @@ func (x *CreateInvestmentRequest) GetQuantity() float64 {
 func (x *CreateInvestmentRequest) GetCostPrice() float64 {
 	if x != nil {
 		return x.CostPrice
+	}
+	return 0
+}
+
+func (x *CreateInvestmentRequest) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
 	}
 	return 0
 }
@@ -516,7 +532,7 @@ var File_proto_asset_investment_proto protoreflect.FileDescriptor
 
 const file_proto_asset_investment_proto_rawDesc = "" +
 	"\n" +
-	"\x1cproto/asset/investment.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xe2\x03\n" +
+	"\x1cproto/asset/investment.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x16proto/asset/file.proto\"\xfa\x03\n" +
 	"\n" +
 	"Investment\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
@@ -528,16 +544,17 @@ const file_proto_asset_investment_proto_rawDesc = "" +
 	"brokerName\x12\x1a\n" +
 	"\bquantity\x18\a \x01(\x01R\bquantity\x12\x1d\n" +
 	"\n" +
-	"cost_price\x18\b \x01(\x01R\tcostPrice\x12 \n" +
-	"\vdescription\x18\t \x01(\tR\vdescription\x12%\n" +
-	"\x05files\x18\n" +
-	" \x03(\v2\x0f.asset.FileInfoR\x05files\x129\n" +
+	"cost_price\x18\b \x01(\x01R\tcostPrice\x12\x16\n" +
+	"\x06amount\x18\t \x01(\x01R\x06amount\x12 \n" +
+	"\vdescription\x18\n" +
+	" \x01(\tR\vdescription\x12%\n" +
+	"\x05files\x18\v \x03(\v2\x0f.asset.FileInfoR\x05files\x129\n" +
 	"\n" +
-	"created_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
+	"updated_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x129\n" +
 	"\n" +
-	"deleted_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\xb5\x02\n" +
+	"deleted_at\x18\x14 \x01(\v2\x1a.google.protobuf.TimestampR\tdeletedAt\"\xcd\x02\n" +
 	"\x17CreateInvestmentRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
@@ -547,9 +564,11 @@ const file_proto_asset_investment_proto_rawDesc = "" +
 	"brokerName\x12\x1a\n" +
 	"\bquantity\x18\x06 \x01(\x01R\bquantity\x12\x1d\n" +
 	"\n" +
-	"cost_price\x18\a \x01(\x01R\tcostPrice\x12 \n" +
-	"\vdescription\x18\b \x01(\tR\vdescription\x12,\n" +
-	"\tnew_files\x18\t \x03(\v2\x0f.asset.FileInfoR\bnewFiles\"\xe7\x01\n" +
+	"cost_price\x18\a \x01(\x01R\tcostPrice\x12\x16\n" +
+	"\x06amount\x18\b \x01(\x01R\x06amount\x12 \n" +
+	"\vdescription\x18\t \x01(\tR\vdescription\x12,\n" +
+	"\tnew_files\x18\n" +
+	" \x03(\v2\x0f.asset.FileInfoR\bnewFiles\"\xe7\x01\n" +
 	"\x17UpdateInvestmentRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12)\n" +
 	"\x06invest\x18\x02 \x01(\v2\x11.asset.InvestmentR\x06invest\x12,\n" +

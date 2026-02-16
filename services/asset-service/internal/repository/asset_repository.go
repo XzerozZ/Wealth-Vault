@@ -44,3 +44,118 @@ func (r *AssetRepository) CheckExists(ctx context.Context, entityType string, id
 	}
 	return count > 0, nil
 }
+
+func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, error) {
+	var assets []domain.AssetSummary
+
+	query := `
+		-- 1. Account
+		SELECT id, 'account' as type, name, amount as value, created_at 
+		FROM accounts WHERE user_id = ? AND deleted_at IS NULL
+
+		UNION ALL
+
+		-- 2. Building
+		SELECT id, 'building' as type, name, amount as value, created_at 
+		FROM buildings WHERE user_id = ? AND deleted_at IS NULL
+
+		UNION ALL
+
+		-- 3. Cash
+		SELECT id, 'cash' as type, name, amount as value, created_at 
+		FROM cashes WHERE user_id = ? AND deleted_at IS NULL
+
+		UNION ALL
+
+		-- 4. Insurance 
+		SELECT id, 'insurance' as type, name, 0 as value, created_at 
+		FROM insurances WHERE user_id = ? AND deleted_at IS NULL
+
+		UNION ALL
+
+		-- 5. Investment
+		SELECT id, 'investment' as type, name, amount as value, created_at 
+		FROM investments WHERE user_id = ? AND deleted_at IS NULL
+
+		UNION ALL
+
+		-- 6. Land
+		SELECT id, 'land' as type, name, amount as value, created_at 
+		FROM lands WHERE user_id = ? AND deleted_at IS NULL
+
+		UNION ALL
+
+		-- 7. Liability (Value = Principal)
+		SELECT id, 'liability' as type, name, principal as value, created_at 
+		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL
+
+		ORDER BY created_at DESC
+	`
+
+	err := r.db.WithContext(ctx).Raw(query, uid, uid, uid, uid, uid, uid, uid).Scan(&assets).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return assets, nil
+}
+
+func (r *AssetRepository) GetAssetCount(ctx context.Context, uid uuid.UUID) (int64, error) {
+	var count int64
+
+	query := `
+		SELECT (
+			-- 1. Account
+			(SELECT COUNT(*) FROM accounts WHERE user_id = ? AND deleted_at IS NULL) +
+
+			-- 2. Building
+			(SELECT COUNT(*) FROM buildings WHERE user_id = ? AND deleted_at IS NULL) +
+
+			-- 3. Cash
+			(SELECT COUNT(*) FROM cashes WHERE user_id = ? AND deleted_at IS NULL) +
+
+			-- 4. Investment
+			(SELECT COUNT(*) FROM investments WHERE user_id = ? AND deleted_at IS NULL) +
+
+			-- 5. Land
+			(SELECT COUNT(*) FROM lands WHERE user_id = ? AND deleted_at IS NULL) +
+
+			-- 6. Liability (นับเฉพาะที่ไม่ใช่ Expense)
+			(SELECT COUNT(*) FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense')
+			
+		) as total_count
+	`
+
+	err := r.db.WithContext(ctx).Raw(query, uid, uid, uid, uid, uid, uid).Scan(&count).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (r *AssetRepository) GetNetWorthOverview(ctx context.Context, uid uuid.UUID) (*domain.NetWorthOverview, error) {
+	var result domain.NetWorthOverview
+
+	query := `
+		SELECT 
+			(
+				COALESCE((SELECT SUM(amount) FROM accounts WHERE user_id = ? AND deleted_at IS NULL), 0) +
+				COALESCE((SELECT SUM(amount) FROM buildings WHERE user_id = ? AND deleted_at IS NULL), 0) +
+				COALESCE((SELECT SUM(amount) FROM cashes WHERE user_id = ? AND deleted_at IS NULL), 0) +
+				COALESCE((SELECT SUM(amount) FROM investments WHERE user_id = ? AND deleted_at IS NULL), 0) +
+				COALESCE((SELECT SUM(amount) FROM lands WHERE user_id = ? AND deleted_at IS NULL), 0)
+			) as total_assets,
+
+			COALESCE((SELECT SUM(principal) FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense'), 0) as total_liabilities
+	`
+
+	err := r.db.WithContext(ctx).Raw(query, uid, uid, uid, uid, uid, uid).Scan(&result).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}

@@ -31,6 +31,12 @@ type FriendItemResponse struct {
 	AssetDetail interface{} `json:"asset_detail"`
 }
 
+type FriendItemPreviewResponse struct {
+	ItemID      string      `json:"item_id"`
+	Type        string      `json:"type"`
+	AssetDetail interface{} `json:"asset_detail"`
+}
+
 type BuildingDetail struct {
 	ID           string  `json:"id"`
 	Name         string  `json:"name"`
@@ -90,4 +96,39 @@ type DeletedDetail struct {
 	ID      string `json:"id"`
 	Name    string `json:"name"`
 	Message string `json:"message"`
+}
+
+type SharedTargetsResponse struct {
+	Groups  []SharedGroupTarget  `json:"groups"`
+	Friends []SharedFriendTarget `json:"friends"`
+	Emails  []SharedEmailTarget  `json:"emails"`
+}
+
+type SharedGroupTarget struct {
+	GroupID     string    `json:"group_id"`
+	GroupName   string    `json:"group_name"`
+	GroupImage  string    `json:"group_image"`
+	MemberCount int64     `json:"member_count"`
+	SharedAt    time.Time `json:"shared_at"`
+}
+
+type SharedFriendTarget struct {
+	FriendID     string    `json:"friend_id"`
+	Username     string    `json:"username"`
+	ProfileImage string    `json:"profile_image"`
+	SharedAt     time.Time `json:"shared_at"`
+}
+
+type SharedEmailTarget struct {
+	Email    string    `json:"email"`
+	SharedAt time.Time `json:"shared_at"`
+	IsSent   bool      `json:"is_sent"`
+}
+
+type AssetSelection struct {
+	ID       string  `json:"id"`
+	Type     string  `json:"type"`
+	Name     string  `json:"name"`
+	Value    float64 `json:"value"`
+	IsShared bool    `json:"is_shared"`
 }

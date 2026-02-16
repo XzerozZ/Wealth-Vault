@@ -86,6 +86,15 @@ func (h *UserGRPCHandler) GetMember(ctx context.Context, req *pb.GetGroupMembers
 	return res, nil
 }
 
+func (h *UserGRPCHandler) GetAllGroup(ctx context.Context, req *pb.AllGroupRequest) (*pb.AllGroupResponse, error) {
+	res, err := h.gusecase.AllGetGroup(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (h *UserGRPCHandler) GetGroup(ctx context.Context, req *pb.GetGroupRequest) (*pb.GroupResponse, error) {
 	res, err := h.gusecase.GetGroup(ctx, req)
 	if err != nil {
@@ -241,6 +250,42 @@ func (h *UserGRPCHandler) GetGroupMessages(ctx context.Context, req *pb.GetGroup
 
 func (h *UserGRPCHandler) GetPrivateMessages(ctx context.Context, req *pb.GetPrivateMessagesRequest) (*pb.GetPrivateMessagesResponse, error) {
 	res, err := h.musecase.GetPrivateMessages(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetItemSharedTargets(ctx context.Context, req *pb.GetItemSharedTargetsRequest) (*pb.GetItemSharedTargetsResponse, error) {
+	res, err := h.giusecase.GetItemSharedTargets(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetSharedItemIDs(ctx context.Context, req *pb.GetSharedItemIDsRequest) (*pb.GetSharedItemIDsResponse, error) {
+	res, err := h.giusecase.GetSharedItemIDs(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) GetItemsSharedByFriend(ctx context.Context, req *pb.GetItemsSharedByFriendRequest) (*pb.GetItemsSharedByFriendResponse, error) {
+	res, err := h.giusecase.GetItemsSharedByFriend(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) DeleteGroup(ctx context.Context, req *pb.DeleteGroupRequest) (*pb.ActionResponse, error) {
+	res, err := h.gusecase.DeleteGroup(ctx, req)
 	if err != nil {
 		return nil, err
 	}

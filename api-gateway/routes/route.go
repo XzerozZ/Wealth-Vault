@@ -25,6 +25,7 @@ func Setup(
 	groupitemHandler *handlers.GroupItemHandler,
 	notificationHandler *handlers.NotificationHandler,
 	msgHandler *handlers.MessageHandler,
+	infoHandler *handlers.InfoHandler,
 ) {
 	api := app.Group("/api")
 
@@ -41,6 +42,7 @@ func Setup(
 	api.Post("/friend", middleware.JWTMiddleware(jwt), userHandler.AddFriend)
 	api.Post("/friend/accept", middleware.JWTMiddleware(jwt), userHandler.AcceptFriend)
 	api.Get("/friend", middleware.JWTMiddleware(jwt), userHandler.GetFriendList)
+	api.Get("/friend/:id/profile", middleware.JWTMiddleware(jwt), userHandler.GetFriendProfile)
 	api.Get("/friend/pending", middleware.JWTMiddleware(jwt), userHandler.GetPendingRequests)
 	api.Post("/closefriend", middleware.JWTMiddleware(jwt), userHandler.ToggleCloseFriend)
 	api.Get("/closefriend", middleware.JWTMiddleware(jwt), userHandler.GetCloseFriends)
@@ -50,10 +52,14 @@ func Setup(
 	api.Delete("/group/:id/removemember", middleware.JWTMiddleware(jwt), groupHandler.RemoveMember)
 	api.Delete("/group/:id/leave", middleware.JWTMiddleware(jwt), groupHandler.LeaveGroup)
 
+	api.Get("/dashboard", middleware.JWTMiddleware(jwt), infoHandler.Dashboard)
+
 	api.Post("/group", middleware.JWTMiddleware(jwt), groupHandler.CreateGroup)
+	api.Get("/group", middleware.JWTMiddleware(jwt), groupHandler.AllGetGroup)
 	api.Get("/group/detail/:id", middleware.JWTMiddleware(jwt), groupHandler.GetGroup)
 	api.Get("/group/member/:id", middleware.JWTMiddleware(jwt), groupHandler.GetMember)
 	api.Patch("/group/:id", middleware.JWTMiddleware(jwt), groupHandler.UpdateGroup)
+	api.Delete("/group/:id", middleware.JWTMiddleware(jwt), groupHandler.DeleteGroup)
 	api.Post("/share/item", middleware.JWTMiddleware(jwt), groupitemHandler.ShareItem)
 	api.Get("/group/:id/item", middleware.JWTMiddleware(jwt), groupitemHandler.GetGroupItems)
 	api.Delete("/group/item/:id", middleware.JWTMiddleware(jwt), groupitemHandler.UnsharedItem)
@@ -100,6 +106,9 @@ func Setup(
 	api.Get("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.GetLiabilityByID)
 	api.Patch("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.UpdateLiability)
 	api.Delete("/lia/:id", middleware.JWTMiddleware(jwt), liaHandler.DeleteLiability)
+
+	api.Get("/share/item/:type/:id/shared-targets", middleware.JWTMiddleware(jwt), groupitemHandler.GetItemSharedTargets)
+	api.Get("share/:type/:id/selection", middleware.JWTMiddleware(jwt), groupitemHandler.GetItemsForSelection)
 
 	api.Get("/ws", middleware.TokenFromQuery, middleware.JWTMiddleware(jwt), websocket.New(notificationHandler.ProxyWebSocket))
 	api.All("/notifications/*", middleware.JWTMiddleware(jwt), notificationHandler.ProxyAPI)

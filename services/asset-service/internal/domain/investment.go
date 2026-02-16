@@ -27,6 +27,7 @@ type Investment struct {
 	BrokerName   string         `gorm:"not null"`
 	Quantity     float64        `gorm:"not null;default:0"`
 	CostPerPrice float64        `gorm:"not null;default:0"`
+	Amount       float64        `gorm:"not null;default:0"`
 	Description  string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time

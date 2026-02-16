@@ -223,6 +223,45 @@ func (h *UserHandler) AcceptFriend(c *fiber.Ctx) error {
 	})
 }
 
+func (h *UserHandler) GetFriendProfile(c *fiber.Ctx) error {
+	targetID := c.Params("id")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	shareRes, err := h.client.GetItemsSharedByFriend(c.Context(), &pb.GetItemsSharedByFriendRequest{
+		UserId:   userID,
+		FriendId: targetID,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch shared items IDs: " + err.Error()})
+	}
+
+	res, err := h.client.GetUser(ctx, &pb.GetUserByIDRequest{
+		Id: targetID,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	userInfo := mapper.ToUserDomain(res.User)
+	itemInfo := mapper.MapAllFriendItemsToDomain(shareRes.AssetDetail)
+
+	return c.JSON(fiber.Map{
+		"status": "get userInfo success",
+		"data": fiber.Map{
+			"user_info":    userInfo,
+			"item_preview": itemInfo,
+		},
+	})
+}
+
 func (h *UserHandler) GetFriendList(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {

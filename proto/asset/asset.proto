@@ -4,6 +4,8 @@ package asset;
 
 option go_package = "wealth-vault/pkg/pb";
 
+import "google/protobuf/timestamp.proto";
+
 // ------Request/Response------
 message GetAssetRequest {
   string user_id = 1; 
@@ -23,9 +25,10 @@ message GetNetWorthRequest {
 }
 
 message GetNetWorthResponse { 
-    double total_assets = 1; 
-    double total_liabilities = 2; 
-    double net_worth = 3; 
+  int64 item_count = 1;
+  double assets_value = 2; 
+  double liabilities_value = 3; 
+  double net_worth = 4; 
 }
 
 message DeleteAssetRequest {
@@ -59,4 +62,20 @@ message GetMyAssetsResponse {
   repeated string investment_ids = 5;
   repeated string land_ids = 6;
   repeated string liability_ids = 7;
+}
+
+message AssetSummary {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  double value = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+message GetAllAssetsRequest {
+  string user_id = 1; 
+}
+
+message GetAllAssetsResponse {
+  repeated AssetSummary assets = 1;
 }

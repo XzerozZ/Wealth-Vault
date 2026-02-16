@@ -3,10 +3,12 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 	"wealth-vault/user-service/internal/domain"
 
 	"github.com/google/uuid"
+	"golang.org/x/sync/errgroup"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -276,4 +278,103 @@ func (r *ShareItemRepository) DeleteAllReferencesByEntityID(ctx context.Context,
 
 		return nil
 	})
+}
+
+func (r *ShareItemRepository) GetItemSharedTargets(ctx context.Context, userID, itemID uuid.UUID, itemType string) (*domain.SharedTargetsResult, error) {
+	result := &domain.SharedTargetsResult{
+		Groups:  make([]domain.SharedGroupTarget, 0),
+		Friends: make([]domain.SharedFriendTarget, 0),
+		Emails:  make([]domain.SharedEmailTarget, 0),
+	}
+
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		query := `
+			groups.id as group_id, 
+			groups.group_name as group_name, 
+			groups.group_profile as group_image, 
+			group_items.share_at as shared_at,
+			(SELECT COUNT(*) FROM group_members WHERE group_members.group_id = groups.id) as member_count
+		`
+
+		return r.db.WithContext(ctx).
+			Table("group_items").
+			Select(query).
+			Joins("JOIN groups ON groups.id = group_items.group_id").
+			Where("group_items.owner_id = ? AND group_items.entity_id = ? AND group_items.entity_type = ?", userID, itemID, itemType).
+			Scan(&result.Groups).Error
+	})
+
+	g.Go(func() error {
+		return r.db.WithContext(ctx).
+			Table("friend_items").
+			Select("users.id as friend_id, users.username, users.profile, friend_items.share_at as shared_at").
+			Joins("JOIN users ON users.id = friend_items.friend_id").
+			Where("friend_items.owner_id = ? AND friend_items.entity_id = ? AND friend_items.entity_type = ?", userID, itemID, itemType).
+			Scan(&result.Friends).Error
+	})
+
+	g.Go(func() error {
+		return r.db.WithContext(ctx).
+			Table("email_items").
+			Select("DISTINCT ON (email) email, share_at as shared_at, is_sent").
+			Where("owner_id = ? AND entity_id = ? AND entity_type = ?", userID, itemID, itemType).
+			Order("email, share_at DESC").
+			Scan(&result.Emails).Error
+	})
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func (r *ShareItemRepository) GetSharedItemIDs(ctx context.Context, userID, targetID uuid.UUID, targetType string) ([]string, error) {
+	var ids []string
+	var err error
+
+	normalizedType := strings.ToUpper(targetType)
+	if normalizedType == "GROUP" {
+		if err = r.db.WithContext(ctx).Table("group_items").
+			Where("owner_id = ? AND group_id = ?", userID, targetID).
+			Pluck("entity_id", &ids).Error; err != nil {
+			return nil, err
+		}
+	} else if normalizedType == "FRIEND" {
+		if err = r.db.WithContext(ctx).
+			Table("friend_items").
+			Where("owner_id = ? AND friend_id = ?", userID, targetID).
+			Pluck("entity_id", &ids).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return ids, nil
+}
+
+func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUserID, friendID uuid.UUID) ([]domain.SharedItemSummary, error) {
+	var items []domain.SharedItemSummary
+
+	query := `
+		SELECT entity_id, entity_type 
+		FROM friend_items 
+		WHERE owner_id = ? AND friend_id = ? 
+
+		UNION
+
+		SELECT entity_id, entity_type 
+		FROM group_items 
+		WHERE owner_id = ? 
+		AND group_id IN (
+			SELECT group_id FROM group_members WHERE user_id = ?
+		)
+	`
+
+	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, friendID, myUserID).Scan(&items).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return items, nil
 }

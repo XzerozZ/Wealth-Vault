@@ -27,10 +27,11 @@ message Investment {
   string broker_name = 6;
   double quantity = 7;
   double cost_price = 8;
-  string description = 9;
-  repeated FileInfo files = 10;
-  google.protobuf.Timestamp created_at = 11;
-  google.protobuf.Timestamp updated_at = 12;
+  double amount = 9 ;
+  string description = 10;
+  repeated FileInfo files = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
   google.protobuf.Timestamp deleted_at = 20;
 }
 
@@ -42,8 +43,9 @@ message CreateInvestmentRequest {
   string broker_name = 5;
   double quantity = 6;
   double cost_price = 7;
-  string description = 8;
-  repeated FileInfo new_files = 9;
+   double amount = 8 ;
+  string description = 9;
+  repeated FileInfo new_files = 10;
 }
 
 message UpdateInvestmentRequest{

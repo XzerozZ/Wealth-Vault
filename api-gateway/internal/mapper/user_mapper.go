@@ -23,6 +23,7 @@ func ToUserDomain(p *pb.User) *domain.User {
 		SharedEnabled: &p.Sharedenabled,
 		CreatedAt:     p.CreatedAt.AsTime(),
 		UpdatedAt:     p.UpdatedAt.AsTime(),
+		IsClose:       p.IsCloseFriend,
 	}
 }
 

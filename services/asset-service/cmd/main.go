@@ -14,6 +14,7 @@ import (
 	"wealth-vault/asset-service/pkg/database"
 	assetpb "wealth-vault/asset-service/pkg/pb/proto/asset"
 	storageclient "wealth-vault/asset-service/pkg/utils"
+	"wealth-vault/asset-service/pkg/utils/helper"
 
 	"google.golang.org/grpc"
 )
@@ -54,9 +55,12 @@ func main() {
 	fileRepo := repo.NewFileRepository(db)
 	liaRepo := repo.NewLiabilityRepository(db)
 
+	// ------ Helper ------
+	assetHelper := helper.NewAssetHelper(fileRepo, supabaseClient, userClient)
+
 	// ------ Usecase ------
 	assUC := usecase.NewAssetUsecase(accRepo, buRepo, cashRepo, insRepo, inRepo, landRepo, liaRepo, assRepo)
-	accUC := usecase.NewAccountUsecase(accRepo, fileRepo, supabaseClient, userClient)
+	accUC := usecase.NewAccountUsecase(accRepo, assetHelper)
 	cashUC := usecase.NewCashUsecase(cashRepo, fileRepo, supabaseClient, userClient)
 	inUC := usecase.NewInvestmentUsecase(inRepo, fileRepo, supabaseClient, userClient)
 	buUC := usecase.NewBuildingUsecase(buRepo, fileRepo, supabaseClient, userClient)

@@ -132,6 +132,26 @@ func (u *GroupUsecase) GetGroup(ctx context.Context, req *pb.GetGroupRequest) (*
 	}, nil
 }
 
+func (u *GroupUsecase) AllGetGroup(ctx context.Context, req *pb.AllGroupRequest) (*pb.AllGroupResponse, error) {
+	userID, _ := uuid.Parse(req.UserId)
+	group, err := u.groupRepo.AllGetGroup(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pbGroups []*pb.Group
+
+	for _, item := range group {
+		pbGroup := utils.ToGroupProto(&item.Group)
+		pbGroup.MemberCount = item.MemberCount
+		pbGroups = append(pbGroups, pbGroup)
+	}
+
+	return &pb.AllGroupResponse{
+		Group: pbGroups,
+	}, nil
+}
+
 func (u *GroupUsecase) UpdateGroup(ctx context.Context, req *pb.UpdateGroupRequest) (*pb.GroupResponse, error) {
 	groupID, _ := uuid.Parse(req.Id)
 	userID, _ := uuid.Parse(req.UserId)

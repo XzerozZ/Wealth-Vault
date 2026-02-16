@@ -38,7 +38,7 @@ func (h *InvestmentHandler) CreateInvestment(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	var quantity, cost float64
+	var quantity, cost, amount float64
 	var err error
 	if req.Quantity != "" {
 		quantity, err = utils.Parseamount(req.Quantity)
@@ -49,6 +49,13 @@ func (h *InvestmentHandler) CreateInvestment(c *fiber.Ctx) error {
 
 	if req.CostPerPrice != "" {
 		cost, err = utils.Parseamount(req.CostPerPrice)
+		if err != nil {
+			return err
+		}
+	}
+
+	if req.Amount != "" {
+		amount, err = utils.Parseamount(req.Amount)
 		if err != nil {
 			return err
 		}
@@ -79,6 +86,7 @@ func (h *InvestmentHandler) CreateInvestment(c *fiber.Ctx) error {
 		BrokerName:  req.BrokerName,
 		Quantity:    quantity,
 		CostPrice:   cost,
+		Amount:      amount,
 		Description: req.Description,
 		NewFiles:    pbFiles,
 	}
@@ -174,7 +182,7 @@ func (h *InvestmentHandler) UpdateInvestment(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	var quantity, cost float64
+	var quantity, cost, amount float64
 	if req.Quantity != "" {
 		quantity, err = utils.Parseamount(req.Quantity)
 		if err != nil {
@@ -184,6 +192,13 @@ func (h *InvestmentHandler) UpdateInvestment(c *fiber.Ctx) error {
 
 	if req.CostPerPrice != "" {
 		cost, err = utils.Parseamount(req.CostPerPrice)
+		if err != nil {
+			return err
+		}
+	}
+
+	if req.Amount != "" {
+		amount, err = utils.Parseamount(req.Amount)
 		if err != nil {
 			return err
 		}
@@ -216,6 +231,7 @@ func (h *InvestmentHandler) UpdateInvestment(c *fiber.Ctx) error {
 			BrokerName:  req.BrokerName,
 			Quantity:    quantity,
 			CostPrice:   cost,
+			Amount:      amount,
 			Description: req.Description,
 		},
 		UpdateMask: &fieldmaskpb.FieldMask{

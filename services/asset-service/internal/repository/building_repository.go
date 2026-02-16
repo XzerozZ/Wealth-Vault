@@ -152,6 +152,7 @@ func (r *BuildingRepository) GetExpiredBuilding(ctx context.Context, olderThan t
 func (r *BuildingRepository) HardDeleteBuilding(ctx context.Context, id uuid.UUID) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var building domain.Building
+
 		if err := tx.Unscoped().First(&building, "id = ?", id).Error; err != nil {
 			return err
 		}
@@ -168,7 +169,11 @@ func (r *BuildingRepository) HardDeleteBuilding(ctx context.Context, id uuid.UUI
 			return err
 		}
 
-		if err := tx.Unscoped().Select("Location").Delete(&building).Error; err != nil {
+		if err := tx.Unscoped().Delete(&building).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Unscoped().Delete(&domain.Location{}, building.LocationID).Error; err != nil {
 			return err
 		}
 

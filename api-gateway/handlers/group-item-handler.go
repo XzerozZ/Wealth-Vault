@@ -2,21 +2,29 @@ package handlers
 
 import (
 	"context"
+	"net/http"
+	"strings"
 	"time"
 	"wealth-vault/api-gateway/internal/domain"
 	"wealth-vault/api-gateway/internal/mapper"
+	assetpb "wealth-vault/api-gateway/pkg/pb/proto/asset"
 	pb "wealth-vault/api-gateway/pkg/pb/proto/user"
 	"wealth-vault/api-gateway/pkg/utils/helper"
 
 	"github.com/gofiber/fiber/v2"
+	"golang.org/x/sync/errgroup"
 )
 
 type GroupItemHandler struct {
-	client pb.UserServiceClient
+	client      pb.UserServiceClient
+	assetClient assetpb.AssetServiceClient
 }
 
-func NewGroupItemHandler(c pb.UserServiceClient) *GroupItemHandler {
-	return &GroupItemHandler{client: c}
+func NewGroupItemHandler(c pb.UserServiceClient, ac assetpb.AssetServiceClient) *GroupItemHandler {
+	return &GroupItemHandler{
+		client:      c,
+		assetClient: ac,
+	}
 }
 
 func (h *GroupItemHandler) ShareItem(c *fiber.Ctx) error {
@@ -151,5 +159,93 @@ func (h *GroupItemHandler) UnsharedIteminFriend(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data": res.Finish,
+	})
+}
+
+func (h *GroupItemHandler) GetItemSharedTargets(c *fiber.Ctx) error {
+	itemType := c.Params("type")
+	itemID := c.Params("id")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	res, err := h.client.GetItemSharedTargets(c.Context(), &pb.GetItemSharedTargetsRequest{
+		UserId:   userID,
+		ItemId:   itemID,
+		ItemType: itemType,
+	})
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	dtoResponse := mapper.ToSharedTargetsResponse(res)
+
+	return c.JSON(dtoResponse)
+}
+
+func (h *GroupItemHandler) GetItemsForSelection(c *fiber.Ctx) error {
+	targetID := c.Params("id")
+	targetType := c.Params("type")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	var (
+		assetRes  *assetpb.GetAllAssetsResponse
+		sharedRes *pb.GetSharedItemIDsResponse
+	)
+
+	g, ctx := errgroup.WithContext(c.Context())
+	g.Go(func() error {
+		var err error
+		assetRes, err = h.assetClient.GetAllAssets(ctx, &assetpb.GetAllAssetsRequest{
+			UserId: userID,
+		})
+		return err
+	})
+
+	g.Go(func() error {
+		var err error
+		sharedRes, err = h.client.GetSharedItemIDs(ctx, &pb.GetSharedItemIDsRequest{
+			UserId:     userID,
+			TargetId:   targetID,
+			TargetType: targetType,
+		})
+		return err
+	})
+
+	if err := g.Wait(); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch data: " + err.Error()})
+	}
+
+	sharedMap := make(map[string]bool)
+	for _, id := range sharedRes.ItemIds {
+		sharedMap[strings.ToLower(id)] = true
+	}
+
+	var response []domain.AssetSelection
+	for _, asset := range assetRes.Assets {
+		isShared := false
+		if _, exists := sharedMap[strings.ToLower(asset.Id)]; exists {
+			isShared = true
+		}
+
+		response = append(response, domain.AssetSelection{
+			ID:       asset.Id,
+			Type:     asset.Type,
+			Name:     asset.Name,
+			Value:    asset.Value,
+			IsShared: isShared,
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"items": response,
 	})
 }
