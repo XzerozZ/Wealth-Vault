@@ -91,10 +91,11 @@ type SharedTargetsResult struct {
 }
 
 type SharedGroupTarget struct {
-	GroupID    string
-	GroupName  string
-	GroupImage string
-	SharedAt   time.Time
+	GroupID     string
+	GroupName   string
+	GroupImage  string
+	MemberCount int64
+	SharedAt    time.Time
 }
 
 type SharedFriendTarget struct {

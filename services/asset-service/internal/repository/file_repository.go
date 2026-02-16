@@ -16,8 +16,10 @@ func NewFileRepository(db *gorm.DB) *FileRepository {
 	return &FileRepository{db: db}
 }
 
-func (r *FileRepository) DeleteFiles(ctx context.Context, fileIDs []string, entityType uuid.UUID, userID uuid.UUID) error {
-	if err := r.db.WithContext(ctx).Where("id IN ? AND entity_type = ? AND user_id = ?", fileIDs, entityType, userID).Delete(&domain.FileAssociate{}).Error; err != nil {
+func (r *FileRepository) DeleteFiles(ctx context.Context, fileIDs []uuid.UUID) error {
+	if err := r.db.WithContext(ctx).Unscoped().
+		Where("id IN ?", fileIDs).
+		Delete(&domain.FileAssociate{}).Error; err != nil {
 		return err
 	}
 

@@ -9,6 +9,6 @@ import (
 
 type FileRepository interface {
 	CreateFiles(ctx context.Context, files []domain.FileAssociate) error
-	DeleteFiles(ctx context.Context, fileIDs []string, entityType uuid.UUID, userID uuid.UUID) error
+	DeleteFiles(ctx context.Context, fileIDs []uuid.UUID) error
 	GetFilesByIDs(ctx context.Context, ids []uuid.UUID) ([]domain.FileAssociate, error)
 }

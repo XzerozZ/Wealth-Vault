@@ -1070,3 +1070,87 @@ func (u *ShareItemUsecase) BatchShareAssets(ctx context.Context, req domain.Batc
 
 	return nil
 }
+
+func (u *ShareItemUsecase) GetItemSharedTargets(ctx context.Context, req *pb.GetItemSharedTargetsRequest) (*pb.GetItemSharedTargetsResponse, error) {
+	itemId, _ := uuid.Parse(req.ItemId)
+	userId, _ := uuid.Parse(req.UserId)
+
+	targets, err := u.itemRepo.GetItemSharedTargets(ctx, userId, itemId, req.ItemType)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &pb.GetItemSharedTargetsResponse{}
+	for _, g := range targets.Groups {
+		resp.Groups = append(resp.Groups, &pb.SharedGroupInfo{
+			GroupId:     g.GroupID,
+			GroupName:   g.GroupName,
+			GroupImage:  g.GroupImage,
+			MemberCount: g.MemberCount,
+			SharedAt:    timestamppb.New(g.SharedAt),
+		})
+	}
+
+	for _, f := range targets.Friends {
+		resp.Friends = append(resp.Friends, &pb.SharedFriendInfo{
+			FriendId:     f.FriendID,
+			Username:     f.Username,
+			ProfileImage: f.ProfileImage,
+			SharedAt:     timestamppb.New(f.SharedAt),
+		})
+	}
+
+	for _, e := range targets.Emails {
+		resp.Emails = append(resp.Emails, &pb.SharedEmailInfo{
+			Email:    e.Email,
+			SharedAt: timestamppb.New(e.SharedAt),
+			IsSent:   e.IsSent,
+		})
+	}
+
+	return resp, nil
+}
+
+func (u *ShareItemUsecase) GetSharedItemIDs(ctx context.Context, req *pb.GetSharedItemIDsRequest) (*pb.GetSharedItemIDsResponse, error) {
+	userID, _ := uuid.Parse(req.UserId)
+	targetID, _ := uuid.Parse(req.TargetId)
+
+	ids, err := u.itemRepo.GetSharedItemIDs(ctx, userID, targetID, req.TargetType)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetSharedItemIDsResponse{
+		ItemIds: ids,
+	}, nil
+}
+
+func (u *ShareItemUsecase) GetItemsSharedByFriend(ctx context.Context, req *pb.GetItemsSharedByFriendRequest) (*pb.GetItemsSharedByFriendResponse, error) {
+	uid, _ := uuid.Parse(req.UserId)
+	friendID, _ := uuid.Parse(req.FriendId)
+
+	items, err := u.itemRepo.GetItemsSharedByFriend(ctx, uid, friendID)
+	if err != nil {
+		return nil, err
+	}
+
+	previewMap, err := u.fetchAssetPreviews(ctx, items)
+	if err != nil {
+		return nil, err
+	}
+
+	var responseItems []*pb.SharedAssetPreview
+	for _, item := range items {
+		if preview, ok := previewMap[item.EntityID]; ok {
+			responseItems = append(responseItems, &pb.SharedAssetPreview{
+				Id:          item.EntityID,
+				Type:        item.EntityType,
+				AssetDetail: preview,
+			})
+		}
+	}
+
+	return &pb.GetItemsSharedByFriendResponse{
+		AssetDetail: responseItems,
+	}, nil
+}

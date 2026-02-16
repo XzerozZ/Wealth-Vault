@@ -29,6 +29,14 @@ message GroupResponse {
   Group group = 1;
 }
 
+message AllGroupRequest{
+  string user_id = 1;
+}
+
+message AllGroupResponse {
+  repeated Group group = 1;
+}
+
 message GetGroupMembersRequest {
   string group_id = 1;
   string user_id = 2;

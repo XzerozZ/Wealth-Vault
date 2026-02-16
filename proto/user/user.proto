@@ -20,6 +20,7 @@ message User {
   bool sharedenabled = 10;
   google.protobuf.Timestamp created_at = 11;
   google.protobuf.Timestamp updated_at = 12;
+  bool is_close_friend = 13;
 }
 
 message CreateUserRequest {

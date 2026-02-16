@@ -75,4 +75,5 @@ service AssetService {
 
   rpc GetNetWorth(GetNetWorthRequest) returns (GetNetWorthResponse);
   rpc GetAllAssetIDs(GetMyAssetsRequest) returns (GetMyAssetsResponse);
+  rpc GetAllAssets(GetAllAssetsRequest) returns (GetAllAssetsResponse);
 }

@@ -9,6 +9,7 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -208,9 +209,10 @@ func (x *GetNetWorthRequest) GetUserId() string {
 
 type GetNetWorthResponse struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	TotalAssets      float64                `protobuf:"fixed64,1,opt,name=total_assets,json=totalAssets,proto3" json:"total_assets,omitempty"`
-	TotalLiabilities float64                `protobuf:"fixed64,2,opt,name=total_liabilities,json=totalLiabilities,proto3" json:"total_liabilities,omitempty"`
-	NetWorth         float64                `protobuf:"fixed64,3,opt,name=net_worth,json=netWorth,proto3" json:"net_worth,omitempty"`
+	ItemCount        int64                  `protobuf:"varint,1,opt,name=item_count,json=itemCount,proto3" json:"item_count,omitempty"`
+	AssetsValue      float64                `protobuf:"fixed64,2,opt,name=assets_value,json=assetsValue,proto3" json:"assets_value,omitempty"`
+	LiabilitiesValue float64                `protobuf:"fixed64,3,opt,name=liabilities_value,json=liabilitiesValue,proto3" json:"liabilities_value,omitempty"`
+	NetWorth         float64                `protobuf:"fixed64,4,opt,name=net_worth,json=netWorth,proto3" json:"net_worth,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -245,16 +247,23 @@ func (*GetNetWorthResponse) Descriptor() ([]byte, []int) {
 	return file_proto_asset_asset_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *GetNetWorthResponse) GetTotalAssets() float64 {
+func (x *GetNetWorthResponse) GetItemCount() int64 {
 	if x != nil {
-		return x.TotalAssets
+		return x.ItemCount
 	}
 	return 0
 }
 
-func (x *GetNetWorthResponse) GetTotalLiabilities() float64 {
+func (x *GetNetWorthResponse) GetAssetsValue() float64 {
 	if x != nil {
-		return x.TotalLiabilities
+		return x.AssetsValue
+	}
+	return 0
+}
+
+func (x *GetNetWorthResponse) GetLiabilitiesValue() float64 {
+	if x != nil {
+		return x.LiabilitiesValue
 	}
 	return 0
 }
@@ -602,11 +611,175 @@ func (x *GetMyAssetsResponse) GetLiabilityIds() []string {
 	return nil
 }
 
+type AssetSummary struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Value         float64                `protobuf:"fixed64,4,opt,name=value,proto3" json:"value,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AssetSummary) Reset() {
+	*x = AssetSummary{}
+	mi := &file_proto_asset_asset_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AssetSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AssetSummary) ProtoMessage() {}
+
+func (x *AssetSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AssetSummary.ProtoReflect.Descriptor instead.
+func (*AssetSummary) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AssetSummary) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AssetSummary) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *AssetSummary) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AssetSummary) GetValue() float64 {
+	if x != nil {
+		return x.Value
+	}
+	return 0
+}
+
+func (x *AssetSummary) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+type GetAllAssetsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllAssetsRequest) Reset() {
+	*x = GetAllAssetsRequest{}
+	mi := &file_proto_asset_asset_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllAssetsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllAssetsRequest) ProtoMessage() {}
+
+func (x *GetAllAssetsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllAssetsRequest.ProtoReflect.Descriptor instead.
+func (*GetAllAssetsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetAllAssetsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetAllAssetsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Assets        []*AssetSummary        `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllAssetsResponse) Reset() {
+	*x = GetAllAssetsResponse{}
+	mi := &file_proto_asset_asset_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllAssetsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllAssetsResponse) ProtoMessage() {}
+
+func (x *GetAllAssetsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_asset_asset_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllAssetsResponse.ProtoReflect.Descriptor instead.
+func (*GetAllAssetsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_asset_asset_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetAllAssetsResponse) GetAssets() []*AssetSummary {
+	if x != nil {
+		return x.Assets
+	}
+	return nil
+}
+
 var File_proto_asset_asset_proto protoreflect.FileDescriptor
 
 const file_proto_asset_asset_proto_rawDesc = "" +
 	"\n" +
-	"\x17proto/asset/asset.proto\x12\x05asset\"*\n" +
+	"\x17proto/asset/asset.proto\x12\x05asset\x1a\x1fgoogle/protobuf/timestamp.proto\"*\n" +
 	"\x0fGetAssetRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\">\n" +
 	"\x13GetAssetByIDRequest\x12\x0e\n" +
@@ -615,11 +788,13 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\x12GetBatchIdsRequest\x12\x10\n" +
 	"\x03ids\x18\x01 \x03(\tR\x03ids\"-\n" +
 	"\x12GetNetWorthRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"\x82\x01\n" +
-	"\x13GetNetWorthResponse\x12!\n" +
-	"\ftotal_assets\x18\x01 \x01(\x01R\vtotalAssets\x12+\n" +
-	"\x11total_liabilities\x18\x02 \x01(\x01R\x10totalLiabilities\x12\x1b\n" +
-	"\tnet_worth\x18\x03 \x01(\x01R\bnetWorth\"=\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"\xa1\x01\n" +
+	"\x13GetNetWorthResponse\x12\x1d\n" +
+	"\n" +
+	"item_count\x18\x01 \x01(\x03R\titemCount\x12!\n" +
+	"\fassets_value\x18\x02 \x01(\x01R\vassetsValue\x12+\n" +
+	"\x11liabilities_value\x18\x03 \x01(\x01R\x10liabilitiesValue\x12\x1b\n" +
+	"\tnet_worth\x18\x04 \x01(\x01R\bnetWorth\"=\n" +
 	"\x12DeleteAssetRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\"/\n" +
@@ -641,7 +816,18 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\rinsurance_ids\x18\x04 \x03(\tR\finsuranceIds\x12%\n" +
 	"\x0einvestment_ids\x18\x05 \x03(\tR\rinvestmentIds\x12\x19\n" +
 	"\bland_ids\x18\x06 \x03(\tR\alandIds\x12#\n" +
-	"\rliability_ids\x18\a \x03(\tR\fliabilityIdsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\rliability_ids\x18\a \x03(\tR\fliabilityIds\"\x97\x01\n" +
+	"\fAssetSummary\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
+	"\x05value\x18\x04 \x01(\x01R\x05value\x129\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\".\n" +
+	"\x13GetAllAssetsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"C\n" +
+	"\x14GetAllAssetsResponse\x12+\n" +
+	"\x06assets\x18\x01 \x03(\v2\x13.asset.AssetSummaryR\x06assetsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_asset_asset_proto_rawDescOnce sync.Once
@@ -655,26 +841,32 @@ func file_proto_asset_asset_proto_rawDescGZIP() []byte {
 	return file_proto_asset_asset_proto_rawDescData
 }
 
-var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_proto_asset_asset_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_proto_asset_asset_proto_goTypes = []any{
-	(*GetAssetRequest)(nil),     // 0: asset.GetAssetRequest
-	(*GetAssetByIDRequest)(nil), // 1: asset.GetAssetByIDRequest
-	(*GetBatchIdsRequest)(nil),  // 2: asset.GetBatchIdsRequest
-	(*GetNetWorthRequest)(nil),  // 3: asset.GetNetWorthRequest
-	(*GetNetWorthResponse)(nil), // 4: asset.GetNetWorthResponse
-	(*DeleteAssetRequest)(nil),  // 5: asset.DeleteAssetRequest
-	(*DeleteAssetResponse)(nil), // 6: asset.DeleteAssetResponse
-	(*CheckAssetRequest)(nil),   // 7: asset.CheckAssetRequest
-	(*CheckAssetResponse)(nil),  // 8: asset.CheckAssetResponse
-	(*GetMyAssetsRequest)(nil),  // 9: asset.GetMyAssetsRequest
-	(*GetMyAssetsResponse)(nil), // 10: asset.GetMyAssetsResponse
+	(*GetAssetRequest)(nil),       // 0: asset.GetAssetRequest
+	(*GetAssetByIDRequest)(nil),   // 1: asset.GetAssetByIDRequest
+	(*GetBatchIdsRequest)(nil),    // 2: asset.GetBatchIdsRequest
+	(*GetNetWorthRequest)(nil),    // 3: asset.GetNetWorthRequest
+	(*GetNetWorthResponse)(nil),   // 4: asset.GetNetWorthResponse
+	(*DeleteAssetRequest)(nil),    // 5: asset.DeleteAssetRequest
+	(*DeleteAssetResponse)(nil),   // 6: asset.DeleteAssetResponse
+	(*CheckAssetRequest)(nil),     // 7: asset.CheckAssetRequest
+	(*CheckAssetResponse)(nil),    // 8: asset.CheckAssetResponse
+	(*GetMyAssetsRequest)(nil),    // 9: asset.GetMyAssetsRequest
+	(*GetMyAssetsResponse)(nil),   // 10: asset.GetMyAssetsResponse
+	(*AssetSummary)(nil),          // 11: asset.AssetSummary
+	(*GetAllAssetsRequest)(nil),   // 12: asset.GetAllAssetsRequest
+	(*GetAllAssetsResponse)(nil),  // 13: asset.GetAllAssetsResponse
+	(*timestamppb.Timestamp)(nil), // 14: google.protobuf.Timestamp
 }
 var file_proto_asset_asset_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	14, // 0: asset.AssetSummary.created_at:type_name -> google.protobuf.Timestamp
+	11, // 1: asset.GetAllAssetsResponse.assets:type_name -> asset.AssetSummary
+	2,  // [2:2] is the sub-list for method output_type
+	2,  // [2:2] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_asset_proto_init() }
@@ -688,7 +880,7 @@ func file_proto_asset_asset_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_asset_asset_proto_rawDesc), len(file_proto_asset_asset_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

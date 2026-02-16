@@ -71,7 +71,7 @@ func (r *AccountRepository) GetAccountByUserID(ctx context.Context, uid uuid.UUI
 
 func (r *AccountRepository) UpdateAccount(ctx context.Context, item *domain.Account) (*domain.Account, error) {
 	return item, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(item).Error; err != nil {
+		if err := tx.Model(item).Omit("Files").Updates(item).Error; err != nil {
 			return err
 		}
 

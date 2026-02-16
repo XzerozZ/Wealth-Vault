@@ -30,6 +30,7 @@ func ToInvestDomain(p *pb.Investment) *domain.Investment {
 		BrokerName:   p.BrokerName,
 		Quantity:     p.Quantity,
 		CostPerPrice: p.CostPrice,
+		Amount:       p.Amount,
 		Description:  p.Description,
 		UserID:       p.UserId,
 		Files:        domainFiles,

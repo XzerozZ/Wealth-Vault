@@ -17,4 +17,7 @@ type GroupItemUsecase interface {
 	ProcessScheduledEmails(ctx context.Context) error
 	DeleteAllReferencesByEntityID(ctx context.Context, req *pb.DeleteByEntityRequest) (*pb.DeleteByEntityResponse, error)
 	BatchShareAssets(ctx context.Context, req domain.BatchShareRequest) error
+	GetItemSharedTargets(ctx context.Context, req *pb.GetItemSharedTargetsRequest) (*pb.GetItemSharedTargetsResponse, error)
+	GetSharedItemIDs(ctx context.Context, req *pb.GetSharedItemIDsRequest) (*pb.GetSharedItemIDsResponse, error)
+	GetItemsSharedByFriend(ctx context.Context, req *pb.GetItemsSharedByFriendRequest) (*pb.GetItemsSharedByFriendResponse, error)
 }

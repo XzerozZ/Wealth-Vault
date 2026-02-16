@@ -82,7 +82,8 @@ message SharedGroupInfo {
   string group_id = 1;
   string group_name = 2;
   string group_image = 3;
-  google.protobuf.Timestamp shared_at = 4; 
+  int64 member_count = 4;
+  google.protobuf.Timestamp shared_at = 5; 
 }
 
 message SharedFriendInfo {
@@ -102,4 +103,29 @@ message GetItemSharedTargetsResponse {
   repeated SharedGroupInfo groups = 1;
   repeated SharedFriendInfo friends = 2;
   repeated SharedEmailInfo emails = 3;
+}
+
+message GetSharedItemIDsRequest {
+  string user_id = 1;
+  string target_id = 2;
+  string target_type = 3;
+}
+
+message GetSharedItemIDsResponse {
+  repeated string item_ids = 1;
+}
+
+message GetItemsSharedByFriendRequest {
+  string user_id = 1;  
+  string friend_id = 2;
+}
+
+message SharedAssetPreview {
+  string id = 1;
+  string type = 2; 
+  AssetPreview asset_detail = 3;
+}
+
+message GetItemsSharedByFriendResponse {
+  repeated SharedAssetPreview asset_detail = 1; 
 }

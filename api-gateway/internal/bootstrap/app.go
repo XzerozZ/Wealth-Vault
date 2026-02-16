@@ -54,9 +54,11 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 	insHandler := handlers.NewInsuranceHandler(assetClient, supabaseClient)
 	liaHandler := handlers.NewLiabilityHandler(assetClient, supabaseClient)
 	groupHandler := handlers.NewGroupHandler(userClient, supabaseClient)
-	groupItemHandler := handlers.NewGroupItemHandler(userClient)
+	groupItemHandler := handlers.NewGroupItemHandler(userClient, assetClient)
 	notificationHandler := handlers.NewNotificationHandler(cfg)
 	msgHandler := handlers.NewMessageHandlerr(userClient)
+	infoHandler := handlers.NewInfoHandler(assetClient)
+
 	// ---------- routes ----------
 	routes.Setup(app,
 		cfg.JWT,
@@ -73,6 +75,7 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 		groupItemHandler,
 		notificationHandler,
 		msgHandler,
+		infoHandler,
 	)
 
 	return app

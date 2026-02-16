@@ -2,12 +2,10 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
-	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -16,54 +14,24 @@ import (
 )
 
 type AccountUsecase struct {
-	accRepo    repo.AccountRepository
-	fileRepo   repo.FileRepository
-	storage    *utils.StorageClient
-	userClient userPb.UserServiceClient
+	accRepo     repo.AccountRepository
+	assetHelper helper.AssetHelper
 }
 
-func NewAccountUsecase(r repo.AccountRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) AccountUsecase {
+func NewAccountUsecase(r repo.AccountRepository, ah helper.AssetHelper) AccountUsecase {
 	return AccountUsecase{
-		accRepo:    r,
-		fileRepo:   fr,
-		storage:    s,
-		userClient: userClient,
+		accRepo:     r,
+		assetHelper: ah,
 	}
 }
 
 func (u *AccountUsecase) CreateAccount(ctx context.Context, req *pb.CreateAccountRequest) (*pb.AccountResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
+	uid, err := utils.ParseID(req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
-	accType := domain.BankTypeSavings
-	if val, ok := helper.ProtoToDomainAccType[req.Type]; ok {
-		accType = val
-	}
-
-	var domainFiles []domain.FileAssociate
-	if len(req.NewFiles) > 0 {
-		for _, f := range req.NewFiles {
-			domainFiles = append(domainFiles, domain.FileAssociate{
-				Link:     f.Url,
-				FileType: f.FileType,
-				UserID:   userID,
-			})
-		}
-	}
-
-	acc := &domain.Account{
-		UserID:      userID,
-		Name:        req.Name,
-		Amount:      req.Amount,
-		BankName:    req.BankName,
-		BankAccount: req.BankAcc,
-		Type:        accType,
-		Description: req.Description,
-		Files:       domainFiles,
-	}
-
+	acc := mapper.ToAccountDomain(req, uid)
 	if err := u.accRepo.CreateAccount(ctx, acc); err != nil {
 		return nil, err
 	}
@@ -74,9 +42,9 @@ func (u *AccountUsecase) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 }
 
 func (u *AccountUsecase) GetAccount(ctx context.Context, req *pb.GetAssetRequest) (*pb.AccountArrayResponse, error) {
-	uid, err := uuid.Parse(req.UserId)
+	uid, err := utils.ParseID(req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	accounts, err := u.accRepo.GetAccount(ctx, uid)
@@ -84,14 +52,9 @@ func (u *AccountUsecase) GetAccount(ctx context.Context, req *pb.GetAssetRequest
 		return nil, err
 	}
 
-	var AccountList []*pb.Account
-	for _, item := range accounts {
-		AccountList = append(AccountList, mapper.ToBankProto(item))
-	}
-
 	return &pb.AccountArrayResponse{
 		Success: true,
-		Account: AccountList,
+		Account: mapper.ToBankProtoSlice(accounts),
 	}, nil
 }
 
@@ -108,13 +71,8 @@ func (u *AccountUsecase) GetAccountByIDs(ctx context.Context, req *pb.GetBatchId
 		return nil, err
 	}
 
-	var pbAccounts []*pb.Account
-	for _, a := range acc {
-		pbAccounts = append(pbAccounts, mapper.ToBankProto(a))
-	}
-
 	return &pb.AccountArrayResponse{
-		Account: pbAccounts,
+		Account: mapper.ToBankProtoSlice(acc),
 	}, nil
 }
 
@@ -131,18 +89,13 @@ func (u *AccountUsecase) GetBatchAccountByIDs(ctx context.Context, req *pb.GetBa
 		return nil, err
 	}
 
-	var pbAccounts []*pb.Account
-	for _, a := range acc {
-		pbAccounts = append(pbAccounts, mapper.ToBankProto(a))
-	}
-
 	return &pb.AccountArrayResponse{
-		Account: pbAccounts,
+		Account: mapper.ToBankProtoSlice(acc),
 	}, nil
 }
 
 func (u *AccountUsecase) GetAccountByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.AccountResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, err := utils.ParseID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -174,6 +127,7 @@ func (u *AccountUsecase) UpdateAccount(ctx context.Context, req *pb.UpdateAccoun
 	}
 
 	syncParams := domain.FileSyncParams{
+		Ctx:           ctx,
 		UserID:        uid,
 		EntityID:      id,
 		EntityType:    "account",
@@ -181,8 +135,7 @@ func (u *AccountUsecase) UpdateAccount(ctx context.Context, req *pb.UpdateAccoun
 		DeleteFileIDs: req.DeleteFileIds,
 	}
 
-	err = helper.SyncEntityFiles(ctx, u.fileRepo, u.storage, syncParams)
-	if err != nil {
+	if err := u.assetHelper.SyncFiles(ctx, syncParams); err != nil {
 		return nil, err
 	}
 
@@ -203,8 +156,7 @@ func (u *AccountUsecase) DeleteAccount(ctx context.Context, req *pb.DeleteAssetR
 		return nil, err
 	}
 
-	_, err = u.accRepo.GetAccountByID(ctx, id)
-	if err != nil {
+	if _, err = u.accRepo.GetAccountByID(ctx, id); err != nil {
 		return nil, err
 	}
 
@@ -218,27 +170,16 @@ func (u *AccountUsecase) DeleteAccount(ctx context.Context, req *pb.DeleteAssetR
 }
 
 func (u *AccountUsecase) CleanupExpiredAccounts(ctx context.Context) error {
-	cutoffTime := time.Now().AddDate(0, 0, -7)
-	expiredAccounts, err := u.accRepo.GetExpiredAccounts(ctx, cutoffTime)
+	cutoff := time.Now().AddDate(0, 0, -7)
+	expiredAccounts, err := u.accRepo.GetExpiredAccounts(ctx, cutoff)
 	if err != nil {
 		return err
 	}
 
-	if len(expiredAccounts) == 0 {
-		return err
-	}
-
 	for _, acc := range expiredAccounts {
-		helper.CleanupAssetResource(
-			ctx,
-			acc.ID,
-			acc.Files,
-			u.storage,
-			u.userClient,
-			func(id uuid.UUID) error {
-				return u.accRepo.HardDeleteAccount(ctx, id)
-			},
-		)
+		u.assetHelper.CleanupResource(ctx, acc.ID, acc.Files, func(id uuid.UUID) error {
+			return u.accRepo.HardDeleteAccount(ctx, id)
+		})
 	}
 
 	return nil

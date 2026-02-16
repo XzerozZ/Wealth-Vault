@@ -33,6 +33,7 @@ func ToInvestProto(d *domain.Investment) *pb.Investment {
 		BrokerName:  d.BrokerName,
 		Quantity:    d.Quantity,
 		CostPrice:   d.CostPerPrice,
+		Amount:      d.Amount,
 		Description: d.Description,
 		Files:       ToPbFiles(d.Files),
 		CreatedAt:   timestamppb.New(d.CreatedAt),
