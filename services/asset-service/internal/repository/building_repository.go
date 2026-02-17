@@ -61,18 +61,9 @@ func (r *BuildingRepository) GetBuildingByID(ctx context.Context, id uuid.UUID) 
 	return &item, nil
 }
 
-func (r *BuildingRepository) GetBuildingByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Building, error) {
-	var items []*domain.Building
-	if err := r.db.WithContext(ctx).Preload("Location").Where("user_id = ?", uid).Find(&items).Error; err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 func (r *BuildingRepository) UpdateBuilding(ctx context.Context, item *domain.Building, addLandIDs, removeLandIDs, addInsIDs, removeInsIDs []uuid.UUID) (*domain.Building, error) {
 	return item, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(item).Error; err != nil {
+		if err := tx.Model(item).Omit("Files").Updates(item).Error; err != nil {
 			return err
 		}
 

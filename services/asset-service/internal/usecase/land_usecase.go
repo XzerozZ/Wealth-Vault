@@ -7,7 +7,6 @@ import (
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
-	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -16,66 +15,24 @@ import (
 )
 
 type LandUsecase struct {
-	landRepo   repo.LandRepository
-	fileRepo   repo.FileRepository
-	storage    *utils.StorageClient
-	userClient userPb.UserServiceClient
+	landRepo    repo.LandRepository
+	assetHelper helper.AssetHelper
 }
 
-func NewLandUsecase(r repo.LandRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) LandUsecase {
+func NewLandUsecase(r repo.LandRepository, ah helper.AssetHelper) LandUsecase {
 	return LandUsecase{
-		landRepo:   r,
-		fileRepo:   fr,
-		storage:    s,
-		userClient: userClient,
+		landRepo:    r,
+		assetHelper: ah,
 	}
 }
 
 func (u *LandUsecase) CreateLand(ctx context.Context, req *pb.CreateLandRequest) (*pb.LandResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
+	uid, err := utils.ParseID(req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
-	var domainFiles []domain.FileAssociate
-	if len(req.NewFiles) > 0 {
-		for _, f := range req.NewFiles {
-			domainFiles = append(domainFiles, domain.FileAssociate{
-				Link:     f.Url,
-				FileType: f.FileType,
-				UserID:   userID,
-			})
-		}
-	}
-
-	var builds []domain.Building
-	if len(req.BuildingIds) > 0 {
-		for _, id := range req.BuildingIds {
-			if uid, err := uuid.Parse(id); err == nil {
-				builds = append(builds, domain.Building{ID: uid})
-			}
-		}
-	}
-
-	loc := domain.Location{
-		Address:     req.Location.Address,
-		Subdistrict: req.Location.Subdistrict,
-		District:    req.Location.District,
-		Province:    req.Location.Province,
-		PostalCode:  req.Location.PostalCode,
-	}
-
-	land := &domain.Land{
-		UserID:      userID,
-		Name:        req.Name,
-		DeedNum:     req.DeedNum,
-		Area:        req.Area,
-		Amount:      req.Amount,
-		Description: req.Description,
-		Location:    loc,
-		Buildings:   builds,
-		Files:       domainFiles,
-	}
+	land := mapper.ToLandDomain(req, uid)
 
 	if err := u.landRepo.CreateLand(ctx, land); err != nil {
 		return nil, err
@@ -87,9 +44,9 @@ func (u *LandUsecase) CreateLand(ctx context.Context, req *pb.CreateLandRequest)
 }
 
 func (u *LandUsecase) GetLand(ctx context.Context, req *pb.GetAssetRequest) (*pb.LandArrayResponse, error) {
-	uid, err := uuid.Parse(req.UserId)
+	uid, err := utils.ParseID(req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	lands, err := u.landRepo.GetLand(ctx, uid)
@@ -97,65 +54,40 @@ func (u *LandUsecase) GetLand(ctx context.Context, req *pb.GetAssetRequest) (*pb
 		return nil, err
 	}
 
-	var LandList []*pb.Land
-	for _, item := range lands {
-		LandList = append(LandList, mapper.ToLandProto(item))
-	}
-
 	return &pb.LandArrayResponse{
 		Success: true,
-		Land:    LandList,
+		Land:    mapper.ToLandProtoSlice(lands),
 	}, nil
 }
 
 func (u *LandUsecase) GetLandByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LandArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
+	ids := utils.ParseUUIDs(req.Ids)
 
-	bu, err := u.landRepo.GetLandByIDs(ctx, ids)
+	lands, err := u.landRepo.GetLandByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbLand []*pb.Land
-	for _, a := range bu {
-		pbLand = append(pbLand, mapper.ToLandProto(a))
-	}
-
 	return &pb.LandArrayResponse{
-		Land: pbLand,
+		Land: mapper.ToLandProtoSlice(lands),
 	}, nil
 }
 
 func (u *LandUsecase) GetBatchLandByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.LandArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
+	ids := utils.ParseUUIDs(req.Ids)
 
-	bu, err := u.landRepo.GetBatchLandByIDs(ctx, ids)
+	lands, err := u.landRepo.GetBatchLandByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbLand []*pb.Land
-	for _, a := range bu {
-		pbLand = append(pbLand, mapper.ToLandProto(a))
-	}
-
 	return &pb.LandArrayResponse{
-		Land: pbLand,
+		Land: mapper.ToLandProtoSlice(lands),
 	}, nil
 }
 
 func (u *LandUsecase) GetLandByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.LandResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, err := utils.ParseID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +104,10 @@ func (u *LandUsecase) GetLandByID(ctx context.Context, req *pb.GetAssetByIDReque
 }
 
 func (u *LandUsecase) UpdateLand(ctx context.Context, req *pb.UpdateLandRequest) (*pb.LandResponse, error) {
+	if req.Land == nil {
+		return nil, errors.New("land data is required")
+	}
+
 	id, uid, err := utils.ValidateIDs(req.Id, req.Land.UserId)
 	if err != nil {
 		return nil, err
@@ -186,24 +122,6 @@ func (u *LandUsecase) UpdateLand(ctx context.Context, req *pb.UpdateLandRequest)
 		return nil, err
 	}
 
-	var addBuildIDs, removeBuildIDs []uuid.UUID
-
-	if len(req.BuildingIds) > 0 {
-		for _, idStr := range req.BuildingIds {
-			if parsedID, err := uuid.Parse(idStr); err == nil {
-				addBuildIDs = append(addBuildIDs, parsedID)
-			}
-		}
-	}
-
-	if len(req.DeleteBuildingIds) > 0 {
-		for _, idStr := range req.DeleteBuildingIds {
-			if parsedID, err := uuid.Parse(idStr); err == nil {
-				removeBuildIDs = append(removeBuildIDs, parsedID)
-			}
-		}
-	}
-
 	syncParams := domain.FileSyncParams{
 		UserID:        uid,
 		EntityID:      id,
@@ -212,12 +130,13 @@ func (u *LandUsecase) UpdateLand(ctx context.Context, req *pb.UpdateLandRequest)
 		DeleteFileIDs: req.DeleteFileIds,
 	}
 
-	err = helper.SyncEntityFiles(ctx, u.fileRepo, u.storage, syncParams)
-	if err != nil {
+	if err := u.assetHelper.SyncFiles(ctx, syncParams); err != nil {
 		return nil, err
 	}
 
-	updatedLand, err := u.landRepo.UpdateLand(ctx, land, addBuildIDs, removeBuildIDs)
+	updatedLand, err := u.landRepo.UpdateLand(
+		ctx, land, utils.ParseUUIDs(req.BuildingIds), utils.ParseUUIDs(req.DeleteBuildingIds),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -234,8 +153,7 @@ func (u *LandUsecase) DeleteLand(ctx context.Context, req *pb.DeleteAssetRequest
 		return nil, err
 	}
 
-	_, err = u.landRepo.GetLandByID(ctx, id)
-	if err != nil {
+	if _, err = u.landRepo.GetLandByID(ctx, id); err != nil {
 		return nil, err
 	}
 
@@ -248,28 +166,21 @@ func (u *LandUsecase) DeleteLand(ctx context.Context, req *pb.DeleteAssetRequest
 	}, nil
 }
 
-func (u *LandUsecase) CleanupExpiredLand(ctx context.Context) error {
+func (u *LandUsecase) CleanupExpiredLands(ctx context.Context) error {
 	cutoffTime := time.Now().AddDate(0, 0, -7)
-	GetExpiredLand, err := u.landRepo.GetExpiredLand(ctx, cutoffTime)
+	expiredLand, err := u.landRepo.GetExpiredLand(ctx, cutoffTime)
 	if err != nil {
 		return err
 	}
 
-	if len(GetExpiredLand) == 0 {
-		return err
+	if len(expiredLand) == 0 {
+		return nil
 	}
 
-	for _, l := range GetExpiredLand {
-		helper.CleanupAssetResource(
-			ctx,
-			l.ID,
-			l.Files,
-			u.storage,
-			u.userClient,
-			func(id uuid.UUID) error {
-				return u.landRepo.HardDeleteLand(ctx, id)
-			},
-		)
+	for _, l := range expiredLand {
+		u.assetHelper.CleanupResource(ctx, l.ID, l.Files, func(id uuid.UUID) error {
+			return u.landRepo.HardDeleteLand(ctx, id)
+		})
 	}
 
 	return nil

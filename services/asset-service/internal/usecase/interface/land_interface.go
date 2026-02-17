@@ -13,5 +13,5 @@ type LandUsecase interface {
 	GetLandByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.LandResponse, error)
 	UpdateLand(ctx context.Context, req *pb.UpdateLandRequest) (*pb.LandResponse, error)
 	DeleteLand(ctx context.Context, req *pb.DeleteAssetRequest) (*pb.DeleteAssetResponse, error)
-	CleanupExpiredLand(ctx context.Context) error
+	CleanupExpiredLands(ctx context.Context) error
 }

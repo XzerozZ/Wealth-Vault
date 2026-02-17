@@ -48,6 +48,7 @@ func (h *RealAssetHelper) CleanupResource(
 ) {
 	CleanupAssetResource(ctx, entityID, files, h.storage, h.userClient, hardDeleteFunc)
 }
+
 func DeleteFilesAsync(storage StorageDeleter, fileURLs []string) {
 	if len(fileURLs) == 0 {
 		return

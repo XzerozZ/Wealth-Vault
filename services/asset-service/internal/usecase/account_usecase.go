@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
@@ -32,6 +33,7 @@ func (u *AccountUsecase) CreateAccount(ctx context.Context, req *pb.CreateAccoun
 	}
 
 	acc := mapper.ToAccountDomain(req, uid)
+
 	if err := u.accRepo.CreateAccount(ctx, acc); err != nil {
 		return nil, err
 	}
@@ -59,13 +61,7 @@ func (u *AccountUsecase) GetAccount(ctx context.Context, req *pb.GetAssetRequest
 }
 
 func (u *AccountUsecase) GetAccountByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.AccountArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
-
+	ids := utils.ParseUUIDs(req.Ids)
 	acc, err := u.accRepo.GetAccountByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
@@ -77,12 +73,7 @@ func (u *AccountUsecase) GetAccountByIDs(ctx context.Context, req *pb.GetBatchId
 }
 
 func (u *AccountUsecase) GetBatchAccountByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.AccountArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
+	ids := utils.ParseUUIDs(req.Ids)
 
 	acc, err := u.accRepo.GetBatchAccountByIDs(ctx, ids)
 	if err != nil {
@@ -112,6 +103,10 @@ func (u *AccountUsecase) GetAccountByID(ctx context.Context, req *pb.GetAssetByI
 }
 
 func (u *AccountUsecase) UpdateAccount(ctx context.Context, req *pb.UpdateAccountRequest) (*pb.AccountResponse, error) {
+	if req.Acc == nil {
+		return nil, errors.New("account data is required")
+	}
+
 	id, uid, err := utils.ValidateIDs(req.Id, req.Acc.UserId)
 	if err != nil {
 		return nil, err
@@ -174,6 +169,10 @@ func (u *AccountUsecase) CleanupExpiredAccounts(ctx context.Context) error {
 	expiredAccounts, err := u.accRepo.GetExpiredAccounts(ctx, cutoff)
 	if err != nil {
 		return err
+	}
+
+	if len(expiredAccounts) == 0 {
+		return nil
 	}
 
 	for _, acc := range expiredAccounts {

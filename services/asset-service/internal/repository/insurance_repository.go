@@ -60,18 +60,9 @@ func (r *InsuranceRepository) GetInsuranceByID(ctx context.Context, id uuid.UUID
 	return &item, nil
 }
 
-func (r *InsuranceRepository) GetInsuranceByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Insurance, error) {
-	var items []*domain.Insurance
-	if err := r.db.WithContext(ctx).Where("user_id = ?", uid).Find(&items).Error; err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 func (r *InsuranceRepository) UpdateInsurance(ctx context.Context, policy *domain.Insurance) (*domain.Insurance, error) {
 	return policy, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(policy).Error; err != nil {
+		if err := tx.Model(policy).Omit("Files").Updates(policy).Error; err != nil {
 			return err
 		}
 

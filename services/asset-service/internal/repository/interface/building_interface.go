@@ -14,7 +14,6 @@ type BuildingRepository interface {
 	GetBuildingByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Building, error)
 	GetBatchBuildingByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Building, error)
 	GetBuildingByID(ctx context.Context, id uuid.UUID) (*domain.Building, error)
-	GetBuildingByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Building, error)
 	UpdateBuilding(ctx context.Context, item *domain.Building, addLandIDs, removeLandIDs, addInsIDs, removeInsIDs []uuid.UUID) (*domain.Building, error)
 	SoftDeleteBuilding(ctx context.Context, id, uid uuid.UUID) error
 	GetExpiredBuilding(ctx context.Context, olderThan time.Time) ([]domain.Building, error)

@@ -7,7 +7,6 @@ import (
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
-	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -16,81 +15,24 @@ import (
 )
 
 type BuildingUsecase struct {
-	buildRepo  repo.BuildingRepository
-	fileRepo   repo.FileRepository
-	storage    *utils.StorageClient
-	userClient userPb.UserServiceClient
+	buildRepo   repo.BuildingRepository
+	assetHelper helper.AssetHelper
 }
 
-func NewBuildingUsecase(r repo.BuildingRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) BuildingUsecase {
+func NewBuildingUsecase(r repo.BuildingRepository, ah helper.AssetHelper) BuildingUsecase {
 	return BuildingUsecase{
-		buildRepo:  r,
-		fileRepo:   fr,
-		storage:    s,
-		userClient: userClient,
+		buildRepo:   r,
+		assetHelper: ah,
 	}
 }
 
 func (u *BuildingUsecase) CreateBuilding(ctx context.Context, req *pb.CreateBuildingRequest) (*pb.BuildingResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
+	userID, err := utils.ParseID(req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
-	buildType := domain.BuildingTypeHouse
-	if val, ok := helper.ProtoToDomainBuildingType[req.Type]; ok {
-		buildType = val
-	}
-
-	var domainFiles []domain.FileAssociate
-	if len(req.NewFiles) > 0 {
-		for _, f := range req.NewFiles {
-			domainFiles = append(domainFiles, domain.FileAssociate{
-				Link:     f.Url,
-				FileType: f.FileType,
-				UserID:   userID,
-			})
-		}
-	}
-
-	var lands []domain.Land
-	if len(req.LandIds) > 0 {
-		for _, id := range req.LandIds {
-			if uid, err := uuid.Parse(id); err == nil {
-				lands = append(lands, domain.Land{ID: uid})
-			}
-		}
-	}
-
-	var ins []domain.Insurance
-	if len(req.InsIds) > 0 {
-		for _, id := range req.InsIds {
-			if uid, err := uuid.Parse(id); err == nil {
-				ins = append(ins, domain.Insurance{ID: uid})
-			}
-		}
-	}
-
-	loc := domain.Location{
-		Address:     req.Location.Address,
-		Subdistrict: req.Location.Subdistrict,
-		District:    req.Location.District,
-		Province:    req.Location.Province,
-		PostalCode:  req.Location.PostalCode,
-	}
-
-	building := &domain.Building{
-		UserID:      userID,
-		Name:        req.Name,
-		Type:        buildType,
-		Area:        req.Area,
-		Amount:      req.Amount,
-		Description: req.Description,
-		Location:    loc,
-		Lands:       lands,
-		Insurances:  ins,
-		Files:       domainFiles,
-	}
+	building := mapper.ToBuildingDomain(req, userID)
 
 	if err := u.buildRepo.CreateBuilding(ctx, building); err != nil {
 		return nil, err
@@ -102,9 +44,9 @@ func (u *BuildingUsecase) CreateBuilding(ctx context.Context, req *pb.CreateBuil
 }
 
 func (u *BuildingUsecase) GetBuilding(ctx context.Context, req *pb.GetAssetRequest) (*pb.BuildingArrayResponse, error) {
-	uid, err := uuid.Parse(req.UserId)
+	uid, err := utils.ParseID(req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
 	buildings, err := u.buildRepo.GetBuilding(ctx, uid)
@@ -112,65 +54,38 @@ func (u *BuildingUsecase) GetBuilding(ctx context.Context, req *pb.GetAssetReque
 		return nil, err
 	}
 
-	var BuildList []*pb.Building
-	for _, item := range buildings {
-		BuildList = append(BuildList, mapper.ToBuildingProto(item))
-	}
-
 	return &pb.BuildingArrayResponse{
 		Success:  true,
-		Building: BuildList,
+		Building: mapper.ToBuildingProtoSlice(buildings),
 	}, nil
 }
 
 func (u *BuildingUsecase) GetBuildingByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.BuildingArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
-
+	ids := utils.ParseUUIDs(req.Ids)
 	bu, err := u.buildRepo.GetBuildingByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbBuildings []*pb.Building
-	for _, a := range bu {
-		pbBuildings = append(pbBuildings, mapper.ToBuildingProto(a))
-	}
-
 	return &pb.BuildingArrayResponse{
-		Building: pbBuildings,
+		Building: mapper.ToBuildingProtoSlice(bu),
 	}, nil
 }
 
 func (u *BuildingUsecase) GetBatchBuildingByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.BuildingArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
-
+	ids := utils.ParseUUIDs(req.Ids)
 	bu, err := u.buildRepo.GetBatchBuildingByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbBuildings []*pb.Building
-	for _, a := range bu {
-		pbBuildings = append(pbBuildings, mapper.ToBuildingProto(a))
-	}
-
 	return &pb.BuildingArrayResponse{
-		Building: pbBuildings,
+		Building: mapper.ToBuildingProtoSlice(bu),
 	}, nil
 }
 
 func (u *BuildingUsecase) GetBuildingByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.BuildingResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, err := utils.ParseID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -187,6 +102,10 @@ func (u *BuildingUsecase) GetBuildingByID(ctx context.Context, req *pb.GetAssetB
 }
 
 func (u *BuildingUsecase) UpdateBuilding(ctx context.Context, req *pb.UpdateBuildingRequest) (*pb.BuildingResponse, error) {
+	if req.Building == nil {
+		return nil, errors.New("building data is required")
+	}
+
 	id, uid, err := utils.ValidateIDs(req.Id, req.Building.UserId)
 	if err != nil {
 		return nil, err
@@ -201,39 +120,6 @@ func (u *BuildingUsecase) UpdateBuilding(ctx context.Context, req *pb.UpdateBuil
 		return nil, err
 	}
 
-	var addLandIDs, removeLandIDs, addInsIDs, removeInsIDs []uuid.UUID
-	if len(req.LandIds) > 0 {
-		for _, idStr := range req.LandIds {
-			if parsedID, err := uuid.Parse(idStr); err == nil {
-				addLandIDs = append(addLandIDs, parsedID)
-			}
-		}
-	}
-
-	if len(req.DeleteLandIds) > 0 {
-		for _, idStr := range req.DeleteLandIds {
-			if parsedID, err := uuid.Parse(idStr); err == nil {
-				removeLandIDs = append(removeLandIDs, parsedID)
-			}
-		}
-	}
-
-	if len(req.InsIds) > 0 {
-		for _, idStr := range req.InsIds {
-			if parsedID, err := uuid.Parse(idStr); err == nil {
-				addInsIDs = append(addInsIDs, parsedID)
-			}
-		}
-	}
-
-	if len(req.DeleteInsIds) > 0 {
-		for _, idStr := range req.DeleteInsIds {
-			if parsedID, err := uuid.Parse(idStr); err == nil {
-				removeInsIDs = append(removeInsIDs, parsedID)
-			}
-		}
-	}
-
 	syncParams := domain.FileSyncParams{
 		UserID:        uid,
 		EntityID:      id,
@@ -242,12 +128,13 @@ func (u *BuildingUsecase) UpdateBuilding(ctx context.Context, req *pb.UpdateBuil
 		DeleteFileIDs: req.DeleteFileIds,
 	}
 
-	err = helper.SyncEntityFiles(ctx, u.fileRepo, u.storage, syncParams)
-	if err != nil {
+	if err := u.assetHelper.SyncFiles(ctx, syncParams); err != nil {
 		return nil, err
 	}
 
-	updatedBuilding, err := u.buildRepo.UpdateBuilding(ctx, building, addLandIDs, removeLandIDs, addInsIDs, removeInsIDs)
+	updatedBuilding, err := u.buildRepo.UpdateBuilding(
+		ctx, building, utils.ParseUUIDs(req.LandIds), utils.ParseUUIDs(req.DeleteLandIds), utils.ParseUUIDs(req.InsIds), utils.ParseUUIDs(req.DeleteInsIds),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -264,8 +151,7 @@ func (u *BuildingUsecase) DeleteBuilding(ctx context.Context, req *pb.DeleteAsse
 		return nil, err
 	}
 
-	_, err = u.buildRepo.GetBuildingByID(ctx, id)
-	if err != nil {
+	if _, err = u.buildRepo.GetBuildingByID(ctx, id); err != nil {
 		return nil, err
 	}
 
@@ -286,20 +172,13 @@ func (u *BuildingUsecase) CleanupExpiredBuildings(ctx context.Context) error {
 	}
 
 	if len(expiredBuilding) == 0 {
-		return err
+		return nil
 	}
 
-	for _, b := range expiredBuilding {
-		helper.CleanupAssetResource(
-			ctx,
-			b.ID,
-			b.Files,
-			u.storage,
-			u.userClient,
-			func(id uuid.UUID) error {
-				return u.buildRepo.HardDeleteBuilding(ctx, id)
-			},
-		)
+	for _, bu := range expiredBuilding {
+		u.assetHelper.CleanupResource(ctx, bu.ID, bu.Files, func(id uuid.UUID) error {
+			return u.buildRepo.HardDeleteBuilding(ctx, id)
+		})
 	}
 
 	return nil

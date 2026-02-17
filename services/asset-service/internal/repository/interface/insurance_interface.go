@@ -14,7 +14,6 @@ type InsuranceRepository interface {
 	GetInsuranceByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Insurance, error)
 	GetBatchInsuranceByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Insurance, error)
 	GetInsuranceByID(ctx context.Context, id uuid.UUID) (*domain.Insurance, error)
-	GetInsuranceByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Insurance, error)
 	UpdateInsurance(ctx context.Context, invest *domain.Insurance) (*domain.Insurance, error)
 	SoftDeleteInsurances(ctx context.Context, id uuid.UUID, uid uuid.UUID) error
 	GetExpiredInsurances(ctx context.Context, olderThan time.Time) ([]domain.Insurance, error)

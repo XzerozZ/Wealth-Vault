@@ -59,14 +59,14 @@ func main() {
 	assetHelper := helper.NewAssetHelper(fileRepo, supabaseClient, userClient)
 
 	// ------ Usecase ------
-	assUC := usecase.NewAssetUsecase(accRepo, buRepo, cashRepo, insRepo, inRepo, landRepo, liaRepo, assRepo)
+	assUC := usecase.NewAssetUsecase(assRepo)
 	accUC := usecase.NewAccountUsecase(accRepo, assetHelper)
-	cashUC := usecase.NewCashUsecase(cashRepo, fileRepo, supabaseClient, userClient)
-	inUC := usecase.NewInvestmentUsecase(inRepo, fileRepo, supabaseClient, userClient)
-	buUC := usecase.NewBuildingUsecase(buRepo, fileRepo, supabaseClient, userClient)
-	landUC := usecase.NewLandUsecase(landRepo, fileRepo, supabaseClient, userClient)
-	insUC := usecase.NewInsuranceUsecase(insRepo, fileRepo, supabaseClient, natsPublisher, userClient)
-	liaUC := usecase.NewLiabilityUsecase(liaRepo, fileRepo, supabaseClient, userClient)
+	cashUC := usecase.NewCashUsecase(cashRepo, assetHelper)
+	inUC := usecase.NewInvestmentUsecase(inRepo, assetHelper)
+	buUC := usecase.NewBuildingUsecase(buRepo, assetHelper)
+	landUC := usecase.NewLandUsecase(landRepo, assetHelper)
+	insUC := usecase.NewInsuranceUsecase(insRepo, assetHelper, natsPublisher)
+	liaUC := usecase.NewLiabilityUsecase(liaRepo, assetHelper)
 
 	// ------ Handler ------
 	assetHandler := handler.NewAssetGRPCHandler(assUC, accUC, cashUC, inUC, buUC, landUC, insUC, liaUC)

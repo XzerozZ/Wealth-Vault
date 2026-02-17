@@ -60,18 +60,9 @@ func (r *InvestmentRepository) GetInvestmentByID(ctx context.Context, id uuid.UU
 	return &item, nil
 }
 
-func (r *InvestmentRepository) GetInvestmentByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Investment, error) {
-	var items []*domain.Investment
-	if err := r.db.WithContext(ctx).Where("user_id = ?", uid).Find(&items).Error; err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 func (r *InvestmentRepository) UpdateInvestment(ctx context.Context, invest *domain.Investment) (*domain.Investment, error) {
 	return invest, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(invest).Error; err != nil {
+		if err := tx.Model(invest).Omit("Files").Updates(invest).Error; err != nil {
 			return err
 		}
 
