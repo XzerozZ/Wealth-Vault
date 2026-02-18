@@ -1,32 +1,28 @@
 package usecase
 
 import (
+	"context"
 	"wealth-vault/notification-service/internal/domain"
-	"wealth-vault/notification-service/internal/infra/socket"
-	repo "wealth-vault/notification-service/internal/repository"
+	socket "wealth-vault/notification-service/internal/infra/socket/interface"
+	repo "wealth-vault/notification-service/internal/repository/interface"
 
 	"github.com/google/uuid"
 )
 
 type NotificationUsecase struct {
-	repo *repo.NotificationRepository
-	hub  *socket.SocketHub
+	repo repo.NotificationRepository
+	hub  socket.ISocketHub
 }
 
-func NewNotificationUsecase(repo *repo.NotificationRepository, hub *socket.SocketHub) *NotificationUsecase {
+func NewNotificationUsecase(repo repo.NotificationRepository, hub socket.ISocketHub) *NotificationUsecase {
 	return &NotificationUsecase{
 		repo: repo,
 		hub:  hub,
 	}
 }
 
-func (u *NotificationUsecase) GetHistory(userIDStr string) ([]domain.Notification, error) {
-	uid, err := uuid.Parse(userIDStr)
-	if err != nil {
-		return nil, err
-	}
-
-	history, err := u.repo.GetByReceiver(uid)
+func (u *NotificationUsecase) GetHistory(ctx context.Context, uid uuid.UUID) ([]domain.Notification, error) {
+	history, err := u.repo.GetByReceiver(ctx, uid)
 	if err != nil {
 		return nil, err
 	}

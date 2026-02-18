@@ -24,8 +24,8 @@ func ApplyUpdateFields(req *pb.UpdateLiabilityRequest, lia *domain.Liability) er
 			}
 
 		case "creditor":
-			if req.Liability.Name != "" {
-				lia.Name = req.Liability.Name
+			if req.Liability.Creditor != "" {
+				lia.Creditor = req.Liability.Creditor
 			}
 
 		case "principal":

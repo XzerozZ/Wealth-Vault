@@ -9,6 +9,15 @@ import (
 	"wealth-vault/asset-service/internal/domain"
 )
 
+type MockStorage struct {
+	mock.Mock
+}
+
+func (m *MockStorage) Delete(url string) error {
+	args := m.Called(url)
+	return args.Error(0)
+}
+
 type MockAssetHelper struct {
 	mock.Mock
 }
