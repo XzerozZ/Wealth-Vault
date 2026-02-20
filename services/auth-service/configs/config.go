@@ -8,11 +8,12 @@ import (
 )
 
 type Configs struct {
-	JWT        JWT
-	GRPC       GRPC
-	UserGRPC   UserGRPC
-	PostgreSQL PostgreSQL
-	Mail       Mail
+	JWT          JWT
+	GRPC         GRPC
+	UserGRPC     UserGRPC
+	PostgreSQL   PostgreSQL
+	Mail         Mail
+	GoogleClient Client
 }
 
 type GRPC struct {
@@ -41,6 +42,10 @@ type Mail struct {
 	Port   string
 	Sender string
 	Key    string
+}
+
+type Client struct {
+	URL string
 }
 
 func LoadConfigs() *Configs {
@@ -80,6 +85,9 @@ func LoadConfigs() *Configs {
 			Port:   requireEnv("EMAIL_PORT"),
 			Sender: requireEnv("EMAIL_USER"),
 			Key:    requireEnv("EMAIL_PASS"),
+		},
+		GoogleClient: Client{
+			URL: requireEnv("GOOGLE_CLIENT"),
 		},
 	}
 }

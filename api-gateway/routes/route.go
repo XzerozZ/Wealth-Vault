@@ -32,6 +32,7 @@ func Setup(
 	auth := api.Group("/auth")
 	auth.Post("/register", authHandler.RegisterLocal)
 	auth.Post("/login", authHandler.Login)
+	auth.Post("/login/google", authHandler.LoginwithGoogle)
 	auth.Post("/refresh", authHandler.RefreshToken)
 	auth.Post("/forgot/password", authHandler.ForgotPassword)
 	auth.Post("/forgot/otp", authHandler.VerifyForgotPasswordOTP)

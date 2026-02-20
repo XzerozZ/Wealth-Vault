@@ -63,6 +63,20 @@ func (h *AuthGRPCHandler) Login(ctx context.Context, req *pb.AuthRequest) (*pb.A
 	}, nil
 }
 
+func (h *AuthGRPCHandler) LoginGoogle(ctx context.Context, req *pb.GoogleRequest) (*pb.AuthResponse, error) {
+	output, err := h.usecase.LoginWithGoogle(ctx, req.Token)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "login failed: %v", err)
+	}
+
+	return &pb.AuthResponse{
+		Success:      true,
+		UserId:       output.UserID,
+		AccessToken:  output.AccessToken,
+		RefreshToken: output.RefreshToken,
+	}, nil
+}
+
 func (h *AuthGRPCHandler) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.AuthResponse, error) {
 	output, err := h.usecase.RefreshToken(ctx, req.RefreshToken)
 	if err != nil {

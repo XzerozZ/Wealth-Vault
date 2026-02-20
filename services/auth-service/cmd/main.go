@@ -7,12 +7,13 @@ import (
 	"wealth-vault/auth-service/configs"
 	authCron "wealth-vault/auth-service/internal/delivery/cron"
 	authHandler "wealth-vault/auth-service/internal/delivery/grpc"
+	"wealth-vault/auth-service/internal/infra/database"
 	authRepo "wealth-vault/auth-service/internal/repository"
 	authUsecase "wealth-vault/auth-service/internal/usecase"
-	"wealth-vault/auth-service/pkg/database"
+	"wealth-vault/auth-service/pkg/google"
+	mailclient "wealth-vault/auth-service/pkg/mail"
 	authpb "wealth-vault/auth-service/pkg/pb/proto/auth"
 	authToken "wealth-vault/auth-service/pkg/token"
-	mailclient "wealth-vault/auth-service/pkg/utils/mail"
 
 	"google.golang.org/grpc"
 )
@@ -30,10 +31,16 @@ func main() {
 		log.Fatal("user service:", err)
 	}
 
-	mailClient := mailclient.NewMailClient(cfg.Mail)
+	mailClient, err := mailclient.NewMailClient(cfg.Mail)
+	if err != nil {
+		log.Fatal("mail client failed:", err)
+	}
+
+	googleVal := google.NewGoogleValidator(cfg.GoogleClient.URL)
+
 	repo := authRepo.NewAuthRepository(db)
-	token := authToken.NewJWT(cfg.JWT.Secret)
-	uc := authUsecase.NewAuthUsecase(repo, userClient, token, mailClient)
+	token := authToken.NewJWTGenerate(cfg.JWT.Secret)
+	uc := authUsecase.NewAuthUsecase(repo, userClient, token, mailClient, googleVal)
 	handler := authHandler.NewAuthGRPCHandler(uc)
 	cronJob := authCron.NewAuthCronJob(uc)
 

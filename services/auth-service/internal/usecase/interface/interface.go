@@ -9,6 +9,7 @@ import (
 type AuthUsecase interface {
 	Register(ctx context.Context, input *domain.RegisterInput) (*domain.AuthOutput, error)
 	Login(ctx context.Context, input *domain.LoginInput) (*domain.AuthOutput, error)
+	LoginWithGoogle(ctx context.Context, googleIDToken string) (*domain.AuthOutput, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*domain.AuthOutput, error)
 	ForgotPassword(ctx context.Context, req *authPb.ForgotPasswordRequest) (*authPb.ForgotPasswordResponse, error)
 	VerifyForgotPasswordOTP(ctx context.Context, req *authPb.VerifyOTPRequest) (*authPb.VerifyOTPResponse, error)

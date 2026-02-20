@@ -9,9 +9,9 @@ import (
 type AuthAccount struct {
 	ID                uuid.UUID `json:"id" gorm:"primaryKey;default:gen_random_uuid()"`
 	UserID            uuid.UUID `json:"u_id"  gorm:"not null;index"`
-	Provider          string    `gorm:"type:varchar(50);not null;uniqueIndex:idx_provider_account"` // 'local', 'google'
-	ProviderAccountID string    `gorm:"type:varchar(255);uniqueIndex:idx_provider_account"`
-	Email             string    `gorm:"type:varchar(255)"`
+	Provider          string    `gorm:"type:varchar(50);not null;uniqueIndex:idx_provider_account;uniqueIndex:idx_email_provider"` // 'local', 'google'
+	ProviderAccountID string    `gorm:"type:varchar(255);not null;uniqueIndex:idx_provider_account"`
+	Email             string    `gorm:"type:varchar(255);not null;uniqueIndex:idx_email_provider"`
 	Password          string    `gorm:"type:varchar(255)"`
 	IsEmailVerified   bool      `json:"is_email_verified" gorm:"default:false"`
 	CreatedAt         time.Time
