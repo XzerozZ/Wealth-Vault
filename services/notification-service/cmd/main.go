@@ -5,11 +5,11 @@ import (
 	"wealth-vault/notification-service/configs"
 	"wealth-vault/notification-service/internal/delivery/http"
 	"wealth-vault/notification-service/internal/delivery/worker"
+	"wealth-vault/notification-service/internal/infra/database"
 	"wealth-vault/notification-service/internal/infra/nats"
 	"wealth-vault/notification-service/internal/infra/socket"
 	"wealth-vault/notification-service/internal/repository"
 	"wealth-vault/notification-service/internal/usecase"
-	"wealth-vault/notification-service/pkg/database"
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"

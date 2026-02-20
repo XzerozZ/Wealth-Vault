@@ -14,7 +14,6 @@ type AccountRepository interface {
 	GetAccountByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Account, error)
 	GetBatchAccountByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Account, error)
 	GetAccountByID(ctx context.Context, id uuid.UUID) (*domain.Account, error)
-	GetAccountByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Account, error)
 	UpdateAccount(ctx context.Context, item *domain.Account) (*domain.Account, error)
 	SoftDeleteAccount(ctx context.Context, id uuid.UUID, uid uuid.UUID) error
 	GetExpiredAccounts(ctx context.Context, olderThan time.Time) ([]domain.Account, error)

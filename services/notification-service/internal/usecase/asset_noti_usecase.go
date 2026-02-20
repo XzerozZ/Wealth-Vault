@@ -1,24 +1,27 @@
 package usecase
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"time"
 	"wealth-vault/notification-service/internal/domain"
+	m "wealth-vault/notification-service/pkg/utils/message"
 
 	"github.com/google/uuid"
 )
 
-func (u *NotificationUsecase) HandleInsuranceExpiring(evt domain.InsuranceExpiringEvent) {
-	userID, _ := uuid.Parse(evt.UserID)
-	insuranceID, _ := uuid.Parse(evt.InsuranceID)
-
-	var message string
-	if evt.DaysLeft == 1 {
-		message = fmt.Sprintf("⚠️ ด่วน! ประกัน '%s' จะหมดอายุในวันพรุ่งนี้ (%s)", evt.InsuranceName, evt.ExpDate)
-	} else {
-		message = fmt.Sprintf("📢 แจ้งเตือน: ประกัน '%s' จะหมดอายุในอีก 1 อาทิตย์ (%s)", evt.InsuranceName, evt.ExpDate)
+func (u *NotificationUsecase) HandleInsuranceExpiring(ctx context.Context, evt domain.InsuranceExpiringEvent) error {
+	userID, err := uuid.Parse(evt.UserID)
+	if err != nil {
+		return fmt.Errorf("invalid user id: %w", err)
 	}
+
+	insuranceID, err := uuid.Parse(evt.InsuranceID)
+	if err != nil {
+		return fmt.Errorf("invalid insurance id: %w", err)
+	}
+
+	message := m.BuildInsuranceExpireMessage(evt)
 
 	noti := &domain.Notification{
 		ID:         uuid.New(),
@@ -31,9 +34,11 @@ func (u *NotificationUsecase) HandleInsuranceExpiring(evt domain.InsuranceExpiri
 		IsRead:     false,
 	}
 
-	if err := u.repo.CreateNotification(noti); err != nil {
-		log.Printf("❌ Save DB Error: %v", err)
+	if err := u.repo.CreateNotification(ctx, noti); err != nil {
+		return fmt.Errorf("create notification: %w", err)
 	}
 
-	u.hub.Emit(evt.UserID, noti)
+	u.hub.Emit(userID.String(), noti)
+
+	return nil
 }

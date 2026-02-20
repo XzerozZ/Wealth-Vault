@@ -16,6 +16,41 @@ func NewAssetRepository(db *gorm.DB) *AssetRepository {
 	return &AssetRepository{db: db}
 }
 
+func (r *AssetRepository) GetAllAssetIDs(ctx context.Context, userID uuid.UUID) (map[string][]string, error) {
+	var results []domain.AssetIDResult
+
+	query := `
+		SELECT 'account' as type, id::text FROM accounts WHERE user_id = ? AND deleted_at IS NULL
+		UNION ALL
+		SELECT 'building' as type, id::text FROM buildings WHERE user_id = ? AND deleted_at IS NULL
+		UNION ALL
+		SELECT 'cash' as type, id::text FROM cash WHERE user_id = ? AND deleted_at IS NULL
+		UNION ALL
+		SELECT 'insurance' as type, id::text FROM insurances WHERE user_id = ? AND deleted_at IS NULL
+		UNION ALL
+		SELECT 'investment' as type, id::text FROM investments WHERE user_id = ? AND deleted_at IS NULL
+		UNION ALL
+		SELECT 'land' as type, id::text FROM lands WHERE user_id = ? AND deleted_at IS NULL
+		UNION ALL
+		SELECT 'liability' as type, id::text FROM liabilities WHERE user_id = ? AND deleted_at IS NULL
+	`
+
+	err := r.db.WithContext(ctx).Raw(query,
+		userID, userID, userID, userID, userID, userID, userID,
+	).Scan(&results).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	assetMap := make(map[string][]string)
+	for _, res := range results {
+		assetMap[res.Type] = append(assetMap[res.Type], res.ID)
+	}
+
+	return assetMap, nil
+}
+
 func (r *AssetRepository) CheckExists(ctx context.Context, entityType string, id uuid.UUID, uid uuid.UUID) (bool, error) {
 	var count int64
 	var err error

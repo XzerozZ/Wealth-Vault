@@ -60,18 +60,9 @@ func (r *LiabilityRepository) GetLiabilityByID(ctx context.Context, id uuid.UUID
 	return &lia, nil
 }
 
-func (r *LiabilityRepository) GetLiabilityByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Liability, error) {
-	var items []*domain.Liability
-	if err := r.db.WithContext(ctx).Where("user_id = ?", uid).Find(&items).Error; err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 func (r *LiabilityRepository) UpdateLiability(ctx context.Context, lia *domain.Liability) (*domain.Liability, error) {
 	return lia, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(lia).Error; err != nil {
+		if err := tx.Model(lia).Omit("Files").Updates(lia).Error; err != nil {
 			return err
 		}
 

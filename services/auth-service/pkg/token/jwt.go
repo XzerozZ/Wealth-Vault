@@ -7,17 +7,14 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type Generator interface {
-	CreateToken(userID string, email string, tokenType string, duration time.Duration) (string, error)
-	VerifyToken(tokenString string) (jwt.MapClaims, error)
-}
-
 type JWTGenerate struct {
 	secretKey string
 }
 
-func NewJWT(secretKey string) *JWTGenerate {
-	return &JWTGenerate{secretKey: secretKey}
+func NewJWTGenerate(secret string) *JWTGenerate {
+	return &JWTGenerate{
+		secretKey: secret,
+	}
 }
 
 func (j *JWTGenerate) CreateToken(userID string, email string, tokenType string, duration time.Duration) (string, error) {

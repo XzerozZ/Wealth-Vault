@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"wealth-vault/auth-service/configs"
 	"wealth-vault/auth-service/internal/domain"
+	mail "wealth-vault/auth-service/pkg/mail/interface"
 
 	"gopkg.in/gomail.v2"
 )
@@ -15,14 +16,10 @@ type gomailClient struct {
 	from   string
 }
 
-type NotificationClient interface {
-	SendOTP(ctx context.Context, req domain.SendEmailRequest) error
-}
-
-func NewMailClient(cfg configs.Mail) NotificationClient {
+func NewMailClient(cfg configs.Mail) (mail.NotificationClient, error) {
 	port, err := strconv.Atoi(cfg.Port)
 	if err != nil {
-		return nil
+		return nil, fmt.Errorf("invalid mail port: %w", err)
 	}
 
 	d := gomail.NewDialer(cfg.Host, port, cfg.Sender, cfg.Key)
@@ -30,7 +27,7 @@ func NewMailClient(cfg configs.Mail) NotificationClient {
 	return &gomailClient{
 		dialer: d,
 		from:   cfg.Sender,
-	}
+	}, nil
 }
 
 func (g *gomailClient) SendOTP(ctx context.Context, req domain.SendEmailRequest) error {
@@ -38,12 +35,12 @@ func (g *gomailClient) SendOTP(ctx context.Context, req domain.SendEmailRequest)
 	m.SetHeader("From", g.from)
 	m.SetHeader("To", req.ToEmail)
 	m.SetHeader("Subject", fmt.Sprintf("Wealth Vault: Hello %v", req.ToEmail))
-	m.SetBody("text/html", g.generateOTPHTML(req))
+	m.SetBody("text/html", g.GenerateOTPHTML(req))
 
 	return g.dialer.DialAndSend(m)
 }
 
-func (g *gomailClient) generateOTPHTML(req domain.SendEmailRequest) string {
+func (g *gomailClient) GenerateOTPHTML(req domain.SendEmailRequest) string {
 	expiry := req.ExpiredAt
 	if expiry == "" {
 		expiry = "5 นาที"

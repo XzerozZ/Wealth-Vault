@@ -14,7 +14,6 @@ type LiabilityRepository interface {
 	GetLiabilityByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Liability, error)
 	GetBatchLiabilityByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Liability, error)
 	GetLiabilityByID(ctx context.Context, id uuid.UUID) (*domain.Liability, error)
-	GetLiabilityByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Liability, error)
 	UpdateLiability(ctx context.Context, lia *domain.Liability) (*domain.Liability, error)
 	SoftDeleteLiability(ctx context.Context, id uuid.UUID, uid uuid.UUID) error
 	GetExpiredLiability(ctx context.Context, olderThan time.Time) ([]domain.Liability, error)

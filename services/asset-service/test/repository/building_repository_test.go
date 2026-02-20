@@ -2,7 +2,6 @@ package repository_test
 
 import (
 	"context"
-	"database/sql/driver"
 	"testing"
 	"time"
 	"wealth-vault/asset-service/internal/domain"
@@ -106,84 +105,43 @@ func TestGetBuildingByID(t *testing.T) {
 
 	mock.Mock.MatchExpectationsInOrder(false)
 
-	mock.Mock.ExpectQuery(`SELECT .* FROM "buildings"`).
+	mock.Mock.ExpectQuery(`SELECT \* FROM "buildings" WHERE .*id = \$1 AND "buildings"\."deleted_at" IS NULL ORDER BY "buildings"\."id" LIMIT \$2`).
 		WithArgs(buildingID, 1).
-		WillReturnRows(
-			sqlmock.NewRows([]string{
-				"id",
-				"user_id",
-				"type",
-				"name",
-				"area",
-				"amount",
-				"description",
-				"location_id",
-			}).
-				AddRow(buildingID, uuid.New(), "house", "Example", 100, 1000, "", locationID),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "type", "name", "area", "amount", "description", "location_id"}).
+			AddRow(buildingID, uuid.New(), "house", "Example", 100, 1000, "", locationID))
 
-	mock.Mock.ExpectQuery(`SELECT .* FROM "file_associates"`).
+	mock.Mock.ExpectQuery(`SELECT \* FROM "file_associates" WHERE "entity_type" = \$1 AND "file_associates"\."entity_id" = \$2`).
 		WithArgs("building", buildingID).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "entity_id"}))
 
-	mock.Mock.ExpectQuery(`SELECT .* FROM "building_insurance"`).
+	mock.Mock.ExpectQuery(`SELECT \* FROM "building_insurance" WHERE "building_insurance"\."building_id" = \$1`).
 		WithArgs(buildingID).
-		WillReturnRows(
-			sqlmock.NewRows([]string{
-				"house_id",
-				"ins_id",
-			}).
-				AddRow(buildingID, insuranceID),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"building_id", "insurance_id"}).AddRow(buildingID, insuranceID))
 
-	mock.Mock.ExpectQuery(`SELECT .* FROM "insurances"`).
+	mock.Mock.ExpectQuery(`SELECT \* FROM "insurances" WHERE "insurances"\."id" = \$1 AND "insurances"\."deleted_at" IS NULL`).
 		WithArgs(insuranceID).
-		WillReturnRows(
-			sqlmock.NewRows([]string{
-				"id",
-				"name",
-			}).
-				AddRow(insuranceID, "Test Insurance"),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).AddRow(insuranceID, "Test Insurance"))
 
-	mock.Mock.ExpectQuery(`SELECT .* FROM "building_land"`).
+	mock.Mock.ExpectQuery(`SELECT \* FROM "building_land" WHERE "building_land"\."building_id" = \$1`).
 		WithArgs(buildingID).
-		WillReturnRows(
-			sqlmock.NewRows([]string{
-				"house_id",
-				"land_id",
-			}).
-				AddRow(buildingID, landID),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"building_id", "land_id"}).AddRow(buildingID, landID))
 
-	mock.Mock.ExpectQuery(`SELECT .* FROM "lands"`).
+	mock.Mock.ExpectQuery(`SELECT \* FROM "lands" WHERE "lands"\."id" = \$1 AND "lands"\."deleted_at" IS NULL`).
 		WithArgs(landID).
-		WillReturnRows(
-			sqlmock.NewRows([]string{
-				"id",
-				"user_id",
-				"name",
-				"location_id",
-			}).
-				AddRow(landID, uuid.Nil, "Test Land", locationID),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "name", "location_id"}).AddRow(landID, uuid.Nil, "Test Land", locationID))
 
-	mock.Mock.ExpectQuery(`SELECT .* FROM "locations"`).
+	mock.Mock.ExpectQuery(`SELECT \* FROM "locations" WHERE "locations"\."id" = \$1`).
 		WithArgs(locationID).
-		WillReturnRows(
-			sqlmock.NewRows([]string{
-				"id",
-				"address",
-			}).
-				AddRow(locationID, "Test Address"),
-		)
+		WillReturnRows(sqlmock.NewRows([]string{"id", "address"}).AddRow(locationID, "Test Address"))
 
 	item, err := repo.GetBuildingByID(context.Background(), buildingID)
 
 	require.NoError(t, err)
 	require.Equal(t, buildingID, item.ID)
+	require.Equal(t, "Example", item.Name)
+	require.Equal(t, "Test Address", item.Location.Address)
 
-	mock.ExpectDone(t)
+	assert.NoError(t, mock.Mock.ExpectationsWereMet())
 }
 
 func TestUpdateBuilding(t *testing.T) {
@@ -208,47 +166,49 @@ func TestUpdateBuilding(t *testing.T) {
 
 	mock.Mock.MatchExpectationsInOrder(false)
 	mock.Mock.ExpectBegin()
-	mock.Mock.ExpectQuery("INSERT INTO \"locations\"").
-		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), locationID).
+	mock.Mock.ExpectQuery(`INSERT INTO "locations"`).
+		WithArgs(
+			sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(),
+			sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), locationID,
+		).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(locationID))
 
-	buildingArgs := make([]driver.Value, 11)
-	for i := range buildingArgs {
-		buildingArgs[i] = sqlmock.AnyArg()
-	}
-	mock.Mock.ExpectExec("UPDATE \"buildings\"").
-		WithArgs(buildingArgs...).
+	mock.Mock.ExpectExec(`UPDATE "buildings" SET "name"=\$1,"location_id"=\$2,"updated_at"=\$3 WHERE "buildings"\."deleted_at" IS NULL AND "id" = \$4`).
+		WithArgs("Updated Name", locationID, sqlmock.AnyArg(), buildingID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	mock.Mock.ExpectExec("UPDATE \"locations\"").
-		WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), locationID).
+	mock.Mock.ExpectExec(`UPDATE "locations" SET .* WHERE "id" = \$8`).
+		WithArgs(
+			sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(),
+			sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), locationID,
+		).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	mock.Mock.ExpectQuery("SELECT .* FROM \"buildings\"").
+	mock.Mock.ExpectQuery(`SELECT \* FROM "buildings" WHERE id = \$1 AND "buildings"\."deleted_at" IS NULL AND "buildings"\."id" = \$2 ORDER BY "buildings"\."id" LIMIT \$3`).
 		WithArgs(buildingID, buildingID, 1).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "name"}).AddRow(buildingID, "Updated Name"))
 
-	mock.Mock.ExpectQuery("SELECT .* FROM \"file_associates\"").
+	mock.Mock.ExpectQuery(`SELECT \* FROM "file_associates" WHERE "entity_type" = \$1 AND "file_associates"\."entity_id" = \$2`).
 		WithArgs("building", buildingID).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "entity_id"}).AddRow(uuid.New(), buildingID))
 
-	mock.Mock.ExpectQuery("SELECT .* FROM \"locations\"").
+	mock.Mock.ExpectQuery(`SELECT \* FROM "locations" WHERE "locations"\."id" = \$1`).
 		WithArgs(locationID).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(locationID))
 
-	mock.Mock.ExpectQuery("SELECT .* FROM \"building_land\"").
+	mock.Mock.ExpectQuery(`SELECT \* FROM "building_land" WHERE "building_land"\."building_id" = \$1`).
 		WithArgs(buildingID).
-		WillReturnRows(sqlmock.NewRows([]string{"house_id", "land_id"}).AddRow(buildingID, landID))
+		WillReturnRows(sqlmock.NewRows([]string{"building_id", "land_id"}).AddRow(buildingID, landID))
 
-	mock.Mock.ExpectQuery("SELECT .* FROM \"lands\"").
+	mock.Mock.ExpectQuery(`SELECT \* FROM "lands" WHERE "lands"\."id" = \$1 AND "lands"\."deleted_at" IS NULL`).
 		WithArgs(landID).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(landID))
 
-	mock.Mock.ExpectQuery("SELECT .* FROM \"building_insurance\"").
+	mock.Mock.ExpectQuery(`SELECT \* FROM "building_insurance" WHERE "building_insurance"\."building_id" = \$1`).
 		WithArgs(buildingID).
-		WillReturnRows(sqlmock.NewRows([]string{"house_id", "ins_id"}).AddRow(buildingID, insID))
+		WillReturnRows(sqlmock.NewRows([]string{"building_id", "insurance_id"}).AddRow(buildingID, insID))
 
-	mock.Mock.ExpectQuery("SELECT .* FROM \"insurances\"").
+	mock.Mock.ExpectQuery(`SELECT \* FROM "insurances" WHERE "insurances"\."id" = \$1 AND "insurances"\."deleted_at" IS NULL`).
 		WithArgs(insID).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(insID))
 

@@ -6,6 +6,11 @@ import (
 	"github.com/google/uuid"
 )
 
+type AssetIDResult struct {
+	Type string
+	ID   string
+}
+
 type AssetSummary struct {
 	ID        uuid.UUID
 	Type      string

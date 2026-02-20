@@ -73,7 +73,7 @@ func (j *AssetCronJob) CleanUpExpiredAsset() {
 	})
 
 	j.safeExecute("Land", func() {
-		j.la.CleanupExpiredLand(ctx)
+		j.la.CleanupExpiredLands(ctx)
 	})
 
 	j.safeExecute("Cash", func() {
@@ -89,7 +89,7 @@ func (j *AssetCronJob) CleanUpExpiredAsset() {
 	})
 
 	j.safeExecute("Liability", func() {
-		j.lia.CleanupExpiredLiability(ctx)
+		j.lia.CleanupExpiredLiabilities(ctx)
 	})
 
 	duration := time.Since(startTime)

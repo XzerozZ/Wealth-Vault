@@ -24,10 +24,10 @@ type Building struct {
 	Area        float64      `gorm:"not null;default:0"`
 	Amount      float64      `gorm:"not null;default:0"`
 	Description string
-	LocationID  uuid.UUID   `gorm:"type:uuid;not null"`
+	LocationID  uuid.UUID   `gorm:"type:uuid;not null;index"`
 	Location    Location    `gorm:"foreignKey:LocationID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Lands       []Land      `gorm:"many2many:building_land;joinForeignKey:house_id;joinReferences:land_id"`
-	Insurances  []Insurance `gorm:"many2many:building_insurance;joinForeignKey:house_id;joinReferences:ins_id"`
+	Lands       []Land      `gorm:"many2many:building_land;joinForeignKey:building_id;joinReferences:land_id"`
+	Insurances  []Insurance `gorm:"many2many:building_insurance;joinForeignKey:building_id;joinReferences:insurance_id"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt  `gorm:"index"`

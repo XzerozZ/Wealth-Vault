@@ -64,6 +64,28 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	})
 }
 
+func (h *AuthHandler) LoginwithGoogle(c *fiber.Ctx) error {
+	var body domain.OAuth
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.LoginGoogle(ctx, &pb.GoogleRequest{
+		Token: body.Token,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"status": "login success",
+		"data":   res,
+	})
+}
+
 func (h *AuthHandler) RefreshToken(c *fiber.Ctx) error {
 	var body domain.RefreshToken
 	if err := c.BodyParser(&body); err != nil {

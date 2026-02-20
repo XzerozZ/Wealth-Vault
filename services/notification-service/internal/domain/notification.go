@@ -6,6 +6,12 @@ import (
 	"github.com/google/uuid"
 )
 
+type WSMessage struct {
+	Type    string      `json:"type"`
+	Event   string      `json:"event,omitempty"`
+	Payload interface{} `json:"payload"`
+}
+
 type Notification struct {
 	ID         uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	EntityType string    `gorm:"not null"`

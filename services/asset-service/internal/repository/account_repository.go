@@ -60,15 +60,6 @@ func (r *AccountRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (*
 	return &item, nil
 }
 
-func (r *AccountRepository) GetAccountByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Account, error) {
-	var items []*domain.Account
-	if err := r.db.WithContext(ctx).Where("user_id = ?", uid).Find(&items).Error; err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 func (r *AccountRepository) UpdateAccount(ctx context.Context, item *domain.Account) (*domain.Account, error) {
 	return item, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Model(item).Omit("Files").Updates(item).Error; err != nil {

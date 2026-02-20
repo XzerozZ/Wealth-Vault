@@ -13,5 +13,5 @@ type LiabilityUsecase interface {
 	GetLiabilityByID(ctx context.Context, req *pb.GetLiabilityByIDRequest) (*pb.LiabilityResponse, error)
 	UpdateLiability(ctx context.Context, req *pb.UpdateLiabilityRequest) (*pb.LiabilityResponse, error)
 	DeleteLiability(ctx context.Context, req *pb.DeleteLiabilityRequest) (*pb.DeleteLiabilityResponse, error)
-	CleanupExpiredLiability(ctx context.Context) error
+	CleanupExpiredLiabilities(ctx context.Context) error
 }

@@ -5,6 +5,10 @@ type Authenticate struct {
 	Password string `json:"password"`
 }
 
+type OAuth struct {
+	Token string `json:"token" form:"token"`
+}
+
 type RefreshToken struct {
 	RefreshToken string `json:"refreshtoken"`
 }

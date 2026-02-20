@@ -61,18 +61,9 @@ func (r *LandRepository) GetLandByID(ctx context.Context, id uuid.UUID) (*domain
 	return &item, nil
 }
 
-func (r *LandRepository) GetLandByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Land, error) {
-	var items []*domain.Land
-	if err := r.db.WithContext(ctx).Preload("Location").Where("user_id = ?", uid).Find(&items).Error; err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 func (r *LandRepository) UpdateLand(ctx context.Context, item *domain.Land, addBuildIDs []uuid.UUID, removeBuildIDs []uuid.UUID) (*domain.Land, error) {
 	return item, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(item).Error; err != nil {
+		if err := tx.Model(item).Omit("Files").Updates(item).Error; err != nil {
 			return err
 		}
 

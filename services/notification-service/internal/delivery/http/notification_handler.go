@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -70,7 +71,13 @@ func (h *Handler) GetNotifications(c *fiber.Ctx) error {
 		return c.SendStatus(401)
 	}
 
-	history, err := h.uc.GetHistory(userID)
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).
+			JSON(fiber.Map{"error": "invalid user id"})
+	}
+
+	history, err := h.uc.GetHistory(c.Context(), uid)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}

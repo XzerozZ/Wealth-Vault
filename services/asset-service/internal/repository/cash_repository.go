@@ -60,18 +60,9 @@ func (r *CashRepository) GetCashByID(ctx context.Context, id uuid.UUID) (*domain
 	return &item, nil
 }
 
-func (r *CashRepository) GetCashByUserID(ctx context.Context, uid uuid.UUID) ([]*domain.Cash, error) {
-	var items []*domain.Cash
-	if err := r.db.WithContext(ctx).Where("user_id = ?", uid).Find(&items).Error; err != nil {
-		return nil, err
-	}
-
-	return items, nil
-}
-
 func (r *CashRepository) UpdateCash(ctx context.Context, cash *domain.Cash) (*domain.Cash, error) {
 	return cash, r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Save(cash).Error; err != nil {
+		if err := tx.Model(cash).Omit("Files").Updates(cash).Error; err != nil {
 			return err
 		}
 

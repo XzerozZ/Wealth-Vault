@@ -24,12 +24,14 @@ func (r *AuthRepository) Register(ctx context.Context, auth *domain.AuthAccount)
 	return nil
 }
 
-func (r *AuthRepository) FindByEmail(ctx context.Context, email string) (*domain.AuthAccount, error) {
-	var auth domain.AuthAccount
-	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&auth).Error; err != nil {
+func (r *AuthRepository) FindByEmailAndProvider(ctx context.Context, email string, provider string) (*domain.AuthAccount, error) {
+	var account domain.AuthAccount
+
+	if err := r.db.WithContext(ctx).Where("email = ? AND provider = ?", email, provider).First(&account).Error; err != nil {
 		return nil, err
 	}
-	return &auth, nil
+
+	return &account, nil
 }
 
 func (r *AuthRepository) FindByID(ctx context.Context, userid string) (*domain.AuthAccount, error) {

@@ -9,7 +9,7 @@ import (
 
 type AuthRepository interface {
 	Register(ctx context.Context, auth *domain.AuthAccount) error
-	FindByEmail(ctx context.Context, email string) (*domain.AuthAccount, error)
+	FindByEmailAndProvider(ctx context.Context, email string, provider string) (*domain.AuthAccount, error)
 	FindByID(ctx context.Context, userid string) (*domain.AuthAccount, error)
 	SaveOTP(ctx context.Context, otp *domain.AuthOTP) error
 	CreateSession(ctx context.Context, session *domain.AuthSession) error

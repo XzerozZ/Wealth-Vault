@@ -7,7 +7,6 @@ import (
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
-	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -16,54 +15,24 @@ import (
 )
 
 type InvestmentUsecase struct {
-	inRepo     repo.InvestmentRepository
-	fileRepo   repo.FileRepository
-	storage    *utils.StorageClient
-	userClient userPb.UserServiceClient
+	inRepo      repo.InvestmentRepository
+	assetHelper helper.AssetHelper
 }
 
-func NewInvestmentUsecase(r repo.InvestmentRepository, fr repo.FileRepository, s *utils.StorageClient, userClient userPb.UserServiceClient) InvestmentUsecase {
+func NewInvestmentUsecase(r repo.InvestmentRepository, ah helper.AssetHelper) InvestmentUsecase {
 	return InvestmentUsecase{
-		inRepo:     r,
-		fileRepo:   fr,
-		storage:    s,
-		userClient: userClient,
+		inRepo:      r,
+		assetHelper: ah,
 	}
 }
 
 func (u *InvestmentUsecase) CreateInvestment(ctx context.Context, req *pb.CreateInvestmentRequest) (*pb.InvestmentResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
+	uid, err := utils.ParseID(req.UserId)
 	if err != nil {
-		return nil, errors.New("invalid user id")
+		return nil, err
 	}
 
-	inType := domain.InvestTypeStockUS
-	if val, ok := helper.ProtoToDomainInType[req.Type]; ok {
-		inType = val
-	}
-
-	var domainFiles []domain.FileAssociate
-	if len(req.NewFiles) > 0 {
-		for _, f := range req.NewFiles {
-			domainFiles = append(domainFiles, domain.FileAssociate{
-				Link:     f.Url,
-				FileType: f.FileType,
-				UserID:   userID,
-			})
-		}
-	}
-
-	in := &domain.Investment{
-		UserID:       userID,
-		Name:         req.Name,
-		Symbol:       req.Symbol,
-		Type:         inType,
-		BrokerName:   req.BrokerName,
-		Quantity:     req.Quantity,
-		CostPerPrice: req.CostPrice,
-		Description:  req.Description,
-		Files:        domainFiles,
-	}
+	in := mapper.ToInvestmentDomain(req, uid)
 
 	if err := u.inRepo.CreateInvestment(ctx, in); err != nil {
 		return nil, err
@@ -75,75 +44,50 @@ func (u *InvestmentUsecase) CreateInvestment(ctx context.Context, req *pb.Create
 }
 
 func (u *InvestmentUsecase) GetInvestment(ctx context.Context, req *pb.GetAssetRequest) (*pb.InvestmentArrayResponse, error) {
-	uid, err := uuid.Parse(req.UserId)
-	if err != nil {
-		return nil, errors.New("invalid user id")
-	}
-
-	accounts, err := u.inRepo.GetInvestment(ctx, uid)
+	uid, err := utils.ParseID(req.UserId)
 	if err != nil {
 		return nil, err
 	}
 
-	var InvestList []*pb.Investment
-	for _, item := range accounts {
-		InvestList = append(InvestList, mapper.ToInvestProto(item))
+	invests, err := u.inRepo.GetInvestment(ctx, uid)
+	if err != nil {
+		return nil, err
 	}
 
 	return &pb.InvestmentArrayResponse{
 		Success: true,
-		Invest:  InvestList,
+		Invest:  mapper.ToInvestProtoSlice(invests),
 	}, nil
 }
 
 func (u *InvestmentUsecase) GetInvestmentByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.InvestmentArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
+	ids := utils.ParseUUIDs(req.Ids)
 
-	bu, err := u.inRepo.GetInvestmentByIDs(ctx, ids)
+	invests, err := u.inRepo.GetInvestmentByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbIns []*pb.Investment
-	for _, a := range bu {
-		pbIns = append(pbIns, mapper.ToInvestProto(a))
-	}
-
 	return &pb.InvestmentArrayResponse{
-		Invest: pbIns,
+		Invest: mapper.ToInvestProtoSlice(invests),
 	}, nil
 }
 
 func (u *InvestmentUsecase) GetBatchInvestmentByIDs(ctx context.Context, req *pb.GetBatchIdsRequest) (*pb.InvestmentArrayResponse, error) {
-	var ids []uuid.UUID
-	for _, idStr := range req.Ids {
-		if parsedID, err := uuid.Parse(idStr); err == nil {
-			ids = append(ids, parsedID)
-		}
-	}
+	ids := utils.ParseUUIDs(req.Ids)
 
-	bu, err := u.inRepo.GetBatchInvestmentByIDs(ctx, ids)
+	invests, err := u.inRepo.GetBatchInvestmentByIDs(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
 
-	var pbIns []*pb.Investment
-	for _, a := range bu {
-		pbIns = append(pbIns, mapper.ToInvestProto(a))
-	}
-
 	return &pb.InvestmentArrayResponse{
-		Invest: pbIns,
+		Invest: mapper.ToInvestProtoSlice(invests),
 	}, nil
 }
 
 func (u *InvestmentUsecase) GetInvestmentByID(ctx context.Context, req *pb.GetAssetByIDRequest) (*pb.InvestmentResponse, error) {
-	id, err := uuid.Parse(req.Id)
+	id, err := utils.ParseID(req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -160,6 +104,10 @@ func (u *InvestmentUsecase) GetInvestmentByID(ctx context.Context, req *pb.GetAs
 }
 
 func (u *InvestmentUsecase) UpdateInvestment(ctx context.Context, req *pb.UpdateInvestmentRequest) (*pb.InvestmentResponse, error) {
+	if req.Invest == nil {
+		return nil, errors.New("investment data is required")
+	}
+
 	id, uid, err := utils.ValidateIDs(req.Id, req.Invest.UserId)
 	if err != nil {
 		return nil, err
@@ -182,8 +130,7 @@ func (u *InvestmentUsecase) UpdateInvestment(ctx context.Context, req *pb.Update
 		DeleteFileIDs: req.DeleteFileIds,
 	}
 
-	err = helper.SyncEntityFiles(ctx, u.fileRepo, u.storage, syncParams)
-	if err != nil {
+	if err := u.assetHelper.SyncFiles(ctx, syncParams); err != nil {
 		return nil, err
 	}
 
@@ -204,8 +151,7 @@ func (u *InvestmentUsecase) DeleteInvestment(ctx context.Context, req *pb.Delete
 		return nil, err
 	}
 
-	_, err = u.inRepo.GetInvestmentByID(ctx, id)
-	if err != nil {
+	if _, err = u.inRepo.GetInvestmentByID(ctx, id); err != nil {
 		return nil, err
 	}
 
@@ -220,26 +166,19 @@ func (u *InvestmentUsecase) DeleteInvestment(ctx context.Context, req *pb.Delete
 
 func (u *InvestmentUsecase) CleanupExpiredInvestment(ctx context.Context) error {
 	cutoffTime := time.Now().AddDate(0, 0, -7)
-	GetExpiredInvest, err := u.inRepo.GetExpiredInvestment(ctx, cutoffTime)
+	expiredInvest, err := u.inRepo.GetExpiredInvestment(ctx, cutoffTime)
 	if err != nil {
 		return err
 	}
 
-	if len(GetExpiredInvest) == 0 {
-		return err
+	if len(expiredInvest) == 0 {
+		return nil
 	}
 
-	for _, i := range GetExpiredInvest {
-		helper.CleanupAssetResource(
-			ctx,
-			i.ID,
-			i.Files,
-			u.storage,
-			u.userClient,
-			func(id uuid.UUID) error {
-				return u.inRepo.HardDeleteInvestment(ctx, id)
-			},
-		)
+	for _, inv := range expiredInvest {
+		u.assetHelper.CleanupResource(ctx, inv.ID, inv.Files, func(id uuid.UUID) error {
+			return u.inRepo.HardDeleteInvestment(ctx, id)
+		})
 	}
 
 	return nil

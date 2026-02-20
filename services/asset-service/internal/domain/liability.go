@@ -22,8 +22,8 @@ type Liability struct {
 	Name         string        `gorm:"not null"`
 	Principal    float64       `gorm:"not null"`
 	InterestRate float64
-	StartAt      *time.Time
-	EndAt        *time.Time
+	StartAt      *time.Time `gorm:"type:date"`
+	EndAt        *time.Time `gorm:"type:date"`
 	Description  string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
