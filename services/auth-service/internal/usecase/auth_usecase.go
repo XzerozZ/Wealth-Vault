@@ -46,8 +46,8 @@ func NewAuthUsecase(
 	t token.Generator,
 	mail mail.NotificationClient,
 	googleValidator google.GoogleTokenValidator,
-) AuthUsecase {
-	return AuthUsecase{
+) *AuthUsecase {
+	return &AuthUsecase{
 		authRepo:        r,
 		userClient:      userClient,
 		token:           t,

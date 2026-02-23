@@ -1,0 +1,187 @@
+package usecase
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"log"
+	"strings"
+	"time"
+	"wealth-vault/user-service/internal/domain"
+	pb "wealth-vault/user-service/pkg/pb/proto/user"
+	"wealth-vault/user-service/pkg/utils"
+
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
+
+func (u *ShareItemUsecase) GetSharedIteminGroup(ctx context.Context, req *pb.GetGroupItemsRequest) (*pb.GetGroupItemsResponse, error) {
+	groupID, err := utils.ParseUUID(req.GroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	uid, err := utils.ParseUUID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	items, err := u.itemRepo.GetSharedIteminGroup(ctx, groupID, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	var summaries []domain.SharedItemSummary
+	for _, item := range items {
+		summaries = append(summaries, domain.SharedItemSummary{
+			EntityID:   item.EntityID.String(),
+			EntityType: item.EntityType,
+		})
+	}
+
+	previewMap, err := u.FetchAssetPreviews(ctx, summaries)
+	if err != nil {
+		log.Printf("Failed to fetch asset previews: %v", err)
+	}
+
+	var responseItems []*pb.GroupItemDetail
+	for _, item := range items {
+		responseItems = append(responseItems, &pb.GroupItemDetail{
+			GroupItemId: item.ID.String(),
+			SharedBy:    item.OwnerID.String(),
+			SharedAt:    timestamppb.New(item.CreatedAt),
+			Type:        item.EntityType,
+			AssetDetail: previewMap[item.EntityID.String()],
+		})
+	}
+
+	return &pb.GetGroupItemsResponse{Items: responseItems}, nil
+}
+
+func (u *ShareItemUsecase) UnsharedIteminGroup(ctx context.Context, req *pb.UnshareItemRequest) (*pb.ShareItemResponse, error) {
+	itemID, err := utils.ParseUUID(req.ItemId)
+	if err != nil {
+		return nil, err
+	}
+
+	userID, err := utils.ParseUUID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := u.itemRepo.DeleteIteminGroup(ctx, itemID, userID); err != nil {
+		return nil, err
+	}
+	return &pb.ShareItemResponse{Finish: true}, nil
+}
+
+func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemberRequest) (*pb.ActionResponse, error) {
+	groupID, err := utils.ParseUUID(req.GroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	senderID, err := utils.ParseUUID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(req.TargetUserIds) == 0 {
+		return nil, errors.New("no users specified")
+	}
+
+	senderName := "Unknown"
+	if sender, err := u.userRepo.GetUser(ctx, senderID); err == nil {
+		senderName = sender.Username
+	}
+
+	var newMembers []domain.GroupMember
+	var targetUUIDs []uuid.UUID
+	var addedNames []string
+
+	for _, userIDStr := range req.TargetUserIds {
+		if uid, err := uuid.Parse(userIDStr); err == nil {
+			userName := "Someone"
+			if user, err := u.userRepo.GetUser(ctx, uid); err == nil {
+				userName = user.Username
+			}
+			addedNames = append(addedNames, userName)
+			targetUUIDs = append(targetUUIDs, uid)
+			newMembers = append(newMembers, domain.GroupMember{
+				GroupID:  groupID,
+				UserID:   uid,
+				Role:     "member",
+				JoinedAt: time.Now(),
+			})
+		}
+	}
+
+	if len(newMembers) > 0 {
+		if err := u.itemRepo.AddMember(ctx, newMembers); err != nil {
+			return nil, fmt.Errorf("failed to add members: %v", err)
+		}
+	}
+
+	go func() {
+		logMetaJSON, _ := json.Marshal(map[string]interface{}{"action": "add_member", "target_ids": req.TargetUserIds, "added_count": len(newMembers)})
+		u.groupRepo.CreateLog(context.Background(), &domain.GroupLog{
+			GroupID: groupID, LogType: LogTypeSystem,
+			Messages: fmt.Sprintf("%s เพิ่มสมาชิกใหม่ %d คน", senderName, len(newMembers)), Metadata: string(logMetaJSON), CreatedBy: senderID,
+		})
+
+		msgContent := fmt.Sprintf("%s เพิ่ม %s เข้ากลุ่ม", senderName, strings.Join(addedNames, ", "))
+		u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
+			GroupID: groupID, SenderID: senderID, MsgType: MsgTypeSystemAlert, Content: msgContent, Metadata: "{}", CreatedAt: time.Now(),
+		}})
+
+		u.publisher.Publish(TopicGroupActivity, domain.GroupActivityEvent{
+			GroupID: req.GroupId, ActivityType: "MEMBER_ADDED", Payload: fmt.Sprintf("%s เพิ่มสมาชิกใหม่", senderName), ActorID: req.UserId, OccurredAt: time.Now().Unix(),
+		})
+	}()
+
+	return &pb.ActionResponse{Success: true}, nil
+}
+
+func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessRequest) (*pb.ActionResponse, error) {
+	ownerID, err := utils.ParseUUID(req.OwnerUserId)
+	if err != nil {
+		return nil, err
+	}
+
+	targetID, err := utils.ParseUUID(req.TargetUserId)
+	if err != nil {
+		return nil, err
+	}
+
+	groupID, err := utils.ParseUUID(req.GroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(req.GroupItemIds) == 0 {
+		return nil, errors.New("no items selected")
+	}
+
+	if isMember, err := u.itemRepo.IsGroupMember(ctx, groupID, targetID); err != nil || !isMember {
+		return nil, errors.New("target user is not a member of this group")
+	}
+
+	validItemIDs, err := u.itemRepo.GetOwnedItemIDs(ctx, req.GroupItemIds, ownerID)
+	if err != nil || len(validItemIDs) == 0 {
+		return nil, errors.New("permission denied or no valid items owned")
+	}
+
+	var viewers []domain.GroupItemViewer
+	for _, itemIDStr := range req.GroupItemIds {
+		if itemID, err := uuid.Parse(itemIDStr); err == nil {
+			viewers = append(viewers, domain.GroupItemViewer{GroupItemID: itemID, ViewerID: targetID, GrantedAt: time.Now()})
+		}
+	}
+
+	if err := u.itemRepo.BatchCreateViewers(ctx, viewers); err != nil {
+		return nil, fmt.Errorf("failed to grant access: %v", err)
+	}
+
+	return &pb.ActionResponse{Success: true}, nil
+}

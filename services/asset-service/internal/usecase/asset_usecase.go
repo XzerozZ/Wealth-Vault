@@ -12,8 +12,8 @@ type AssetUsecase struct {
 	r repo.AssetRepository
 }
 
-func NewAssetUsecase(r repo.AssetRepository) AssetUsecase {
-	return AssetUsecase{r: r}
+func NewAssetUsecase(r repo.AssetRepository) *AssetUsecase {
+	return &AssetUsecase{r: r}
 }
 
 func (u *AssetUsecase) CheckExists(ctx context.Context, req *pb.CheckAssetRequest) (*pb.CheckAssetResponse, error) {

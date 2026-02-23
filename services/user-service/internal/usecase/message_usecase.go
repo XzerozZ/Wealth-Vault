@@ -5,9 +5,8 @@ import (
 	"errors"
 	repo "wealth-vault/user-service/internal/repository/interface"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
+	"wealth-vault/user-service/pkg/utils"
 	"wealth-vault/user-service/pkg/utils/mapper"
-
-	"github.com/google/uuid"
 )
 
 type MessageUsecase struct {
@@ -15,17 +14,29 @@ type MessageUsecase struct {
 	itemRepo repo.ShareItemRepository
 }
 
-func NewMessageUsecase(m repo.MsgRepository, i repo.ShareItemRepository) MessageUsecase {
-	return MessageUsecase{
+func NewMessageUsecase(m repo.MsgRepository, i repo.ShareItemRepository) *MessageUsecase {
+	return &MessageUsecase{
 		msgRepo:  m,
 		itemRepo: i,
 	}
 }
 
 func (u *MessageUsecase) GetGroupMessages(ctx context.Context, req *pb.GetGroupMessagesRequest) (*pb.GetGroupMessagesResponse, error) {
-	groupUUID, _ := uuid.Parse(req.GroupId)
-	userUUID, _ := uuid.Parse(req.UserId)
-	isMember, _ := u.itemRepo.IsGroupMember(ctx, groupUUID, userUUID)
+	groupUUID, err := utils.ParseUUID(req.GroupId)
+	if err != nil {
+		return nil, err
+	}
+
+	userUUID, err := utils.ParseUUID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	isMember, err := u.itemRepo.IsGroupMember(ctx, groupUUID, userUUID)
+	if err != nil {
+		return nil, err
+	}
+
 	if !isMember {
 		return nil, errors.New("unauthorized")
 	}

@@ -19,8 +19,8 @@ type CashUsecase struct {
 	assetHelper helper.AssetHelper
 }
 
-func NewCashUsecase(r repo.CashRepository, ah helper.AssetHelper) CashUsecase {
-	return CashUsecase{
+func NewCashUsecase(r repo.CashRepository, ah helper.AssetHelper) *CashUsecase {
+	return &CashUsecase{
 		cashRepo:    r,
 		assetHelper: ah,
 	}

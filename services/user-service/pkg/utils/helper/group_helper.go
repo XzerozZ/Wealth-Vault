@@ -2,10 +2,11 @@ package helper
 
 import (
 	"wealth-vault/user-service/internal/domain"
+	"wealth-vault/user-service/internal/infra/storage"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 )
 
-func ApplyUpdateGroupFields(req *pb.UpdateGroupRequest, storage StorageDeleter, group *domain.Group) ([]string, error) {
+func ApplyUpdateGroupFields(req *pb.UpdateGroupRequest, storage storage.SupabaseStorage, group *domain.Group) ([]string, error) {
 	var updateMask []string
 	has := func(target string) bool {
 		if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
@@ -28,7 +29,7 @@ func ApplyUpdateGroupFields(req *pb.UpdateGroupRequest, storage StorageDeleter, 
 
 	if has("profile") {
 		if group.GroupProfile != "" && group.GroupProfile != req.Profile {
-			go DeleteFilesAsync(storage, []string{group.GroupProfile})
+			DeleteFilesAsync(storage, []string{group.GroupProfile})
 		}
 		group.GroupProfile = req.Profile
 		updateMask = append(updateMask, "GroupProfile")

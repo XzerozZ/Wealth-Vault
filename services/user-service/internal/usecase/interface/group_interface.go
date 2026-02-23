@@ -13,4 +13,5 @@ type GroupUsecase interface {
 	UpdateGroup(ctx context.Context, req *pb.UpdateGroupRequest) (*pb.GroupResponse, error)
 	RemoveMember(ctx context.Context, req *pb.RemoveMemberRequest) (*pb.ActionResponse, error)
 	DeleteGroup(ctx context.Context, req *pb.DeleteGroupRequest) (*pb.ActionResponse, error)
+	LeaveGroup(ctx context.Context, req *pb.LeaveGroupRequest) (*pb.ActionResponse, error)
 }

@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"wealth-vault/asset-service/internal/usecase"
+	usecase "wealth-vault/asset-service/internal/usecase/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
 )
 

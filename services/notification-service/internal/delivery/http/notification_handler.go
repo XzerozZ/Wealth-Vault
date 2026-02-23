@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"wealth-vault/notification-service/internal/infra/socket"
-	"wealth-vault/notification-service/internal/usecase"
+	usecase "wealth-vault/notification-service/internal/usecase/interface"
 
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -13,7 +13,7 @@ import (
 
 type Handler struct {
 	hub *socket.SocketHub
-	uc  *usecase.NotificationUsecase
+	uc  usecase.NotificationUsecase
 }
 
 type ClientCommand struct {
@@ -21,7 +21,7 @@ type ClientCommand struct {
 	GroupID string `json:"group_id"`
 }
 
-func NewHandler(hub *socket.SocketHub, uc *usecase.NotificationUsecase) *Handler {
+func NewHandler(hub *socket.SocketHub, uc usecase.NotificationUsecase) *Handler {
 	return &Handler{hub: hub, uc: uc}
 }
 

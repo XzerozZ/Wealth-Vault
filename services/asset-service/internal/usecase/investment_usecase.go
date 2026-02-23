@@ -19,8 +19,8 @@ type InvestmentUsecase struct {
 	assetHelper helper.AssetHelper
 }
 
-func NewInvestmentUsecase(r repo.InvestmentRepository, ah helper.AssetHelper) InvestmentUsecase {
-	return InvestmentUsecase{
+func NewInvestmentUsecase(r repo.InvestmentRepository, ah helper.AssetHelper) *InvestmentUsecase {
+	return &InvestmentUsecase{
 		inRepo:      r,
 		assetHelper: ah,
 	}

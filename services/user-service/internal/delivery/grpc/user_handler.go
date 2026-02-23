@@ -2,7 +2,9 @@ package grpc
 
 import (
 	"context"
-	"wealth-vault/user-service/internal/usecase"
+
+	usecase "wealth-vault/user-service/internal/usecase/interface"
+
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 )
 

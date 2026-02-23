@@ -6,8 +6,8 @@ import (
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 )
 
-type GroupItemUsecase interface {
-	ShareItemtoGroup(ctx context.Context, req *pb.ShareItemRequest) (*pb.ShareItemResponse, error)
+type ShareItemUsecase interface {
+	ShareItem(ctx context.Context, req *pb.ShareItemRequest) (*pb.ShareItemResponse, error)
 	GetSharedIteminGroup(ctx context.Context, req *pb.GetGroupItemsRequest) (*pb.GetGroupItemsResponse, error)
 	GetSharedIteminFriend(ctx context.Context, req *pb.GetFriendItemRequest) (*pb.GetFriendItemsResponse, error)
 	UnsharedIteminGroup(ctx context.Context, req *pb.UnshareItemRequest) (*pb.ShareItemResponse, error)

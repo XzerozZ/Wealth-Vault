@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	"time"
-	"wealth-vault/asset-service/internal/usecase"
+	usecase "wealth-vault/asset-service/internal/usecase/interface"
 
 	"github.com/robfig/cron/v3"
 )

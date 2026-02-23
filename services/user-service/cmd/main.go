@@ -8,13 +8,16 @@ import (
 	userCron "wealth-vault/user-service/internal/delivery/cron"
 	handler "wealth-vault/user-service/internal/delivery/grpc"
 	"wealth-vault/user-service/internal/event"
-	"wealth-vault/user-service/internal/infra"
+	"wealth-vault/user-service/internal/infra/database"
+	"wealth-vault/user-service/internal/infra/nats"
+	storageclient "wealth-vault/user-service/internal/infra/storage"
 	repo "wealth-vault/user-service/internal/repository"
 	usecase "wealth-vault/user-service/internal/usecase"
-	"wealth-vault/user-service/pkg/database"
+	groupusecase "wealth-vault/user-service/internal/usecase/group"
+	shareusecase "wealth-vault/user-service/internal/usecase/shareItem"
+	userusecase "wealth-vault/user-service/internal/usecase/user"
+	mailclient "wealth-vault/user-service/pkg/mail"
 	userpb "wealth-vault/user-service/pkg/pb/proto/user"
-	storageclient "wealth-vault/user-service/pkg/utils"
-	mailclient "wealth-vault/user-service/pkg/utils/mail"
 
 	"google.golang.org/grpc"
 )
@@ -37,7 +40,7 @@ func main() {
 		log.Fatal("supabase client:", err)
 	}
 
-	nc, err := infra.NewNATSConnection(cfg.NATS.Host, cfg.NATS.Port)
+	nc, err := nats.NewNATSConnection(cfg.NATS.Host, cfg.NATS.Port)
 	if err != nil {
 		log.Fatal("Failed to connect to NATS:", err)
 	}
@@ -53,9 +56,9 @@ func main() {
 	mrepo := repo.NewMsgRepository(db)
 
 	// ------ Usecase ------
-	guc := usecase.NewGroupUsecase(grepo, urepo, mrepo, supabaseClient, natsPublisher)
-	iuc := usecase.NewShareItemUsecase(irepo, grepo, urepo, mrepo, assetClient, mailClient, natsPublisher)
-	uuc := usecase.NewUserUsecase(urepo, iuc, supabaseClient, natsPublisher, assetClient)
+	guc := groupusecase.NewGroupUsecase(grepo, urepo, mrepo, supabaseClient, natsPublisher)
+	iuc := shareusecase.NewShareItemUsecase(irepo, grepo, urepo, mrepo, assetClient, mailClient, natsPublisher)
+	uuc := userusecase.NewUserUsecase(urepo, iuc, supabaseClient, natsPublisher, assetClient)
 	muc := usecase.NewMessageUsecase(mrepo, irepo)
 
 	// ------ Handler ------

@@ -42,13 +42,18 @@ func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
 	}
 
 ProcessActive:
+	locationText := "ไม่ระบุตำแหน่ง"
+	if b.Location != nil {
+		locationText = fmt.Sprintf("%s, %s", b.Location.District, b.Location.Province)
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Building{
 			Building: &pb.BuildingPreview{
 				Id:           b.Id,
 				Name:         b.Name,
 				Amount:       b.Amount,
-				LocationText: fmt.Sprintf("%s, %s", b.Location.District, b.Location.Province),
+				LocationText: locationText,
 				TypeName:     b.Type.String(),
 			},
 		},
@@ -73,6 +78,11 @@ func MapLandToPreview(l *assetPb.Land) *pb.AssetPreview {
 	}
 
 ProcessActive:
+	locationText := "ไม่ระบุตำแหน่ง"
+	if l.Location != nil {
+		locationText = fmt.Sprintf("%s, %s", l.Location.District, l.Location.Province)
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Land{
 			Land: &pb.LandPreview{
@@ -81,7 +91,7 @@ ProcessActive:
 				DeedNum:      l.DeedNum,
 				Area:         l.Area,
 				Amount:       l.Amount,
-				LocationText: fmt.Sprintf("%s, %s", l.Location.District, l.Location.Province),
+				LocationText: locationText,
 			},
 		},
 	}
@@ -167,6 +177,11 @@ func MapInsuranceToPreview(i *assetPb.Insurance) *pb.AssetPreview {
 	}
 
 ProcessActive:
+	expDateStr := "ไม่ระบุ"
+	if i.ExpDate != nil {
+		expDateStr = i.ExpDate.AsTime().String()
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Insurance{
 			Insurance: &pb.InsurancePreview{
@@ -175,7 +190,7 @@ ProcessActive:
 				CompanyName:    i.CompanyName,
 				PolNum:         i.PolNum,
 				CoverageAmount: i.CoverageAmount,
-				ExpDateText:    i.ExpDate.AsTime().String(),
+				ExpDateText:    expDateStr,
 			},
 		},
 	}

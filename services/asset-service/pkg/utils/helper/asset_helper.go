@@ -10,6 +10,8 @@ import (
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/user"
 
+	storage "wealth-vault/asset-service/internal/infra/storage"
+
 	"github.com/google/uuid"
 )
 
@@ -18,17 +20,13 @@ type AssetHelper interface {
 	CleanupResource(ctx context.Context, entityID uuid.UUID, files []domain.FileAssociate, hardDeleteFunc func(uuid.UUID) error)
 }
 
-type StorageDeleter interface {
-	Delete(url string) error
-}
-
 type RealAssetHelper struct {
 	fileRepo   repo.FileRepository
-	storage    StorageDeleter
+	storage    storage.SupabaseStorage
 	userClient pb.UserServiceClient
 }
 
-func NewAssetHelper(fr repo.FileRepository, sd StorageDeleter, uc pb.UserServiceClient) AssetHelper {
+func NewAssetHelper(fr repo.FileRepository, sd storage.SupabaseStorage, uc pb.UserServiceClient) AssetHelper {
 	return &RealAssetHelper{
 		fileRepo:   fr,
 		storage:    sd,
@@ -49,7 +47,7 @@ func (h *RealAssetHelper) CleanupResource(
 	CleanupAssetResource(ctx, entityID, files, h.storage, h.userClient, hardDeleteFunc)
 }
 
-func DeleteFilesAsync(storage StorageDeleter, fileURLs []string) {
+func DeleteFilesAsync(storage storage.SupabaseStorage, fileURLs []string) {
 	if len(fileURLs) == 0 {
 		return
 	}
@@ -63,7 +61,7 @@ func DeleteFilesAsync(storage StorageDeleter, fileURLs []string) {
 	}()
 }
 
-func SyncEntityFiles(ctx context.Context, r repo.FileRepository, storage StorageDeleter, params domain.FileSyncParams) error {
+func SyncEntityFiles(ctx context.Context, r repo.FileRepository, storage storage.SupabaseStorage, params domain.FileSyncParams) error {
 	if len(params.DeleteFileIDs) > 0 {
 		fileUUIDs := parseUUIDs(params.DeleteFileIDs)
 
@@ -120,7 +118,7 @@ func CleanupAssetResource(
 	ctx context.Context,
 	entityID uuid.UUID,
 	files []domain.FileAssociate,
-	storage StorageDeleter,
+	storage storage.SupabaseStorage,
 	userClient pb.UserServiceClient,
 	hardDeleteFunc func(uuid.UUID) error,
 ) {

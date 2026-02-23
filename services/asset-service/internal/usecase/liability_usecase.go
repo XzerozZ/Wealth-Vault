@@ -19,8 +19,8 @@ type LiabilityUsecase struct {
 	assetHelper helper.AssetHelper
 }
 
-func NewLiabilityUsecase(r repo.LiabilityRepository, ah helper.AssetHelper) LiabilityUsecase {
-	return LiabilityUsecase{
+func NewLiabilityUsecase(r repo.LiabilityRepository, ah helper.AssetHelper) *LiabilityUsecase {
+	return &LiabilityUsecase{
 		liaRepo:     r,
 		assetHelper: ah,
 	}
