@@ -14,4 +14,5 @@ type InsuranceUsecase interface {
 	UpdateInsurance(ctx context.Context, req *pb.UpdateInsuranceRequest) (*pb.InsuranceResponse, error)
 	DeleteInsurance(ctx context.Context, req *pb.DeleteAssetRequest) (*pb.DeleteAssetResponse, error)
 	CleanupExpiredInsurances(ctx context.Context) error
+	CheckExpiringInsurances(ctx context.Context) error
 }

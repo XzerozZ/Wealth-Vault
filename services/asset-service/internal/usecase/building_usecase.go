@@ -19,8 +19,8 @@ type BuildingUsecase struct {
 	assetHelper helper.AssetHelper
 }
 
-func NewBuildingUsecase(r repo.BuildingRepository, ah helper.AssetHelper) BuildingUsecase {
-	return BuildingUsecase{
+func NewBuildingUsecase(r repo.BuildingRepository, ah helper.AssetHelper) *BuildingUsecase {
+	return &BuildingUsecase{
 		buildRepo:   r,
 		assetHelper: ah,
 	}

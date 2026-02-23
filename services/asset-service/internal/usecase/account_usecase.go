@@ -19,8 +19,8 @@ type AccountUsecase struct {
 	assetHelper helper.AssetHelper
 }
 
-func NewAccountUsecase(r repo.AccountRepository, ah helper.AssetHelper) AccountUsecase {
-	return AccountUsecase{
+func NewAccountUsecase(r repo.AccountRepository, ah helper.AssetHelper) *AccountUsecase {
+	return &AccountUsecase{
 		accRepo:     r,
 		assetHelper: ah,
 	}

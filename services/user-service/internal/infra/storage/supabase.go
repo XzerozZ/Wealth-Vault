@@ -1,4 +1,4 @@
-package utils
+package storage
 
 import (
 	"fmt"
@@ -12,6 +12,10 @@ type StorageClient struct {
 	Client *storage.Client
 	Bucket string
 	URL    string
+}
+
+type SupabaseStorage interface {
+	Delete(fileURL string) error
 }
 
 func NewStorageClient(url, key, bucket string) (*StorageClient, error) {

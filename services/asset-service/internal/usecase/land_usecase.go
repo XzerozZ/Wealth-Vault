@@ -19,8 +19,8 @@ type LandUsecase struct {
 	assetHelper helper.AssetHelper
 }
 
-func NewLandUsecase(r repo.LandRepository, ah helper.AssetHelper) LandUsecase {
-	return LandUsecase{
+func NewLandUsecase(r repo.LandRepository, ah helper.AssetHelper) *LandUsecase {
+	return &LandUsecase{
 		landRepo:    r,
 		assetHelper: ah,
 	}

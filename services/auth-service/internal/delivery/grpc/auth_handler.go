@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	"wealth-vault/auth-service/internal/domain"
-	"wealth-vault/auth-service/internal/usecase"
+	usecase "wealth-vault/auth-service/internal/usecase/interface"
 	pb "wealth-vault/auth-service/pkg/pb/proto/auth"
 
 	"google.golang.org/grpc/codes"

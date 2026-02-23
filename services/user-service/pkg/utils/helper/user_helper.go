@@ -2,10 +2,11 @@ package helper
 
 import (
 	"wealth-vault/user-service/internal/domain"
+	"wealth-vault/user-service/internal/infra/storage"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 )
 
-func ApplyUpdateUserFields(req *pb.UpdateUserRequest, storage StorageDeleter, user *domain.User) ([]string, error) {
+func ApplyUpdateUserFields(req *pb.UpdateUserRequest, storage storage.SupabaseStorage, user *domain.User) ([]string, error) {
 	var updateMask []string
 	has := func(target string) bool {
 		if req.UpdateMask == nil || len(req.UpdateMask.Paths) == 0 {
@@ -38,7 +39,7 @@ func ApplyUpdateUserFields(req *pb.UpdateUserRequest, storage StorageDeleter, us
 
 	if has("profile") {
 		if user.Profile != "" && user.Profile != req.Profile {
-			go DeleteFilesAsync(storage, []string{user.Profile})
+			DeleteFilesAsync(storage, []string{user.Profile})
 		}
 		user.Profile = req.Profile
 		updateMask = append(updateMask, "Profile")
@@ -55,12 +56,12 @@ func ApplyUpdateUserFields(req *pb.UpdateUserRequest, storage StorageDeleter, us
 		updateMask = append(updateMask, "Birthday")
 	}
 
-	if has("shared_age") && req.Sharedenabled != nil {
+	if has("share_enabled") && req.Sharedenabled != nil {
 		user.IsAutoShareEnabled = *req.Sharedenabled
 		updateMask = append(updateMask, "AutoShareAge")
 	}
 
-	if has("share_enabled") && req.Sharedage != nil {
+	if has("shared_age") && req.Sharedage != nil {
 		user.AutoShareAge = int(*req.Sharedage)
 		updateMask = append(updateMask, "IsAutoShareEnabled")
 	}

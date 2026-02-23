@@ -22,8 +22,8 @@ type InsuranceUsecase struct {
 	publisher   event.EventPublisher
 }
 
-func NewInsuranceUsecase(r repo.InsuranceRepository, ah helper.AssetHelper, e event.EventPublisher) InsuranceUsecase {
-	return InsuranceUsecase{
+func NewInsuranceUsecase(r repo.InsuranceRepository, ah helper.AssetHelper, e event.EventPublisher) *InsuranceUsecase {
+	return &InsuranceUsecase{
 		insRepo:     r,
 		assetHelper: ah,
 		publisher:   e,

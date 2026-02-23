@@ -14,6 +14,10 @@ type StorageClient struct {
 	URL    string
 }
 
+type SupabaseStorage interface {
+	Delete(fileURL string) error
+}
+
 func NewStorageClient(url, key, bucket string) (*StorageClient, error) {
 	if url == "" || key == "" || bucket == "" {
 		return nil, fmt.Errorf("missing supabase config")

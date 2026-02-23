@@ -140,7 +140,7 @@ func (r *GroupRepository) UpdateGroup(ctx context.Context, group *domain.Group, 
 		return nil, 0, err
 	}
 
-	if err := tx.Create(logEntry).Error; err != nil {
+	if err := r.db.WithContext(ctx).Create(logEntry).Error; err != nil {
 		return nil, 0, err
 	}
 

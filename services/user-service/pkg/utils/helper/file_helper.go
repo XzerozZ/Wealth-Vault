@@ -1,12 +1,11 @@
 package helper
 
-import "fmt"
+import (
+	"fmt"
+	"wealth-vault/user-service/internal/infra/storage"
+)
 
-type StorageDeleter interface {
-	Delete(url string) error
-}
-
-func DeleteFilesAsync(storage StorageDeleter, fileURLs []string) {
+func DeleteFilesAsync(storage storage.SupabaseStorage, fileURLs []string) {
 	if len(fileURLs) == 0 {
 		return
 	}
