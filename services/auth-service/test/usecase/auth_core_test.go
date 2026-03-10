@@ -184,3 +184,62 @@ func TestLogin(t *testing.T) {
 		assert.Equal(t, "invalid email or password", err.Error())
 	})
 }
+
+func TestGetAllProviderAccounts(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		mockRepo := new(mock_repo.MockAuthRepository)
+		uc := usecase.NewAuthUsecase(mockRepo, nil, nil, nil, nil)
+
+		userID := uuid.New()
+		ctx := context.Background()
+
+		mockAccounts := []domain.AuthAccount{
+			{UserID: userID, Provider: "local", Email: "test@example.com"},
+			{UserID: userID, Provider: "google", Email: "test@gmail.com"},
+		}
+
+		mockRepo.
+			On("FindAllByUserID", mock.Anything, userID).
+			Return(mockAccounts, nil)
+
+		res, err := uc.GetAllProviderAccounts(ctx, userID.String())
+
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.Len(t, res, 2)
+		assert.Equal(t, "local", res[0].Provider)
+		assert.Equal(t, "google", res[1].Provider)
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("invalid user id format", func(t *testing.T) {
+		mockRepo := new(mock_repo.MockAuthRepository)
+		uc := usecase.NewAuthUsecase(mockRepo, nil, nil, nil, nil)
+
+		res, err := uc.GetAllProviderAccounts(context.Background(), "invalid-uuid-123")
+
+		assert.Error(t, err)
+		assert.Nil(t, res)
+		assert.Equal(t, "invalid user id format", err.Error())
+		mockRepo.AssertNotCalled(t, "FindAllByUserID", mock.Anything, mock.Anything)
+	})
+
+	t.Run("repository error", func(t *testing.T) {
+		mockRepo := new(mock_repo.MockAuthRepository)
+		uc := usecase.NewAuthUsecase(mockRepo, nil, nil, nil, nil)
+
+		userID := uuid.New()
+		ctx := context.Background()
+
+		mockRepo.
+			On("FindAllByUserID", mock.Anything, userID).
+			Return([]domain.AuthAccount(nil), errors.New("database connection failed"))
+
+		res, err := uc.GetAllProviderAccounts(ctx, userID.String())
+
+		assert.Error(t, err)
+		assert.Nil(t, res)
+		assert.Contains(t, err.Error(), "failed to get provider accounts")
+		mockRepo.AssertExpectations(t)
+	})
+}

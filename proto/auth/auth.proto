@@ -1,16 +1,8 @@
 syntax = "proto3";
 
-option go_package = "wealth-vault/pkg/pb";
+package auth;
 
-service AuthService {
-  rpc Register(AuthRequest) returns (AuthResponse);
-  rpc Login(AuthRequest) returns (AuthResponse);
-  rpc LoginGoogle(GoogleRequest) returns (AuthResponse);
-  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse);
-  rpc VerifyForgotPasswordOTP(VerifyOTPRequest) returns (VerifyOTPResponse);
-  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
-  rpc RefreshToken(RefreshTokenRequest) returns (AuthResponse);
-}
+option go_package = "wealth-vault/pkg/pb";
 
 message AuthRequest {
   string email = 1;
@@ -32,29 +24,25 @@ message RefreshTokenRequest {
   string refresh_token = 1;
 }
 
-message ForgotPasswordRequest {
-  string email = 1;
+message GetProviderAccountRequest {
+  string user_id = 1;
 }
 
-message ForgotPasswordResponse {
+message LinkLineAccountRequest {
+  string user_id = 1;
+  string line_user_id = 2;
+}
+
+message LinkAccountResponse {
   bool success = 1;
 }
 
-message VerifyOTPRequest {
-  string email = 1;
-  string otp = 2;
+message ProviderAccount {
+  string provider = 1;
+  bool is_linked = 2; 
+  string provider_account_id = 3;
 }
 
-message VerifyOTPResponse {
-  bool success = 1;
-  string reset_token = 2;
-}
-
-message ResetPasswordRequest {
-  string reset_token = 1;
-  string new_password = 2;
-}
-
-message ResetPasswordResponse {
-  bool success = 1;
+message GetProviderAccountsResponse {
+  repeated ProviderAccount accounts = 1; 
 }

@@ -8,9 +8,12 @@ import (
 )
 
 type Configs struct {
-	APP        APP
-	PostgreSQL PostgreSQL
-	NATS       NATS
+	APP         APP
+	PostgreSQL  PostgreSQL
+	AuthService Auth
+	NATS        NATS
+	Line        Line
+	FCM         FCM
 }
 
 type APP struct {
@@ -25,9 +28,22 @@ type PostgreSQL struct {
 	Database string
 }
 
+type Auth struct {
+	Host string
+	Port string
+}
+
 type NATS struct {
 	Host string
 	Port string
+}
+
+type FCM struct {
+	CredentialsFile string
+}
+
+type Line struct {
+	Token string
 }
 
 func LoadConfigs() *Configs {
@@ -55,9 +71,19 @@ func LoadConfigs() *Configs {
 			Password: requireEnv("DB_PASSWORD"),
 			Database: requireEnv("DB_NAME"),
 		},
+		AuthService: Auth{
+			Host: requireEnv("AUTH_HOST"),
+			Port: requireEnv("AUTH_PORT"),
+		},
 		NATS: NATS{
 			Host: requireEnv("NATS_HOST"),
 			Port: requireEnv("NATS_PORT"),
+		},
+		Line: Line{
+			Token: requireEnv("CHANNEL_ACCESS_TOKEN"),
+		},
+		FCM: FCM{
+			CredentialsFile: requireEnv("FCM_CLIENT_FILE"),
 		},
 	}
 }

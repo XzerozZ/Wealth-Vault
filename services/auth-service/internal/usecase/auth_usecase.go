@@ -18,6 +18,7 @@ import (
 const (
 	ProviderLocal  = "local"
 	ProviderGoogle = "google"
+	ProviderLine   = "line"
 
 	TokenTypeAccess  = "access"
 	TokenTypeRefresh = "refresh"

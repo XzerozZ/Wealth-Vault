@@ -71,3 +71,13 @@ func (m *MockAuthRepository) DeleteExpiredOTPs(ctx context.Context) error {
 	args := m.Called(ctx)
 	return args.Error(0)
 }
+
+func (m *MockAuthRepository) FindByUserIDAndProvider(ctx context.Context, userID uuid.UUID, provider string) (*domain.AuthAccount, error) {
+	args := m.Called(ctx, userID, provider)
+	return args.Get(0).(*domain.AuthAccount), args.Error(1)
+}
+
+func (m *MockAuthRepository) FindAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.AuthAccount, error) {
+	args := m.Called(ctx, userID)
+	return args.Get(0).([]domain.AuthAccount), args.Error(1)
+}

@@ -25,3 +25,13 @@ func (m *MockNotificationRepository) GetByReceiver(ctx context.Context, receiver
 
 	return args.Get(0).([]domain.Notification), args.Error(1)
 }
+
+func (m *MockNotificationRepository) MarkAsRead(ctx context.Context, notificationID uuid.UUID, receiverID uuid.UUID) error {
+	args := m.Called(ctx, notificationID, receiverID)
+	return args.Error(0)
+}
+
+func (m *MockNotificationRepository) MarkAllAsRead(ctx context.Context, receiverID uuid.UUID) error {
+	args := m.Called(ctx, receiverID)
+	return args.Error(0)
+}

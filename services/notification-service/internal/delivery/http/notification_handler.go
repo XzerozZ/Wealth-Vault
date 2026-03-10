@@ -3,7 +3,7 @@ package http
 import (
 	"encoding/json"
 	"log"
-	"wealth-vault/notification-service/internal/infra/socket"
+	socket "wealth-vault/notification-service/internal/infra/socket"
 	usecase "wealth-vault/notification-service/internal/usecase/interface"
 
 	"github.com/gofiber/contrib/websocket"
@@ -12,7 +12,7 @@ import (
 )
 
 type Handler struct {
-	hub *socket.SocketHub
+	hub socket.ISocketHub
 	uc  usecase.NotificationUsecase
 }
 
@@ -21,7 +21,7 @@ type ClientCommand struct {
 	GroupID string `json:"group_id"`
 }
 
-func NewHandler(hub *socket.SocketHub, uc usecase.NotificationUsecase) *Handler {
+func NewHandler(hub socket.ISocketHub, uc usecase.NotificationUsecase) *Handler {
 	return &Handler{hub: hub, uc: uc}
 }
 
@@ -32,9 +32,9 @@ func (h *Handler) WebSocketEndpoint(c *websocket.Conn) {
 		return
 	}
 
-	h.hub.Register(userID, c)
+	connID := h.hub.Register(userID, c)
 	defer func() {
-		h.hub.Unregister(userID)
+		h.hub.Unregister(userID, connID)
 		c.Close()
 	}()
 
@@ -68,19 +68,95 @@ func (h *Handler) WebSocketEndpoint(c *websocket.Conn) {
 func (h *Handler) GetNotifications(c *fiber.Ctx) error {
 	userID := c.Get("X-User-ID")
 	if userID == "" {
-		return c.SendStatus(401)
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
 	}
 
 	uid, err := uuid.Parse(userID)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).
-			JSON(fiber.Map{"error": "invalid user id"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid user id",
+		})
 	}
 
 	history, err := h.uc.GetHistory(c.Context(), uid)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
-	return c.JSON(history)
+	return c.JSON(fiber.Map{
+		"success": true,
+		"data":    history,
+	})
+}
+
+func (h *Handler) MarkAsRead(c *fiber.Ctx) error {
+	userID := c.Get("X-User-ID")
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	notiID := c.Params("id")
+	if notiID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "notification id is required",
+		})
+	}
+
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid user id",
+		})
+	}
+
+	nid, err := uuid.Parse(notiID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid notification id",
+		})
+	}
+
+	if err := h.uc.MarkAsRead(c.Context(), nid, uid); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "marked as read",
+	})
+}
+
+func (h *Handler) MarkAllAsRead(c *fiber.Ctx) error {
+	userID := c.Get("X-User-ID")
+	if userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid user id",
+		})
+	}
+
+	if err := h.uc.MarkAllAsRead(c.Context(), uid); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "all marked as read",
+	})
 }

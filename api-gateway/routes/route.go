@@ -33,6 +33,7 @@ func Setup(
 	auth.Post("/register", authHandler.RegisterLocal)
 	auth.Post("/login", authHandler.Login)
 	auth.Post("/login/google", authHandler.LoginwithGoogle)
+	auth.Post("/line/link", middleware.JWTMiddleware(jwt), authHandler.LinkLineAccount)
 	auth.Post("/refresh", authHandler.RefreshToken)
 	auth.Post("/forgot/password", authHandler.ForgotPassword)
 	auth.Post("/forgot/otp", authHandler.VerifyForgotPasswordOTP)
@@ -113,6 +114,7 @@ func Setup(
 
 	api.Get("/ws", middleware.TokenFromQuery, middleware.JWTMiddleware(jwt), websocket.New(notificationHandler.ProxyWebSocket))
 	api.All("/notifications/*", middleware.JWTMiddleware(jwt), notificationHandler.ProxyAPI)
+	api.All("/devices/*", middleware.JWTMiddleware(jwt), notificationHandler.ProxyAPI)
 
 	api.Get("/group/:id/msg", middleware.JWTMiddleware(jwt), msgHandler.GetGroupMessages)
 	api.Get("/friend/:id/msg", middleware.JWTMiddleware(jwt), msgHandler.GetPrivateMessages)

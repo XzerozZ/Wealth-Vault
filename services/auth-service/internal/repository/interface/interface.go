@@ -20,4 +20,7 @@ type AuthRepository interface {
 	UpdatePassword(ctx context.Context, userID uuid.UUID, newHash string) error
 	DeleteExpiredSessions(ctx context.Context) error
 	DeleteExpiredOTPs(ctx context.Context) error
+
+	FindByUserIDAndProvider(ctx context.Context, userID uuid.UUID, provider string) (*domain.AuthAccount, error)
+	FindAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.AuthAccount, error)
 }

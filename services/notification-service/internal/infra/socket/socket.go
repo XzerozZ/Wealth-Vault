@@ -6,70 +6,83 @@ import (
 	"sync"
 
 	"github.com/gofiber/contrib/websocket"
+	"github.com/google/uuid"
 )
 
 type client struct {
-	conn *websocket.Conn
-	mu   sync.Mutex
+	connID string
+	conn   *websocket.Conn
+	mu     sync.Mutex
 }
 
 type SocketHub struct {
-	clients map[string]*client
+	clients map[string]map[string]*client
 	rooms   map[string]map[string]bool
 	mu      sync.RWMutex
 }
 
 func NewSocketHub() *SocketHub {
 	return &SocketHub{
-		clients: make(map[string]*client),
+		clients: make(map[string]map[string]*client),
 		rooms:   make(map[string]map[string]bool),
 	}
 }
 
-func (h *SocketHub) Register(userID string, conn *websocket.Conn) {
+func (h *SocketHub) Register(userID string, conn *websocket.Conn) string {
+	connID := uuid.New().String()
+
 	h.mu.Lock()
-	h.clients[userID] = &client{conn: conn}
+	if h.clients[userID] == nil {
+		h.clients[userID] = make(map[string]*client)
+	}
+	h.clients[userID][connID] = &client{connID: connID, conn: conn}
+	total := len(h.clients[userID])
 	h.mu.Unlock()
 
-	log.Printf("🔌 User %s Connected (Online)", userID)
+	log.Printf("🔌 User %s connected | connID: %.8s | devices online: %d", userID, connID, total)
+	return connID
 }
 
-func (h *SocketHub) Unregister(userID string) {
+func (h *SocketHub) Unregister(userID, connID string) {
 	h.mu.Lock()
+	defer h.mu.Unlock()
 
-	c, ok := h.clients[userID]
-	if ok {
-		delete(h.clients, userID)
-		c.conn.Close()
+	conns, ok := h.clients[userID]
+	if !ok {
+		return
 	}
 
-	for groupID, members := range h.rooms {
-		if _, ok := members[userID]; ok {
+	if c, exists := conns[connID]; exists {
+		c.conn.Close()
+		delete(conns, connID)
+	}
+
+	if len(conns) == 0 {
+		delete(h.clients, userID)
+		for groupID, members := range h.rooms {
 			delete(members, userID)
 			if len(members) == 0 {
 				delete(h.rooms, groupID)
 			}
 		}
+		log.Printf("❌ User %s fully offline (all devices disconnected)", userID)
+	} else {
+		log.Printf("📴 User %s device disconnected | connID: %.8s | remaining: %d", userID, connID, len(conns))
 	}
-
-	h.mu.Unlock()
-
-	log.Printf("❌ User %s Disconnected (Cleaned up)", userID)
 }
 
-func (h *SocketHub) JoinGroup(userID string, groupID string) {
+func (h *SocketHub) JoinGroup(userID, groupID string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-
 	if h.rooms[groupID] == nil {
 		h.rooms[groupID] = make(map[string]bool)
 	}
-	h.rooms[groupID][userID] = true
 
-	log.Printf("➕ User %s JOINED Group %s", userID, groupID)
+	h.rooms[groupID][userID] = true
+	log.Printf("➕ User %s joined group %s", userID, groupID)
 }
 
-func (h *SocketHub) LeaveGroup(userID string, groupID string) {
+func (h *SocketHub) LeaveGroup(userID, groupID string) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -85,52 +98,75 @@ func (h *SocketHub) LeaveGroup(userID string, groupID string) {
 
 func (h *SocketHub) Emit(userID string, data interface{}) {
 	h.mu.RLock()
-	c, ok := h.clients[userID]
-	h.mu.RUnlock()
+	snapshot := make(map[string]*client, len(h.clients[userID]))
+	for id, c := range h.clients[userID] {
+		snapshot[id] = c
+	}
 
-	if ok {
-		h.send(userID, c, data)
+	h.mu.RUnlock()
+	for connID, c := range snapshot {
+		if err := h.send(c, data); err != nil {
+			log.Printf("⚠️  Write error to %s [%.8s]: %v", userID, connID, err)
+			h.Unregister(userID, connID)
+		}
 	}
 }
 
 func (h *SocketHub) BroadcastToGroup(groupID string, data interface{}) {
 	h.mu.RLock()
-	membersMap, ok := h.rooms[groupID]
+	members, ok := h.rooms[groupID]
 	if !ok {
 		h.mu.RUnlock()
 		return
 	}
 
-	memberIDs := make([]string, 0, len(membersMap))
-	for id := range membersMap {
-		memberIDs = append(memberIDs, id)
+	userIDs := make([]string, 0, len(members))
+	for uid := range members {
+		userIDs = append(userIDs, uid)
 	}
+
 	h.mu.RUnlock()
 
-	for _, id := range memberIDs {
-		h.mu.RLock()
-		c, ok := h.clients[id]
-		h.mu.RUnlock()
-
-		if ok {
-			h.send(id, c, data)
-		}
+	for _, uid := range userIDs {
+		h.Emit(uid, data)
 	}
 }
 
-func (h *SocketHub) send(userID string, c *client, data interface{}) {
-	msgBytes, err := json.Marshal(data)
-	if err != nil {
-		log.Printf("❌ Marshal Error: %v", err)
+func (h *SocketHub) BroadcastToGroupExcept(groupID, senderID string, data interface{}) {
+	h.mu.RLock()
+	members, ok := h.rooms[groupID]
+	if !ok {
+		h.mu.RUnlock()
 		return
 	}
 
-	c.mu.Lock()
-	err = c.conn.WriteMessage(websocket.TextMessage, msgBytes)
-	c.mu.Unlock()
-
-	if err != nil {
-		log.Printf("⚠️ Write Error to %s: %v", userID, err)
-		h.Unregister(userID)
+	userIDs := make([]string, 0, len(members))
+	for uid := range members {
+		if uid != senderID {
+			userIDs = append(userIDs, uid)
+		}
 	}
+
+	h.mu.RUnlock()
+
+	for _, uid := range userIDs {
+		h.Emit(uid, data)
+	}
+}
+
+func (h *SocketHub) IsOnline(userID string) bool {
+	h.mu.RLock()
+	defer h.mu.RUnlock()
+	return len(h.clients[userID]) > 0
+}
+
+func (h *SocketHub) send(c *client, data interface{}) error {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.conn.WriteMessage(websocket.TextMessage, b)
 }

@@ -160,3 +160,50 @@ func TestUpdatePassword(t *testing.T) {
 
 	assert.NoError(t, err)
 }
+
+func TestFindByUserIDAndProvider(t *testing.T) {
+	mock := testutil.NewMockDB(t)
+	defer mock.Close()
+	repo := repository.NewAuthRepository(mock.DB)
+
+	uID := uuid.New()
+	provider := "google"
+	ctx := context.Background()
+	rows := sqlmock.NewRows([]string{"user_id", "provider", "email"}).
+		AddRow(uID, provider, "test@example.com")
+
+	mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "auth_accounts" WHERE user_id = $1 AND provider = $2 ORDER BY "auth_accounts"."id" LIMIT $3`)).
+		WithArgs(uID, provider, 1).
+		WillReturnRows(rows)
+
+	result, err := repo.FindByUserIDAndProvider(ctx, uID, provider)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, uID, result.UserID)
+	assert.Equal(t, provider, result.Provider)
+}
+
+func TestFindAllByUserID(t *testing.T) {
+	mock := testutil.NewMockDB(t)
+	defer mock.Close()
+	repo := repository.NewAuthRepository(mock.DB)
+
+	uID := uuid.New()
+	ctx := context.Background()
+
+	rows := sqlmock.NewRows([]string{"user_id", "provider"}).
+		AddRow(uID, "email").
+		AddRow(uID, "facebook")
+
+	mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "auth_accounts" WHERE user_id = $1`)).
+		WithArgs(uID).
+		WillReturnRows(rows)
+
+	results, err := repo.FindAllByUserID(ctx, uID)
+
+	assert.NoError(t, err)
+	assert.Len(t, results, 2)
+	assert.Equal(t, "email", results[0].Provider)
+	assert.Equal(t, "facebook", results[1].Provider)
+}

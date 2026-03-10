@@ -41,6 +41,33 @@ func (h *AuthGRPCHandler) Register(ctx context.Context, req *pb.AuthRequest) (*p
 	}, nil
 }
 
+func (h *AuthGRPCHandler) GetProviderAccount(ctx context.Context, req *pb.GetProviderAccountRequest) (*pb.GetProviderAccountsResponse, error) {
+	supportedProviders := []string{"local", "google", "line"}
+	existingAccounts, err := h.usecase.GetAllProviderAccounts(ctx, req.UserId)
+
+	linkedMap := make(map[string]string)
+	if err == nil {
+		for _, acc := range existingAccounts {
+			linkedMap[acc.Provider] = acc.ProviderAccountID
+		}
+	}
+
+	var pbAccounts []*pb.ProviderAccount
+	for _, provider := range supportedProviders {
+		accountID, exists := linkedMap[provider]
+
+		pbAccounts = append(pbAccounts, &pb.ProviderAccount{
+			Provider:          provider,
+			IsLinked:          exists,
+			ProviderAccountId: accountID,
+		})
+	}
+
+	return &pb.GetProviderAccountsResponse{
+		Accounts: pbAccounts,
+	}, nil
+}
+
 func (h *AuthGRPCHandler) Login(ctx context.Context, req *pb.AuthRequest) (*pb.AuthResponse, error) {
 	input := &domain.LoginInput{
 		Email:    req.Email,
@@ -77,43 +104,15 @@ func (h *AuthGRPCHandler) LoginGoogle(ctx context.Context, req *pb.GoogleRequest
 	}, nil
 }
 
-func (h *AuthGRPCHandler) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.AuthResponse, error) {
-	output, err := h.usecase.RefreshToken(ctx, req.RefreshToken)
+func (h *AuthGRPCHandler) LinkLineAccount(ctx context.Context, req *pb.LinkLineAccountRequest) (*pb.LinkAccountResponse, error) {
+	err := h.usecase.LinkLineAccount(ctx, req.UserId, req.LineUserId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "refresh token failed: %v", err)
+		return &pb.LinkAccountResponse{
+			Success: false,
+		}, err
 	}
 
-	return &pb.AuthResponse{
-		Success:      true,
-		UserId:       output.UserID,
-		AccessToken:  output.AccessToken,
-		RefreshToken: output.RefreshToken,
+	return &pb.LinkAccountResponse{
+		Success: true,
 	}, nil
-}
-
-func (h *AuthGRPCHandler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*pb.ForgotPasswordResponse, error) {
-	res, err := h.usecase.ForgotPassword(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func (h *AuthGRPCHandler) VerifyForgotPasswordOTP(ctx context.Context, req *pb.VerifyOTPRequest) (*pb.VerifyOTPResponse, error) {
-	res, err := h.usecase.VerifyForgotPasswordOTP(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func (h *AuthGRPCHandler) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse, error) {
-	res, err := h.usecase.ResetPassword(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
 }
