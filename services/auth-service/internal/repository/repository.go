@@ -26,7 +26,6 @@ func (r *AuthRepository) Register(ctx context.Context, auth *domain.AuthAccount)
 
 func (r *AuthRepository) FindByEmailAndProvider(ctx context.Context, email string, provider string) (*domain.AuthAccount, error) {
 	var account domain.AuthAccount
-
 	if err := r.db.WithContext(ctx).Where("email = ? AND provider = ?", email, provider).First(&account).Error; err != nil {
 		return nil, err
 	}
@@ -122,4 +121,23 @@ func (r *AuthRepository) UpdatePassword(ctx context.Context, userID uuid.UUID, n
 		return err
 	}
 	return nil
+}
+
+func (r *AuthRepository) FindByUserIDAndProvider(ctx context.Context, userID uuid.UUID, provider string) (*domain.AuthAccount, error) {
+	var account domain.AuthAccount
+	if err := r.db.WithContext(ctx).Where("user_id = ? AND provider = ?", userID, provider).First(&account).Error; err != nil {
+		return nil, err
+	}
+
+	return &account, nil
+}
+
+func (r *AuthRepository) FindAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.AuthAccount, error) {
+	var accounts []domain.AuthAccount
+
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userID).Find(&accounts).Error; err != nil {
+		return nil, err
+	}
+
+	return accounts, nil
 }

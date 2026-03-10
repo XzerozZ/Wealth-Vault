@@ -14,10 +14,6 @@ import (
 
 func (u *AuthUsecase) Register(ctx context.Context, input *domain.RegisterInput) (*domain.AuthOutput, error) {
 	existingUser, err := u.authRepo.FindByEmailAndProvider(ctx, input.Email, ProviderLocal)
-	if err != nil {
-		return nil, err
-	}
-
 	if existingUser != nil {
 		return nil, errors.New("email already registered with this provider")
 	}
@@ -80,4 +76,18 @@ func (u *AuthUsecase) Login(ctx context.Context, input *domain.LoginInput) (*dom
 	}
 
 	return u.GenerateTokensAndSession(ctx, existingUser.UserID, existingUser.Email)
+}
+
+func (u *AuthUsecase) GetAllProviderAccounts(ctx context.Context, userID string) ([]domain.AuthAccount, error) {
+	uid, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, errors.New("invalid user id format")
+	}
+
+	accounts, err := u.authRepo.FindAllByUserID(ctx, uid)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get provider accounts: %w", err)
+	}
+
+	return accounts, nil
 }

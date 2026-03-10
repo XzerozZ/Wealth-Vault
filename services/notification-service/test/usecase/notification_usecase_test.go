@@ -7,6 +7,10 @@ import (
 
 	"wealth-vault/notification-service/internal/domain"
 	"wealth-vault/notification-service/internal/usecase"
+	pb "wealth-vault/notification-service/pkg/pb/proto/auth"
+	mock_client "wealth-vault/notification-service/test/mock/client"
+	mock_line "wealth-vault/notification-service/test/mock/line"
+	mock_dispatch "wealth-vault/notification-service/test/mock/push_provider"
 	mock_repo "wealth-vault/notification-service/test/mock/repository"
 	mock_socket "wealth-vault/notification-service/test/mock/socket"
 
@@ -18,8 +22,12 @@ import (
 func TestNotificationUsecase(t *testing.T) {
 	t.Run("GetHistory - Success", func(t *testing.T) {
 		repo := new(mock_repo.MockNotificationRepository)
+		drepo := new(mock_repo.MockDeviceRepository)
 		hub := new(mock_socket.MockSocketHub)
-		uc := usecase.NewNotificationUsecase(repo, hub)
+		dispatch := new(mock_dispatch.MockDispatcher)
+		authClient := new(mock_client.MockAuthClient)
+		lineClient := new(mock_line.MockLineClient)
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
 
 		ctx := context.Background()
 		uid := uuid.New()
@@ -40,8 +48,12 @@ func TestNotificationUsecase(t *testing.T) {
 
 	t.Run("HandleFriendRequest - Success", func(t *testing.T) {
 		repo := new(mock_repo.MockNotificationRepository)
+		drepo := new(mock_repo.MockDeviceRepository)
 		hub := new(mock_socket.MockSocketHub)
-		uc := usecase.NewNotificationUsecase(repo, hub)
+		dispatch := new(mock_dispatch.MockDispatcher)
+		authClient := new(mock_client.MockAuthClient)
+		lineClient := new(mock_line.MockLineClient)
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
 
 		ctx := context.Background()
 
@@ -63,6 +75,8 @@ func TestNotificationUsecase(t *testing.T) {
 			Return(nil).
 			Once()
 
+		hub.On("IsOnline", targetID.String()).Return(true).Once()
+
 		hub.
 			On("Emit", targetID.String(), mock.MatchedBy(func(msg domain.WSMessage) bool {
 				return msg.Type == "NOTIFICATION" &&
@@ -80,8 +94,12 @@ func TestNotificationUsecase(t *testing.T) {
 
 	t.Run("HandleGroupMemberAdded - Multi-User and Skip Sender", func(t *testing.T) {
 		repo := new(mock_repo.MockNotificationRepository)
+		drepo := new(mock_repo.MockDeviceRepository)
 		hub := new(mock_socket.MockSocketHub)
-		uc := usecase.NewNotificationUsecase(repo, hub)
+		dispatch := new(mock_dispatch.MockDispatcher)
+		authClient := new(mock_client.MockAuthClient)
+		lineClient := new(mock_line.MockLineClient)
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
 
 		ctx := context.Background()
 
@@ -101,6 +119,8 @@ func TestNotificationUsecase(t *testing.T) {
 			})).
 			Return(nil).
 			Once()
+
+		hub.On("IsOnline", targetID.String()).Return(true).Once()
 
 		hub.
 			On("Emit", targetID.String(), mock.Anything).
@@ -124,9 +144,12 @@ func TestNotificationUsecase(t *testing.T) {
 
 	t.Run("HandleMemberRemoved - Success", func(t *testing.T) {
 		repo := new(mock_repo.MockNotificationRepository)
+		drepo := new(mock_repo.MockDeviceRepository)
 		hub := new(mock_socket.MockSocketHub)
-		uc := usecase.NewNotificationUsecase(repo, hub)
-
+		dispatch := new(mock_dispatch.MockDispatcher)
+		authClient := new(mock_client.MockAuthClient)
+		lineClient := new(mock_line.MockLineClient)
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
 		ctx := context.Background()
 
 		targetID := uuid.New()
@@ -142,6 +165,8 @@ func TestNotificationUsecase(t *testing.T) {
 			On("CreateNotification", ctx, mock.Anything).
 			Return(nil).
 			Once()
+
+		hub.On("IsOnline", targetID.String()).Return(true).Once()
 
 		hub.
 			On("Emit", targetID.String(), mock.MatchedBy(func(msg domain.WSMessage) bool {
@@ -168,8 +193,12 @@ func TestNotificationUsecase(t *testing.T) {
 
 	t.Run("HandleInsuranceExpiring - Invalid UUID", func(t *testing.T) {
 		repo := new(mock_repo.MockNotificationRepository)
+		drepo := new(mock_repo.MockDeviceRepository)
 		hub := new(mock_socket.MockSocketHub)
-		uc := usecase.NewNotificationUsecase(repo, hub)
+		dispatch := new(mock_dispatch.MockDispatcher)
+		authClient := new(mock_client.MockAuthClient)
+		lineClient := new(mock_line.MockLineClient)
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
 
 		ctx := context.Background()
 
@@ -185,10 +214,77 @@ func TestNotificationUsecase(t *testing.T) {
 		repo.AssertNotCalled(t, "CreateNotification", mock.Anything, mock.Anything)
 	})
 
+	t.Run("HandleInsuranceExpiring - Success with LINE Notification", func(t *testing.T) {
+		repo := new(mock_repo.MockNotificationRepository)
+		drepo := new(mock_repo.MockDeviceRepository)
+		hub := new(mock_socket.MockSocketHub)
+		dispatch := new(mock_dispatch.MockDispatcher)
+		authClient := new(mock_client.MockAuthClient)
+		lineClient := new(mock_line.MockLineClient)
+
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
+
+		ctx := context.Background()
+		userID := uuid.New()
+		insuranceID := uuid.New()
+		lineID := "U1234567890abcdef"
+
+		evt := domain.InsuranceExpiringEvent{
+			UserID:        userID.String(),
+			InsuranceID:   insuranceID.String(),
+			InsuranceName: "AIA Health",
+			DaysLeft:      7,
+			ExpDate:       "2026-03-17",
+		}
+
+		repo.On("CreateNotification", ctx, mock.Anything).Return(nil).Once()
+		hub.On("IsOnline", userID.String()).Return(false).Once()
+		dispatch.On("SendToUser",
+			mock.Anything,
+			mock.AnythingOfType("[]domain.DeviceToken"),
+			mock.AnythingOfType("push_provider.PushPayload"),
+		).Return(nil).Maybe()
+
+		drepo.On("GetActiveTokens", mock.Anything, userID).
+			Return([]domain.DeviceToken{
+				{
+					Token: "token_1",
+				},
+			}, nil).
+			Maybe()
+
+		mockGrpcResponse := &pb.GetProviderAccountsResponse{
+			Accounts: []*pb.ProviderAccount{
+				{
+					Provider:          "line",
+					IsLinked:          true,
+					ProviderAccountId: lineID,
+				},
+			},
+		}
+		authClient.On("GetProviderAccount", mock.Anything, mock.MatchedBy(func(req *pb.GetProviderAccountRequest) bool {
+			return req.UserId == userID.String()
+		})).Return(mockGrpcResponse, nil).Once()
+
+		lineClient.On("SendTextMessage", lineID, mock.AnythingOfType("string")).Return(nil).Once()
+		err := uc.HandleInsuranceExpiring(ctx, evt)
+		assert.NoError(t, err)
+		time.Sleep(150 * time.Millisecond)
+
+		repo.AssertExpectations(t)
+		authClient.AssertExpectations(t)
+		lineClient.AssertExpectations(t)
+		dispatch.AssertExpectations(t)
+	})
+
 	t.Run("HandleAccessGranted - Check Payload", func(t *testing.T) {
 		repo := new(mock_repo.MockNotificationRepository)
+		drepo := new(mock_repo.MockDeviceRepository)
 		hub := new(mock_socket.MockSocketHub)
-		uc := usecase.NewNotificationUsecase(repo, hub)
+		dispatch := new(mock_dispatch.MockDispatcher)
+		authClient := new(mock_client.MockAuthClient)
+		lineClient := new(mock_line.MockLineClient)
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
 
 		ctx := context.Background()
 
@@ -206,6 +302,8 @@ func TestNotificationUsecase(t *testing.T) {
 			On("CreateNotification", ctx, mock.Anything).
 			Return(nil).
 			Once()
+
+		hub.On("IsOnline", targetID.String()).Return(true).Once()
 
 		hub.
 			On("Emit", targetID.String(), mock.MatchedBy(func(msg domain.WSMessage) bool {

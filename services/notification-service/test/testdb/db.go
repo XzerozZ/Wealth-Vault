@@ -18,7 +18,7 @@ type MockDB struct {
 }
 
 func NewMockDB(t *testing.T) *MockDB {
-	sqlDB, mock, err := sqlmock.New()
+	sqlDB, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherRegexp))
 	require.NoError(t, err)
 
 	dialector := postgres.New(postgres.Config{

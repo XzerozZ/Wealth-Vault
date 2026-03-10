@@ -3,90 +3,11 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"time"
 	"wealth-vault/notification-service/internal/domain"
 	"wealth-vault/notification-service/pkg/utils"
 
 	"github.com/google/uuid"
 )
-
-func (u *NotificationUsecase) emitToUser(userID string, event string, payload interface{}) {
-	u.hub.Emit(userID, domain.WSMessage{
-		Type:    "DATA_UPDATE",
-		Event:   event,
-		Payload: payload,
-	})
-}
-
-func (u *NotificationUsecase) emitToGroup(groupID string, event string, payload interface{}) {
-	u.hub.BroadcastToGroup(groupID, domain.WSMessage{
-		Type:    "DATA_UPDATE",
-		Event:   event,
-		Payload: payload,
-	})
-}
-
-func (u *NotificationUsecase) notifyTarget(
-	ctx context.Context,
-	receiverID uuid.UUID,
-	senderID *uuid.UUID,
-	entityType string,
-	entityID uuid.UUID,
-	message string,
-	occurredAt int64,
-) error {
-
-	noti := &domain.Notification{
-		ID:         uuid.New(),
-		EntityType: entityType,
-		EntityID:   entityID,
-		Receiver:   receiverID,
-		SenderID:   senderID,
-		Message:    message,
-		Channel:    "IN_APP",
-		CreatedAt:  time.Unix(occurredAt, 0),
-		IsRead:     false,
-	}
-
-	if err := u.repo.CreateNotification(ctx, noti); err != nil {
-		return err
-	}
-
-	u.hub.Emit(receiverID.String(), domain.WSMessage{
-		Type:    "NOTIFICATION",
-		Payload: noti,
-	})
-
-	return nil
-}
-
-func (u *NotificationUsecase) notifyMany(
-	ctx context.Context,
-	targetIDs []string,
-	senderUUID *uuid.UUID,
-	entityType string,
-	entityID uuid.UUID,
-	message string,
-	occurredAt int64,
-) error {
-
-	for _, idStr := range targetIDs {
-		receiverID, err := uuid.Parse(idStr)
-		if err != nil {
-			continue
-		}
-
-		if senderUUID != nil && *senderUUID == receiverID {
-			continue
-		}
-
-		if err := u.notifyTarget(ctx, receiverID, senderUUID, entityType, entityID, message, occurredAt); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
 
 func (u *NotificationUsecase) HandleGroupCreated(ctx context.Context, evt domain.GroupCreatedEvent) error {
 	groupUUID, err := uuid.Parse(evt.GroupID)

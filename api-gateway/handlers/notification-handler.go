@@ -83,12 +83,12 @@ func (h *NotificationHandler) bridgeWS(c *websocket.Conn, targetURL string, user
 
 func (h *NotificationHandler) ProxyAPI(c *fiber.Ctx) error {
 	baseURL := fmt.Sprintf("http://%s:%s", h.cfg.NotiService.Host, h.cfg.NotiService.Port)
-
 	path := strings.TrimPrefix(c.OriginalURL(), "/api")
 	targetURL := baseURL + path
-
 	userID := c.Locals("user_id").(string)
-	c.Request().Header.Set("X-User-ID", userID)
+	if userID != "" {
+		c.Request().Header.Set("X-User-ID", userID)
+	}
 
 	return proxy.Do(c, targetURL)
 }
