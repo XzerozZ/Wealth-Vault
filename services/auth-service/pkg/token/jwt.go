@@ -22,7 +22,7 @@ func (j *JWTGenerate) CreateToken(userID string, email string, tokenType string,
 		"user_id": userID,
 		"email":   email,
 		"type":    tokenType,
-		//"exp":     time.Now().Add(duration).Unix(),
+		"exp":     time.Now().Add(duration).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
