@@ -9,8 +9,8 @@ import (
 type Platform string
 
 const (
-	PlatformIOS     Platform = "ios"
-	PlatformAndroid Platform = "android"
+	PlatformIOS     Platform = "IOS"
+	PlatformAndroid Platform = "Android"
 )
 
 type DeviceToken struct {
