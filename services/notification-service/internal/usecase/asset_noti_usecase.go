@@ -48,6 +48,7 @@ func (u *NotificationUsecase) HandleInsuranceExpiring(ctx context.Context, evt d
 			Payload: noti,
 		})
 	} else {
+		log.Printf("Push Notification Successfully")
 		go u.sendPush(context.Background(), userID, noti.Message, noti)
 	}
 
