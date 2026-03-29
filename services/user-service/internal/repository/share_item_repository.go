@@ -378,3 +378,19 @@ func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUser
 
 	return items, nil
 }
+
+func (r *ShareItemRepository) GetAllSharedItemIDsByUser(ctx context.Context, userID uuid.UUID) ([]string, error) {
+	var itemIDs []string
+	query := `
+		SELECT entity_id FROM group_items WHERE owner_id = ?
+		UNION
+		SELECT entity_id FROM friend_items WHERE owner_id = ?
+		UNION
+		SELECT entity_id FROM email_items WHERE owner_id = ?
+	`
+	if err := r.db.WithContext(ctx).Raw(query, userID, userID, userID).Pluck("entity_id", &itemIDs).Error; err != nil {
+		return nil, err
+	}
+
+	return itemIDs, nil
+}

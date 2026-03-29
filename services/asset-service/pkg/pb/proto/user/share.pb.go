@@ -1270,6 +1270,94 @@ func (x *GetItemsSharedByFriendResponse) GetAssetDetail() []*SharedAssetPreview 
 	return nil
 }
 
+type GetAllSharedItemIDsByUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllSharedItemIDsByUserRequest) Reset() {
+	*x = GetAllSharedItemIDsByUserRequest{}
+	mi := &file_proto_user_share_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllSharedItemIDsByUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllSharedItemIDsByUserRequest) ProtoMessage() {}
+
+func (x *GetAllSharedItemIDsByUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllSharedItemIDsByUserRequest.ProtoReflect.Descriptor instead.
+func (*GetAllSharedItemIDsByUserRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetAllSharedItemIDsByUserRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetAllSharedItemIDsByUserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ItemIds       []string               `protobuf:"bytes,1,rep,name=item_ids,json=itemIds,proto3" json:"item_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllSharedItemIDsByUserResponse) Reset() {
+	*x = GetAllSharedItemIDsByUserResponse{}
+	mi := &file_proto_user_share_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllSharedItemIDsByUserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllSharedItemIDsByUserResponse) ProtoMessage() {}
+
+func (x *GetAllSharedItemIDsByUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_share_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllSharedItemIDsByUserResponse.ProtoReflect.Descriptor instead.
+func (*GetAllSharedItemIDsByUserResponse) Descriptor() ([]byte, []int) {
+	return file_proto_user_share_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetAllSharedItemIDsByUserResponse) GetItemIds() []string {
+	if x != nil {
+		return x.ItemIds
+	}
+	return nil
+}
+
 var File_proto_user_share_proto protoreflect.FileDescriptor
 
 const file_proto_user_share_proto_rawDesc = "" +
@@ -1357,7 +1445,11 @@ const file_proto_user_share_proto_rawDesc = "" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x125\n" +
 	"\fasset_detail\x18\x03 \x01(\v2\x12.user.AssetPreviewR\vassetDetail\"]\n" +
 	"\x1eGetItemsSharedByFriendResponse\x12;\n" +
-	"\fasset_detail\x18\x01 \x03(\v2\x18.user.SharedAssetPreviewR\vassetDetailB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\fasset_detail\x18\x01 \x03(\v2\x18.user.SharedAssetPreviewR\vassetDetail\";\n" +
+	" GetAllSharedItemIDsByUserRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\">\n" +
+	"!GetAllSharedItemIDsByUserResponse\x12\x19\n" +
+	"\bitem_ids\x18\x01 \x03(\tR\aitemIdsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_user_share_proto_rawDescOnce sync.Once
@@ -1371,51 +1463,53 @@ func file_proto_user_share_proto_rawDescGZIP() []byte {
 	return file_proto_user_share_proto_rawDescData
 }
 
-var file_proto_user_share_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_proto_user_share_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_proto_user_share_proto_goTypes = []any{
-	(*ShareTarget)(nil),                    // 0: user.ShareTarget
-	(*ShareItemRequest)(nil),               // 1: user.ShareItemRequest
-	(*ShareItemResponse)(nil),              // 2: user.ShareItemResponse
-	(*GetGroupItemsRequest)(nil),           // 3: user.GetGroupItemsRequest
-	(*GetFriendItemRequest)(nil),           // 4: user.GetFriendItemRequest
-	(*GetGroupItemsResponse)(nil),          // 5: user.GetGroupItemsResponse
-	(*GroupItemDetail)(nil),                // 6: user.GroupItemDetail
-	(*GetFriendItemsResponse)(nil),         // 7: user.GetFriendItemsResponse
-	(*FriendItemDetail)(nil),               // 8: user.FriendItemDetail
-	(*UnshareItemRequest)(nil),             // 9: user.UnshareItemRequest
-	(*DeleteByEntityRequest)(nil),          // 10: user.DeleteByEntityRequest
-	(*DeleteByEntityResponse)(nil),         // 11: user.DeleteByEntityResponse
-	(*GetItemSharedTargetsRequest)(nil),    // 12: user.GetItemSharedTargetsRequest
-	(*SharedGroupInfo)(nil),                // 13: user.SharedGroupInfo
-	(*SharedFriendInfo)(nil),               // 14: user.SharedFriendInfo
-	(*SharedEmailInfo)(nil),                // 15: user.SharedEmailInfo
-	(*GetItemSharedTargetsResponse)(nil),   // 16: user.GetItemSharedTargetsResponse
-	(*GetSharedItemIDsRequest)(nil),        // 17: user.GetSharedItemIDsRequest
-	(*GetSharedItemIDsResponse)(nil),       // 18: user.GetSharedItemIDsResponse
-	(*GetItemsSharedByFriendRequest)(nil),  // 19: user.GetItemsSharedByFriendRequest
-	(*SharedAssetPreview)(nil),             // 20: user.SharedAssetPreview
-	(*GetItemsSharedByFriendResponse)(nil), // 21: user.GetItemsSharedByFriendResponse
-	(*timestamppb.Timestamp)(nil),          // 22: google.protobuf.Timestamp
-	(*AssetPreview)(nil),                   // 23: user.AssetPreview
+	(*ShareTarget)(nil),                       // 0: user.ShareTarget
+	(*ShareItemRequest)(nil),                  // 1: user.ShareItemRequest
+	(*ShareItemResponse)(nil),                 // 2: user.ShareItemResponse
+	(*GetGroupItemsRequest)(nil),              // 3: user.GetGroupItemsRequest
+	(*GetFriendItemRequest)(nil),              // 4: user.GetFriendItemRequest
+	(*GetGroupItemsResponse)(nil),             // 5: user.GetGroupItemsResponse
+	(*GroupItemDetail)(nil),                   // 6: user.GroupItemDetail
+	(*GetFriendItemsResponse)(nil),            // 7: user.GetFriendItemsResponse
+	(*FriendItemDetail)(nil),                  // 8: user.FriendItemDetail
+	(*UnshareItemRequest)(nil),                // 9: user.UnshareItemRequest
+	(*DeleteByEntityRequest)(nil),             // 10: user.DeleteByEntityRequest
+	(*DeleteByEntityResponse)(nil),            // 11: user.DeleteByEntityResponse
+	(*GetItemSharedTargetsRequest)(nil),       // 12: user.GetItemSharedTargetsRequest
+	(*SharedGroupInfo)(nil),                   // 13: user.SharedGroupInfo
+	(*SharedFriendInfo)(nil),                  // 14: user.SharedFriendInfo
+	(*SharedEmailInfo)(nil),                   // 15: user.SharedEmailInfo
+	(*GetItemSharedTargetsResponse)(nil),      // 16: user.GetItemSharedTargetsResponse
+	(*GetSharedItemIDsRequest)(nil),           // 17: user.GetSharedItemIDsRequest
+	(*GetSharedItemIDsResponse)(nil),          // 18: user.GetSharedItemIDsResponse
+	(*GetItemsSharedByFriendRequest)(nil),     // 19: user.GetItemsSharedByFriendRequest
+	(*SharedAssetPreview)(nil),                // 20: user.SharedAssetPreview
+	(*GetItemsSharedByFriendResponse)(nil),    // 21: user.GetItemsSharedByFriendResponse
+	(*GetAllSharedItemIDsByUserRequest)(nil),  // 22: user.GetAllSharedItemIDsByUserRequest
+	(*GetAllSharedItemIDsByUserResponse)(nil), // 23: user.GetAllSharedItemIDsByUserResponse
+	(*timestamppb.Timestamp)(nil),             // 24: google.protobuf.Timestamp
+	(*AssetPreview)(nil),                      // 25: user.AssetPreview
 }
 var file_proto_user_share_proto_depIdxs = []int32{
-	22, // 0: user.ShareTarget.share_at:type_name -> google.protobuf.Timestamp
+	24, // 0: user.ShareTarget.share_at:type_name -> google.protobuf.Timestamp
 	0,  // 1: user.ShareItemRequest.groups:type_name -> user.ShareTarget
 	0,  // 2: user.ShareItemRequest.friends:type_name -> user.ShareTarget
 	0,  // 3: user.ShareItemRequest.emails:type_name -> user.ShareTarget
 	6,  // 4: user.GetGroupItemsResponse.items:type_name -> user.GroupItemDetail
-	22, // 5: user.GroupItemDetail.shared_at:type_name -> google.protobuf.Timestamp
-	23, // 6: user.GroupItemDetail.asset_detail:type_name -> user.AssetPreview
+	24, // 5: user.GroupItemDetail.shared_at:type_name -> google.protobuf.Timestamp
+	25, // 6: user.GroupItemDetail.asset_detail:type_name -> user.AssetPreview
 	8,  // 7: user.GetFriendItemsResponse.items:type_name -> user.FriendItemDetail
-	22, // 8: user.FriendItemDetail.shared_at:type_name -> google.protobuf.Timestamp
-	23, // 9: user.FriendItemDetail.asset_detail:type_name -> user.AssetPreview
-	22, // 10: user.SharedGroupInfo.shared_at:type_name -> google.protobuf.Timestamp
-	22, // 11: user.SharedFriendInfo.shared_at:type_name -> google.protobuf.Timestamp
-	22, // 12: user.SharedEmailInfo.shared_at:type_name -> google.protobuf.Timestamp
+	24, // 8: user.FriendItemDetail.shared_at:type_name -> google.protobuf.Timestamp
+	25, // 9: user.FriendItemDetail.asset_detail:type_name -> user.AssetPreview
+	24, // 10: user.SharedGroupInfo.shared_at:type_name -> google.protobuf.Timestamp
+	24, // 11: user.SharedFriendInfo.shared_at:type_name -> google.protobuf.Timestamp
+	24, // 12: user.SharedEmailInfo.shared_at:type_name -> google.protobuf.Timestamp
 	13, // 13: user.GetItemSharedTargetsResponse.groups:type_name -> user.SharedGroupInfo
 	14, // 14: user.GetItemSharedTargetsResponse.friends:type_name -> user.SharedFriendInfo
 	15, // 15: user.GetItemSharedTargetsResponse.emails:type_name -> user.SharedEmailInfo
-	23, // 16: user.SharedAssetPreview.asset_detail:type_name -> user.AssetPreview
+	25, // 16: user.SharedAssetPreview.asset_detail:type_name -> user.AssetPreview
 	20, // 17: user.GetItemsSharedByFriendResponse.asset_detail:type_name -> user.SharedAssetPreview
 	18, // [18:18] is the sub-list for method output_type
 	18, // [18:18] is the sub-list for method input_type
@@ -1436,7 +1530,7 @@ func file_proto_user_share_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_user_share_proto_rawDesc), len(file_proto_user_share_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

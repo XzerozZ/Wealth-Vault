@@ -129,3 +129,11 @@ message SharedAssetPreview {
 message GetItemsSharedByFriendResponse {
   repeated SharedAssetPreview asset_detail = 1; 
 }
+
+message GetAllSharedItemIDsByUserRequest {
+  string user_id = 1;
+}
+
+message GetAllSharedItemIDsByUserResponse {
+  repeated string item_ids = 1;
+}

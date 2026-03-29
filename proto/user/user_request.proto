@@ -40,6 +40,7 @@ service UserService {
   rpc DeleteAllReferencesByEntityID(DeleteByEntityRequest) returns (DeleteByEntityResponse);
   rpc GetItemSharedTargets(GetItemSharedTargetsRequest) returns (GetItemSharedTargetsResponse);
   rpc GetSharedItemIDs(GetSharedItemIDsRequest) returns (GetSharedItemIDsResponse);
+  rpc GetAllSharedItemIDsByUser(GetAllSharedItemIDsByUserRequest) returns (GetAllSharedItemIDsByUserResponse);
   
   rpc GetGroupMessages(GetGroupMessagesRequest) returns (GetGroupMessagesResponse);
   rpc GetPrivateMessages(GetPrivateMessagesRequest) returns (GetPrivateMessagesResponse);
