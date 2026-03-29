@@ -294,3 +294,12 @@ func (h *UserGRPCHandler) DeleteGroup(ctx context.Context, req *pb.DeleteGroupRe
 
 	return res, nil
 }
+
+func (h *UserGRPCHandler) GetAllSharedItemIDsByUser(ctx context.Context, req *pb.GetAllSharedItemIDsByUserRequest) (*pb.GetAllSharedItemIDsByUserResponse, error) {
+	res, err := h.giusecase.GetAllSharedItemIDsByUser(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}

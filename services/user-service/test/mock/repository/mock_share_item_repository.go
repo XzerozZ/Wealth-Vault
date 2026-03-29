@@ -285,3 +285,11 @@ func (m *MockShareItemRepository) GetItemsSharedByFriend(
 
 	return result, args.Error(1)
 }
+
+func (m *MockShareItemRepository) GetAllSharedItemIDsByUser(
+	ctx context.Context,
+	userID uuid.UUID,
+) ([]string, error) {
+	args := m.Called(ctx, userID)
+	return args.Get(0).([]string), args.Error(1)
+}

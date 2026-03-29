@@ -57,7 +57,7 @@ func InitApp(cfg *configs.Configs) *fiber.App {
 	groupItemHandler := handlers.NewGroupItemHandler(userClient, assetClient)
 	notificationHandler := handlers.NewNotificationHandler(cfg)
 	msgHandler := handlers.NewMessageHandlerr(userClient)
-	infoHandler := handlers.NewInfoHandler(assetClient)
+	infoHandler := handlers.NewInfoHandler(assetClient, userClient)
 
 	// ---------- routes ----------
 	routes.Setup(app,

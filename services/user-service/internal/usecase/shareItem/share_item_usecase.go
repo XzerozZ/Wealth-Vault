@@ -145,3 +145,19 @@ func (u *ShareItemUsecase) GetSharedItemIDs(ctx context.Context, req *pb.GetShar
 		ItemIds: ids,
 	}, nil
 }
+
+func (u *ShareItemUsecase) GetAllSharedItemIDsByUser(ctx context.Context, req *pb.GetAllSharedItemIDsByUserRequest) (*pb.GetAllSharedItemIDsByUserResponse, error) {
+	userID, err := utils.ParseUUID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	ids, err := u.itemRepo.GetAllSharedItemIDsByUser(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GetAllSharedItemIDsByUserResponse{
+		ItemIds: ids,
+	}, nil
+}

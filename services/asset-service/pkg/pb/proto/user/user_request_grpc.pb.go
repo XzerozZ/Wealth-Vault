@@ -47,6 +47,7 @@ const (
 	UserService_DeleteAllReferencesByEntityID_FullMethodName = "/user.UserService/DeleteAllReferencesByEntityID"
 	UserService_GetItemSharedTargets_FullMethodName          = "/user.UserService/GetItemSharedTargets"
 	UserService_GetSharedItemIDs_FullMethodName              = "/user.UserService/GetSharedItemIDs"
+	UserService_GetAllSharedItemIDsByUser_FullMethodName     = "/user.UserService/GetAllSharedItemIDsByUser"
 	UserService_GetGroupMessages_FullMethodName              = "/user.UserService/GetGroupMessages"
 	UserService_GetPrivateMessages_FullMethodName            = "/user.UserService/GetPrivateMessages"
 )
@@ -83,6 +84,7 @@ type UserServiceClient interface {
 	DeleteAllReferencesByEntityID(ctx context.Context, in *DeleteByEntityRequest, opts ...grpc.CallOption) (*DeleteByEntityResponse, error)
 	GetItemSharedTargets(ctx context.Context, in *GetItemSharedTargetsRequest, opts ...grpc.CallOption) (*GetItemSharedTargetsResponse, error)
 	GetSharedItemIDs(ctx context.Context, in *GetSharedItemIDsRequest, opts ...grpc.CallOption) (*GetSharedItemIDsResponse, error)
+	GetAllSharedItemIDsByUser(ctx context.Context, in *GetAllSharedItemIDsByUserRequest, opts ...grpc.CallOption) (*GetAllSharedItemIDsByUserResponse, error)
 	GetGroupMessages(ctx context.Context, in *GetGroupMessagesRequest, opts ...grpc.CallOption) (*GetGroupMessagesResponse, error)
 	GetPrivateMessages(ctx context.Context, in *GetPrivateMessagesRequest, opts ...grpc.CallOption) (*GetPrivateMessagesResponse, error)
 }
@@ -375,6 +377,16 @@ func (c *userServiceClient) GetSharedItemIDs(ctx context.Context, in *GetSharedI
 	return out, nil
 }
 
+func (c *userServiceClient) GetAllSharedItemIDsByUser(ctx context.Context, in *GetAllSharedItemIDsByUserRequest, opts ...grpc.CallOption) (*GetAllSharedItemIDsByUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAllSharedItemIDsByUserResponse)
+	err := c.cc.Invoke(ctx, UserService_GetAllSharedItemIDsByUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) GetGroupMessages(ctx context.Context, in *GetGroupMessagesRequest, opts ...grpc.CallOption) (*GetGroupMessagesResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetGroupMessagesResponse)
@@ -427,6 +439,7 @@ type UserServiceServer interface {
 	DeleteAllReferencesByEntityID(context.Context, *DeleteByEntityRequest) (*DeleteByEntityResponse, error)
 	GetItemSharedTargets(context.Context, *GetItemSharedTargetsRequest) (*GetItemSharedTargetsResponse, error)
 	GetSharedItemIDs(context.Context, *GetSharedItemIDsRequest) (*GetSharedItemIDsResponse, error)
+	GetAllSharedItemIDsByUser(context.Context, *GetAllSharedItemIDsByUserRequest) (*GetAllSharedItemIDsByUserResponse, error)
 	GetGroupMessages(context.Context, *GetGroupMessagesRequest) (*GetGroupMessagesResponse, error)
 	GetPrivateMessages(context.Context, *GetPrivateMessagesRequest) (*GetPrivateMessagesResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -522,6 +535,9 @@ func (UnimplementedUserServiceServer) GetItemSharedTargets(context.Context, *Get
 }
 func (UnimplementedUserServiceServer) GetSharedItemIDs(context.Context, *GetSharedItemIDsRequest) (*GetSharedItemIDsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSharedItemIDs not implemented")
+}
+func (UnimplementedUserServiceServer) GetAllSharedItemIDsByUser(context.Context, *GetAllSharedItemIDsByUserRequest) (*GetAllSharedItemIDsByUserResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllSharedItemIDsByUser not implemented")
 }
 func (UnimplementedUserServiceServer) GetGroupMessages(context.Context, *GetGroupMessagesRequest) (*GetGroupMessagesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetGroupMessages not implemented")
@@ -1054,6 +1070,24 @@ func _UserService_GetSharedItemIDs_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetAllSharedItemIDsByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllSharedItemIDsByUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetAllSharedItemIDsByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetAllSharedItemIDsByUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetAllSharedItemIDsByUser(ctx, req.(*GetAllSharedItemIDsByUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_GetGroupMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetGroupMessagesRequest)
 	if err := dec(in); err != nil {
@@ -1208,6 +1242,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSharedItemIDs",
 			Handler:    _UserService_GetSharedItemIDs_Handler,
+		},
+		{
+			MethodName: "GetAllSharedItemIDsByUser",
+			Handler:    _UserService_GetAllSharedItemIDsByUser_Handler,
 		},
 		{
 			MethodName: "GetGroupMessages",
