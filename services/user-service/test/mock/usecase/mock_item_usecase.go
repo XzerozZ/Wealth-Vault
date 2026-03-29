@@ -12,6 +12,11 @@ type MockItemUsecase struct {
 	mock.Mock
 }
 
+// GetAllSharedItemIDsByUser implements usecase.ShareItemUsecase.
+func (m *MockItemUsecase) GetAllSharedItemIDsByUser(ctx context.Context, req *pb.GetAllSharedItemIDsByUserRequest) (*pb.GetAllSharedItemIDsByUserResponse, error) {
+	panic("unimplemented")
+}
+
 // AddMemberToGroup implements usecase.GroupItemUsecase.
 func (m *MockItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemberRequest) (*pb.ActionResponse, error) {
 	panic("unimplemented")
