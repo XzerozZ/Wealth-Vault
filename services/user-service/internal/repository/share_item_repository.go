@@ -141,7 +141,7 @@ func (r *ShareItemRepository) GetSharedIteminFriend(ctx context.Context, friendI
 }
 
 func (r *ShareItemRepository) DeleteIteminGroup(ctx context.Context, itemID uuid.UUID, userID uuid.UUID) error {
-	if err := r.db.WithContext(ctx).Where("id = ? AND created_by = ?", itemID, userID).Delete(&domain.GroupItem{}).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", itemID, userID).Delete(&domain.GroupItem{}).Error; err != nil {
 		return err
 	}
 
@@ -149,7 +149,7 @@ func (r *ShareItemRepository) DeleteIteminGroup(ctx context.Context, itemID uuid
 }
 
 func (r *ShareItemRepository) DeleteIteminFriend(ctx context.Context, itemID uuid.UUID, userID uuid.UUID) error {
-	if err := r.db.WithContext(ctx).Where("id = ? AND created_by = ?", itemID, userID).Delete(&domain.FriendItem{}).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id = ? AND owner_id = ?", itemID, userID).Delete(&domain.FriendItem{}).Error; err != nil {
 		return err
 	}
 
