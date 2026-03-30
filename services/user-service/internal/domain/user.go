@@ -15,7 +15,7 @@ type User struct {
 	Profile              string
 	Phonenumber          string
 	Birthday             *time.Time `gorm:"type:date"`
-	AutoShareAge         int        `gorm:"default:0"`
+	AutoShareAge         int        `gorm:"default:80"`
 	IsAutoShareEnabled   bool       `gorm:"default:false"`
 	IsAutoShareTriggered bool       `gorm:"default:false"`
 	CreatedAt            time.Time
