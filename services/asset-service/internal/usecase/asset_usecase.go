@@ -60,14 +60,16 @@ func (u *AssetUsecase) GetAllAssets(ctx context.Context, req *pb.GetAllAssetsReq
 		return nil, err
 	}
 
-	assets, err := u.r.GetAllAssets(ctx, uid)
+	assets, lias, err := u.r.GetAllAssets(ctx, uid)
 	if err != nil {
 		return nil, err
 	}
 
 	pbAssets := mapper.ToAssetSummaryProtoList(assets)
+	pbLias := mapper.ToAssetSummaryProtoList(lias)
 	return &pb.GetAllAssetsResponse{
-		Assets: pbAssets,
+		Assets:      pbAssets,
+		Liabilities: pbLias,
 	}, nil
 }
 

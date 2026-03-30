@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"log"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -374,7 +375,7 @@ func (h *UserHandler) GetCloseFriends(c *fiber.Ctx) error {
 	}
 
 	friendInfo := mapper.ToUserList(res.Friends)
-
+	log.Println(friendInfo[0].IsClose)
 	return c.JSON(fiber.Map{
 		"data": friendInfo,
 	})

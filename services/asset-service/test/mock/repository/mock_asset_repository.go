@@ -22,9 +22,9 @@ func (m *MockAssetRepository) CheckExists(ctx context.Context, entityType string
 	return args.Get(0).(bool), args.Error(1)
 }
 
-func (m *MockAssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, error) {
+func (m *MockAssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error) {
 	args := m.Called(ctx, uid)
-	return args.Get(0).([]domain.AssetSummary), args.Error(1)
+	return args.Get(0).([]domain.AssetSummary), args.Get(1).([]domain.AssetSummary), args.Error(2)
 }
 
 func (m *MockAssetRepository) GetAssetCount(ctx context.Context, uid uuid.UUID) (int64, error) {

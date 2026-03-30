@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestAddFriend(t *testing.T) {
@@ -171,24 +172,40 @@ func TestSetCloseFriend(t *testing.T) {
 	assert.True(t, res.Success)
 }
 
-func TestGetCloseFriends(t *testing.T) {
+func TestGetCloseFriends_Usecase(t *testing.T) {
 	ctx := context.Background()
 	userRepo := new(mock_repo.MockUserRepository)
 	pub := new(mock_event.MockEventPublisher)
+
 	uc := usecase.NewUserUsecase(userRepo, nil, nil, pub, nil)
 
 	u1 := uuid.New()
-
+	friendID := uuid.New()
 	userRepo.
-		On("GetCloseFriends", ctx, u1).
-		Return([]domain.User{
-			{ID: uuid.New(), Username: "Bob"},
+		On("GetCloseFriends", mock.Anything, u1).
+		Return([]domain.FriendList{
+			{
+				UserID:        u1,
+				FriendID:      friendID,
+				Status:        "ACCEPTED",
+				IsCloseFriend: true,
+				Friend: domain.User{
+					ID:       friendID,
+					Username: "Bob",
+				},
+			},
 		}, nil)
 
 	res, err := uc.GetCloseFriends(ctx, &pb.GetCloseFriendsRequest{
 		UserId: u1.String(),
 	})
 
-	assert.NoError(t, err)
-	assert.Len(t, res.Friends, 1)
+	require.NoError(t, err)
+	require.NotNil(t, res)
+	require.Len(t, res.Friends, 1)
+
+	assert.Equal(t, "Bob", res.Friends[0].Username)
+	assert.True(t, res.Friends[0].IsCloseFriend)
+
+	userRepo.AssertExpectations(t)
 }

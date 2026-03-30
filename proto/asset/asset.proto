@@ -78,4 +78,5 @@ message GetAllAssetsRequest {
 
 message GetAllAssetsResponse {
   repeated AssetSummary assets = 1;
+  repeated AssetSummary liabilities = 2;
 }

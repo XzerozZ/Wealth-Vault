@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 	"wealth-vault/user-service/internal/domain"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
@@ -127,6 +128,19 @@ func (u *UserUsecase) SetCloseFriend(ctx context.Context, req *pb.SetCloseFriend
 		return nil, err
 	}
 
+	exists, status, err := u.userRepo.CheckFriendship(ctx, userID, friendID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return nil, errors.New("friendship not found")
+	}
+
+	if status != "ACCEPTED" {
+		return nil, errors.New("cannot set close friend while friendship status is pending")
+	}
+
 	if err := u.userRepo.SetCloseFriendStatus(ctx, userID, friendID, req.IsClose); err != nil {
 		return nil, err
 	}
@@ -149,9 +163,12 @@ func (u *UserUsecase) GetCloseFriends(ctx context.Context, req *pb.GetCloseFrien
 
 	var friends []*pb.User
 	for _, item := range closefriendlists {
-		friends = append(friends, utils.ToUserProto(&item))
+		friendProto := utils.ToUserProto(&item.Friend)
+		friendProto.IsCloseFriend = item.IsCloseFriend
+		friends = append(friends, friendProto)
 	}
 
+	log.Println(friends[0].IsCloseFriend)
 	return &pb.GetCloseFriendsResponse{
 		Friends: friends,
 	}, nil

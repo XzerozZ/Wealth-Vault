@@ -22,7 +22,7 @@ type UserRepository interface {
 	CheckFriendship(ctx context.Context, userID, friendID uuid.UUID) (bool, string, error)
 	GetIncomingRequests(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error)
 	SetCloseFriendStatus(ctx context.Context, userID, friendID uuid.UUID, isClose bool) error
-	GetCloseFriends(ctx context.Context, userID uuid.UUID) ([]domain.User, error)
+	GetCloseFriends(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error)
 	GetUsersReadyForAutoShare(ctx context.Context) ([]domain.User, error)
 	MarkAutoShareTriggered(ctx context.Context, userID uuid.UUID) error
 	CreateFriendLog(ctx context.Context, log *domain.FriendLog) error

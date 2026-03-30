@@ -10,6 +10,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCheckExists_Account_Found(t *testing.T) {
@@ -72,23 +73,36 @@ func TestGetAllAssets_Success(t *testing.T) {
 	defer mock.Close()
 
 	repo := repository.NewAssetRepository(mock.DB)
-
 	uid := uuid.New()
 
-	rows := sqlmock.NewRows([]string{
+	assetRows := sqlmock.NewRows([]string{
 		"id", "type", "name", "value", "created_at",
 	}).AddRow(
 		uuid.New(), "account", "My Account", 1000, time.Now(),
 	)
 
 	mock.Mock.ExpectQuery(`SELECT id, 'account'`).
-		WithArgs(uid, uid, uid, uid, uid, uid, uid).
-		WillReturnRows(rows)
+		WithArgs(uid, uid, uid, uid, uid, uid).
+		WillReturnRows(assetRows)
 
-	result, err := repo.GetAllAssets(context.Background(), uid)
+	liabilityRows := sqlmock.NewRows([]string{
+		"id", "type", "name", "value", "created_at",
+	}).AddRow(
+		uuid.New(), "liability", "Car Loan", 500, time.Now(),
+	)
 
-	assert.NoError(t, err)
-	assert.Len(t, result, 1)
+	mock.Mock.ExpectQuery(`SELECT id, 'liability'`).
+		WithArgs(uid).
+		WillReturnRows(liabilityRows)
+
+	assets, liabilities, err := repo.GetAllAssets(context.Background(), uid)
+
+	require.NoError(t, err)
+	assert.Len(t, assets, 1)
+	assert.Len(t, liabilities, 1)
+	assert.Equal(t, "My Account", assets[0].Name)
+	assert.Equal(t, "Car Loan", liabilities[0].Name)
+
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())
 }
 
@@ -97,21 +111,29 @@ func TestGetAllAssets_Empty(t *testing.T) {
 	defer mock.Close()
 
 	repo := repository.NewAssetRepository(mock.DB)
-
 	uid := uuid.New()
 
-	rows := sqlmock.NewRows([]string{
+	emptyAssetRows := sqlmock.NewRows([]string{
 		"id", "type", "name", "value", "created_at",
 	})
 
 	mock.Mock.ExpectQuery(`SELECT id, 'account'`).
-		WithArgs(uid, uid, uid, uid, uid, uid, uid).
-		WillReturnRows(rows)
+		WithArgs(uid, uid, uid, uid, uid, uid).
+		WillReturnRows(emptyAssetRows)
 
-	result, err := repo.GetAllAssets(context.Background(), uid)
+	emptyLiabilityRows := sqlmock.NewRows([]string{
+		"id", "type", "name", "value", "created_at",
+	})
 
-	assert.NoError(t, err)
-	assert.Len(t, result, 0)
+	mock.Mock.ExpectQuery(`SELECT id, 'liability'`).
+		WithArgs(uid).
+		WillReturnRows(emptyLiabilityRows)
+
+	assets, liabilities, err := repo.GetAllAssets(context.Background(), uid)
+
+	require.NoError(t, err)
+	assert.Len(t, assets, 0)
+	assert.Len(t, liabilities, 0)
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())
 }
 

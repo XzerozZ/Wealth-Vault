@@ -11,6 +11,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetFriendList(t *testing.T) {
@@ -189,15 +190,31 @@ func TestGetCloseFriends(t *testing.T) {
 
 	userID := uuid.New()
 	friendID := uuid.New()
-	queryRegex := `^SELECT .* FROM "users" JOIN "friend_lists" ON "friend_lists"\."friend_id" = "users"\."id" AND "friend_lists"\."user_id" = \$1 WHERE friend_lists\.is_close_friend = \$2$`
+	queryRegex := `^SELECT \* FROM "friend_lists" WHERE user_id = \$1 AND is_close_friend = \$2$`
+	rows := sqlmock.NewRows([]string{"user_id", "friend_id", "is_close_friend", "status"}).
+		AddRow(userID, friendID, true, "ACCEPTED")
 
 	mock.Mock.ExpectQuery(queryRegex).
 		WithArgs(userID, true).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(friendID))
+		WillReturnRows(rows)
+
+	preloadRegex := `^SELECT \* FROM "users" WHERE.*id.*`
+
+	userRows := sqlmock.NewRows([]string{"id", "username"}).
+		AddRow(friendID, "Bob")
+
+	mock.Mock.ExpectQuery(preloadRegex).
+		WithArgs(friendID).
+		WillReturnRows(userRows)
 
 	res, err := repo.GetCloseFriends(context.Background(), userID)
 
-	assert.NoError(t, err)
-	assert.Len(t, res, 1)
+	require.NoError(t, err)
+	require.Len(t, res, 1)
+
+	assert.Equal(t, friendID, res[0].FriendID)
+	assert.True(t, res[0].IsCloseFriend)
+	assert.Equal(t, "Bob", res[0].Friend.Username)
+
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())
 }
