@@ -58,12 +58,12 @@ func ApplyUpdateUserFields(req *pb.UpdateUserRequest, storage storage.SupabaseSt
 
 	if has("share_enabled") && req.Sharedenabled != nil {
 		user.IsAutoShareEnabled = *req.Sharedenabled
-		updateMask = append(updateMask, "AutoShareAge")
+		updateMask = append(updateMask, "IsAutoShareEnabled")
 	}
 
 	if has("shared_age") && req.Sharedage != nil {
 		user.AutoShareAge = int(*req.Sharedage)
-		updateMask = append(updateMask, "IsAutoShareEnabled")
+		updateMask = append(updateMask, "AutoShareAge")
 	}
 
 	return updateMask, nil

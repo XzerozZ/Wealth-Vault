@@ -37,6 +37,16 @@ func (u *UserUsecase) AddFriend(ctx context.Context, req *pb.FriendRequest) (*pb
 		}
 	}
 
+	reverseExists, reverseStatus, _ := u.userRepo.CheckFriendship(ctx, friendID, userID)
+	if reverseExists {
+		if reverseStatus == "ACCEPTED" {
+			return nil, errors.New("already friends")
+		}
+		if reverseStatus == "PENDING" {
+			return nil, errors.New("this user has already sent you a friend request, please check your pending requests")
+		}
+	}
+
 	friendRequest := &domain.FriendList{
 		UserID:   userID,
 		FriendID: friendID,

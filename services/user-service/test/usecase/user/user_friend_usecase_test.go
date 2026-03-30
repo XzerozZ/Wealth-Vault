@@ -55,6 +55,31 @@ func TestAddFriend(t *testing.T) {
 		assert.Equal(t, "already friends", err.Error())
 	})
 
+	t.Run("reverse pending", func(t *testing.T) {
+		userRepo := new(mock_repo.MockUserRepository)
+		pub := new(mock_event.MockEventPublisher)
+		uc := usecase.NewUserUsecase(userRepo, nil, nil, pub, nil)
+
+		u1 := uuid.New()
+		u2 := uuid.New()
+
+		userRepo.
+			On("CheckFriendship", ctx, u1, u2).
+			Return(false, "", nil)
+
+		userRepo.
+			On("CheckFriendship", ctx, u2, u1).
+			Return(true, "PENDING", nil)
+
+		_, err := uc.AddFriend(ctx, &pb.FriendRequest{
+			Id:     u1.String(),
+			UserId: u2.String(),
+		})
+
+		assert.Error(t, err)
+		assert.Equal(t, "this user has already sent you a friend request, please check your pending requests", err.Error())
+	})
+
 	t.Run("success", func(t *testing.T) {
 		userRepo := new(mock_repo.MockUserRepository)
 		pub := new(mock_event.MockEventPublisher)
@@ -65,6 +90,10 @@ func TestAddFriend(t *testing.T) {
 
 		userRepo.
 			On("CheckFriendship", ctx, u1, u2).
+			Return(false, "", nil)
+
+		userRepo.
+			On("CheckFriendship", ctx, u2, u1).
 			Return(false, "", nil)
 
 		userRepo.
@@ -159,6 +188,10 @@ func TestSetCloseFriend(t *testing.T) {
 	u2 := uuid.New()
 
 	userRepo.
+		On("CheckFriendship", ctx, u1, u2).
+		Return(true, "ACCEPTED", nil)
+
+	userRepo.
 		On("SetCloseFriendStatus", ctx, u1, u2, true).
 		Return(nil)
 
@@ -170,6 +203,7 @@ func TestSetCloseFriend(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.True(t, res.Success)
+	userRepo.AssertExpectations(t)
 }
 
 func TestGetCloseFriends_Usecase(t *testing.T) {
