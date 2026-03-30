@@ -80,60 +80,62 @@ func (r *AssetRepository) CheckExists(ctx context.Context, entityType string, id
 	return count > 0, nil
 }
 
-func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, error) {
+func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error) {
 	var assets []domain.AssetSummary
+	var liabilities []domain.AssetSummary
 
-	query := `
-		-- 1. Account
+	assetQuery := `
 		SELECT id, 'account' as type, name, amount as value, created_at 
 		FROM accounts WHERE user_id = ? AND deleted_at IS NULL
 
 		UNION ALL
 
-		-- 2. Building
 		SELECT id, 'building' as type, name, amount as value, created_at 
 		FROM buildings WHERE user_id = ? AND deleted_at IS NULL
 
 		UNION ALL
 
-		-- 3. Cash
 		SELECT id, 'cash' as type, name, amount as value, created_at 
 		FROM cashes WHERE user_id = ? AND deleted_at IS NULL
 
 		UNION ALL
 
-		-- 4. Insurance 
+		-- ประกันเราอาจจะใส่ 0 หรือถ้าอยากเรียงตามมูลค่าประกัน ก็เปลี่ยนเป็น coverage_amount as value ได้ครับ
 		SELECT id, 'insurance' as type, name, 0 as value, created_at 
 		FROM insurances WHERE user_id = ? AND deleted_at IS NULL
 
 		UNION ALL
 
-		-- 5. Investment
 		SELECT id, 'investment' as type, name, amount as value, created_at 
 		FROM investments WHERE user_id = ? AND deleted_at IS NULL
 
 		UNION ALL
 
-		-- 6. Land
 		SELECT id, 'land' as type, name, amount as value, created_at 
 		FROM lands WHERE user_id = ? AND deleted_at IS NULL
 
-		UNION ALL
-
-		-- 7. Liability (Value = Principal)
-		SELECT id, 'liability' as type, name, principal as value, created_at 
-		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL
-
-		ORDER BY created_at DESC
+		ORDER BY value DESC
+		LIMIT 5
 	`
 
-	err := r.db.WithContext(ctx).Raw(query, uid, uid, uid, uid, uid, uid, uid).Scan(&assets).Error
+	liabilityQuery := `
+		SELECT id, 'liability' as type, name, principal as value, created_at 
+		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL
+		ORDER BY value DESC
+		LIMIT 5
+	`
 
+	err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid, uid).Scan(&assets).Error
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return assets, nil
+	err = r.db.WithContext(ctx).Raw(liabilityQuery, uid).Scan(&liabilities).Error
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return assets, liabilities, nil
 }
 
 func (r *AssetRepository) GetAssetCount(ctx context.Context, uid uuid.UUID) (int64, error) {

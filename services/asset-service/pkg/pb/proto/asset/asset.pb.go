@@ -734,6 +734,7 @@ func (x *GetAllAssetsRequest) GetUserId() string {
 type GetAllAssetsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Assets        []*AssetSummary        `protobuf:"bytes,1,rep,name=assets,proto3" json:"assets,omitempty"`
+	Liabilities   []*AssetSummary        `protobuf:"bytes,2,rep,name=liabilities,proto3" json:"liabilities,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -771,6 +772,13 @@ func (*GetAllAssetsResponse) Descriptor() ([]byte, []int) {
 func (x *GetAllAssetsResponse) GetAssets() []*AssetSummary {
 	if x != nil {
 		return x.Assets
+	}
+	return nil
+}
+
+func (x *GetAllAssetsResponse) GetLiabilities() []*AssetSummary {
+	if x != nil {
+		return x.Liabilities
 	}
 	return nil
 }
@@ -825,9 +833,10 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\".\n" +
 	"\x13GetAllAssetsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"C\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"z\n" +
 	"\x14GetAllAssetsResponse\x12+\n" +
-	"\x06assets\x18\x01 \x03(\v2\x13.asset.AssetSummaryR\x06assetsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\x06assets\x18\x01 \x03(\v2\x13.asset.AssetSummaryR\x06assets\x125\n" +
+	"\vliabilities\x18\x02 \x03(\v2\x13.asset.AssetSummaryR\vliabilitiesB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_asset_asset_proto_rawDescOnce sync.Once
@@ -862,11 +871,12 @@ var file_proto_asset_asset_proto_goTypes = []any{
 var file_proto_asset_asset_proto_depIdxs = []int32{
 	14, // 0: asset.AssetSummary.created_at:type_name -> google.protobuf.Timestamp
 	11, // 1: asset.GetAllAssetsResponse.assets:type_name -> asset.AssetSummary
-	2,  // [2:2] is the sub-list for method output_type
-	2,  // [2:2] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	11, // 2: asset.GetAllAssetsResponse.liabilities:type_name -> asset.AssetSummary
+	3,  // [3:3] is the sub-list for method output_type
+	3,  // [3:3] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_proto_asset_asset_proto_init() }

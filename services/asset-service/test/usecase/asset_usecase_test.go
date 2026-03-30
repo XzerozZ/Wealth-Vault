@@ -59,9 +59,14 @@ func TestAssetUsecase(t *testing.T) {
 		mockAssets := []domain.AssetSummary{
 			{ID: assetID, Name: "My Home", Type: "building"},
 		}
-		repo.On("GetAllAssets", ctx, userID).Return(mockAssets, nil).Once()
 
+		mockLiabilities := []domain.AssetSummary{
+			{ID: uuid.New(), Name: "Car Loan", Type: "liability"},
+		}
+
+		repo.On("GetAllAssets", ctx, userID).Return(mockAssets, mockLiabilities, nil).Once()
 		res, err := uc.GetAllAssets(ctx, req)
+
 		assert.NoError(t, err)
 		assert.NotNil(t, res.Assets)
 		repo.AssertExpectations(t)

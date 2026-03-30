@@ -60,12 +60,12 @@ func (m *MockUserRepository) SetCloseFriendStatus(ctx context.Context, userID, f
 	return args.Error(0)
 }
 
-func (m *MockUserRepository) GetCloseFriends(ctx context.Context, userID uuid.UUID) ([]domain.User, error) {
+func (m *MockUserRepository) GetCloseFriends(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error) {
 	args := m.Called(ctx, userID)
 
-	var users []domain.User
+	var users []domain.FriendList
 	if args.Get(0) != nil {
-		users = args.Get(0).([]domain.User)
+		users = args.Get(0).([]domain.FriendList)
 	}
 
 	return users, args.Error(1)

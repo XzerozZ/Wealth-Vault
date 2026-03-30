@@ -87,16 +87,16 @@ func (r *UserRepository) SetCloseFriendStatus(ctx context.Context, userID, frien
 	return nil
 }
 
-func (r *UserRepository) GetCloseFriends(ctx context.Context, userID uuid.UUID) ([]domain.User, error) {
-	var friends []domain.User
+func (r *UserRepository) GetCloseFriends(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error) {
+	var friendLists []domain.FriendList
 	err := r.db.WithContext(ctx).
-		Model(&domain.User{ID: userID}).
-		Association("Friends").
-		Find(&friends, "friend_lists.is_close_friend = ?", true)
+		Where("user_id = ? AND is_close_friend = ?", userID, true).
+		Preload("Friend").
+		Find(&friendLists).Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return friends, nil
+	return friendLists, nil
 }

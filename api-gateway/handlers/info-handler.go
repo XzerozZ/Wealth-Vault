@@ -41,7 +41,6 @@ func (h *InfoHandler) Dashboard(c *fiber.Ctx) error {
 	)
 
 	g, gCtx := errgroup.WithContext(timeoutCtx)
-
 	g.Go(func() error {
 		var err error
 		assetsRes, err = h.assetClient.GetAllAssets(gCtx, &assetPb.GetAllAssetsRequest{
@@ -111,7 +110,8 @@ func (h *InfoHandler) Dashboard(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"assets": assetsRes.Assets,
+		"assets":    assetsRes.Assets,
+		"liabities": assetsRes.Liabilities,
 		"net_worth": fiber.Map{
 			"count":             netWorthRes.ItemCount,
 			"total_assets":      netWorthRes.AssetsValue,
