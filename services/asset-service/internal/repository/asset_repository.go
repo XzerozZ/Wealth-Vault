@@ -115,14 +115,14 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 		FROM lands WHERE user_id = ? AND deleted_at IS NULL
 
 		ORDER BY value DESC
-		LIMIT 5
+		LIMIT 10
 	`
 
 	liabilityQuery := `
 		SELECT id, 'liability' as type, name, principal as value, created_at 
 		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL
 		ORDER BY value DESC
-		LIMIT 5
+		LIMIT 10
 	`
 
 	err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid, uid).Scan(&assets).Error

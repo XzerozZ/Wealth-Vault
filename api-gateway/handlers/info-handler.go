@@ -110,8 +110,8 @@ func (h *InfoHandler) Dashboard(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"assets":    assetsRes.Assets,
-		"liabities": assetsRes.Liabilities,
+		"assets":      assetsRes.Assets,
+		"liabilities": assetsRes.Liabilities,
 		"net_worth": fiber.Map{
 			"count":             netWorthRes.ItemCount,
 			"total_assets":      netWorthRes.AssetsValue,
