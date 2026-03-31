@@ -12,7 +12,7 @@ type User struct {
 	Profile       string     `json:"profile"`
 	Birthday      *time.Time `json:"birthday"`
 	SharedAge     *int32     `json:"shared_age"`
-	SharedEnabled *bool      `json:"share_enabled"`
+	SharedEnabled *bool      `json:"shared_enabled"`
 	CreatedAt     time.Time  `json:"created_at"`
 	UpdatedAt     time.Time  `json:"updated_at"`
 	IsClose       bool       `json:"is_close"`
