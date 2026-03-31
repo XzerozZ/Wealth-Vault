@@ -82,7 +82,7 @@ func TestGetAllAssets_Success(t *testing.T) {
 	)
 
 	mock.Mock.ExpectQuery(`SELECT id, 'account'`).
-		WithArgs(uid, uid, uid, uid, uid, uid).
+		WithArgs(uid, uid, uid, uid, uid).
 		WillReturnRows(assetRows)
 
 	liabilityRows := sqlmock.NewRows([]string{
@@ -118,7 +118,7 @@ func TestGetAllAssets_Empty(t *testing.T) {
 	})
 
 	mock.Mock.ExpectQuery(`SELECT id, 'account'`).
-		WithArgs(uid, uid, uid, uid, uid, uid).
+		WithArgs(uid, uid, uid, uid, uid).
 		WillReturnRows(emptyAssetRows)
 
 	emptyLiabilityRows := sqlmock.NewRows([]string{

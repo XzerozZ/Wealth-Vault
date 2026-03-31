@@ -100,12 +100,6 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 
 		UNION ALL
 
-		-- ประกันเราอาจจะใส่ 0 หรือถ้าอยากเรียงตามมูลค่าประกัน ก็เปลี่ยนเป็น coverage_amount as value ได้ครับ
-		SELECT id, 'insurance' as type, name, 0 as value, created_at 
-		FROM insurances WHERE user_id = ? AND deleted_at IS NULL
-
-		UNION ALL
-
 		SELECT id, 'investment' as type, name, amount as value, created_at 
 		FROM investments WHERE user_id = ? AND deleted_at IS NULL
 
@@ -120,12 +114,12 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 
 	liabilityQuery := `
 		SELECT id, 'liability' as type, name, principal as value, created_at 
-		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL
+		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense'
 		ORDER BY value DESC
 		LIMIT 10
 	`
 
-	err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid, uid).Scan(&assets).Error
+	err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid).Scan(&assets).Error
 	if err != nil {
 		return nil, nil, err
 	}
