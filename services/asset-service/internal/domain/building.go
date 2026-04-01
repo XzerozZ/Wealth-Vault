@@ -26,8 +26,8 @@ type Building struct {
 	Description string
 	LocationID  uuid.UUID   `gorm:"type:uuid;not null;index"`
 	Location    Location    `gorm:"foreignKey:LocationID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	Lands       []Land      `gorm:"many2many:building_land;joinForeignKey:building_id;joinReferences:land_id"`
-	Insurances  []Insurance `gorm:"many2many:building_insurance;joinForeignKey:building_id;joinReferences:insurance_id"`
+	Lands       []Land      `gorm:"many2many:building_land;"`
+	Insurances  []Insurance `gorm:"many2many:building_insurance;"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt  `gorm:"index"`
