@@ -33,5 +33,5 @@ type Insurance struct {
 	UpdatedAt      time.Time
 	DeletedAt      gorm.DeletedAt  `gorm:"index"`
 	Files          []FileAssociate `gorm:"polymorphic:Entity;polymorphicValue:insurance"`
-	Buildings      []Building      `gorm:"many2many:building_insurance;joinForeignKey:ins_id;joinReferences:house_id"`
+	Buildings      []Building      `gorm:"many2many:building_insurance"`
 }
