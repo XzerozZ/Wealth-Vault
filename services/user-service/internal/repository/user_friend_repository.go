@@ -5,6 +5,7 @@ import (
 	"wealth-vault/user-service/internal/domain"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func (r *UserRepository) GetFriendList(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error) {
@@ -99,4 +100,20 @@ func (r *UserRepository) GetCloseFriends(ctx context.Context, userID uuid.UUID) 
 	}
 
 	return friendLists, nil
+}
+
+func (r *UserRepository) RemoveFriendAndSharedItems(ctx context.Context, userID, friendID uuid.UUID) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
+			userID, friendID, friendID, userID).Delete(&domain.FriendList{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("(owner_id = ? AND friend_id = ?) OR (owner_id = ? AND friend_id = ?)",
+			userID, friendID, friendID, userID).Delete(&domain.FriendItem{}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

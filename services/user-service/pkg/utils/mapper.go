@@ -36,6 +36,18 @@ func ToUserProto(d *domain.User) *pb.User {
 	return res
 }
 
+func ToUserProtoSlice(users []*domain.User) []*pb.User {
+	if len(users) == 0 {
+		return []*pb.User{}
+	}
+
+	res := make([]*pb.User, len(users))
+	for i, u := range users {
+		res[i] = ToUserProto(u)
+	}
+	return res
+}
+
 func ToGroupProto(g *domain.Group) *pb.Group {
 	if g == nil {
 		return nil

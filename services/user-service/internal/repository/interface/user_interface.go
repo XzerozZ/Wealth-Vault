@@ -11,6 +11,7 @@ type UserRepository interface {
 	// ------ User ------
 	CreateUser(ctx context.Context, user *domain.User) error
 	GetUser(ctx context.Context, id uuid.UUID) (*domain.User, error)
+	GetUsersByEmail(ctx context.Context, email string) ([]*domain.User, error)
 	UpdateUser(ctx context.Context, user *domain.User, mask []string) (*domain.User, error)
 
 	// ------ Friend ------
@@ -26,4 +27,5 @@ type UserRepository interface {
 	GetUsersReadyForAutoShare(ctx context.Context) ([]domain.User, error)
 	MarkAutoShareTriggered(ctx context.Context, userID uuid.UUID) error
 	CreateFriendLog(ctx context.Context, log *domain.FriendLog) error
+	RemoveFriendAndSharedItems(ctx context.Context, userID, friendID uuid.UUID) error
 }

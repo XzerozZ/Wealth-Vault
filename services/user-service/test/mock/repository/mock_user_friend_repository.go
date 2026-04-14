@@ -91,3 +91,8 @@ func (m *MockUserRepository) CreateFriendLog(ctx context.Context, log *domain.Fr
 	args := m.Called(ctx, log)
 	return args.Error(0)
 }
+
+func (m *MockUserRepository) RemoveFriendAndSharedItems(ctx context.Context, userID, friendID uuid.UUID) error {
+	args := m.Called(ctx, userID, friendID)
+	return args.Error(0)
+}

@@ -2,6 +2,7 @@ package repository_test
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"testing"
 	"wealth-vault/user-service/internal/domain"
@@ -216,5 +217,53 @@ func TestGetCloseFriends(t *testing.T) {
 	assert.True(t, res[0].IsCloseFriend)
 	assert.Equal(t, "Bob", res[0].Friend.Username)
 
+	assert.NoError(t, mock.Mock.ExpectationsWereMet())
+}
+
+func TestRemoveFriendAndSharedItems(t *testing.T) {
+	mock := testutil.NewMockDB(t)
+	defer mock.Close()
+	repo := repository.NewUserRepository(mock.DB)
+
+	userID := uuid.New()
+	friendID := uuid.New()
+
+	mock.Mock.ExpectBegin()
+	mock.Mock.ExpectExec(regexp.QuoteMeta(
+		`DELETE FROM "friend_lists" WHERE (user_id = $1 AND friend_id = $2) OR (user_id = $3 AND friend_id = $4)`,
+	)).WithArgs(userID, friendID, friendID, userID).
+		WillReturnResult(sqlmock.NewResult(0, 2))
+
+	mock.Mock.ExpectExec(regexp.QuoteMeta(
+		`DELETE FROM "friend_items" WHERE (owner_id = $1 AND friend_id = $2) OR (owner_id = $3 AND friend_id = $4)`,
+	)).WithArgs(userID, friendID, friendID, userID).
+		WillReturnResult(sqlmock.NewResult(0, 5))
+
+	mock.Mock.ExpectCommit()
+
+	err := repo.RemoveFriendAndSharedItems(context.Background(), userID, friendID)
+
+	assert.NoError(t, err)
+	assert.NoError(t, mock.Mock.ExpectationsWereMet())
+}
+
+func TestRemoveFriendAndSharedItems_Error(t *testing.T) {
+	mock := testutil.NewMockDB(t)
+	defer mock.Close()
+	repo := repository.NewUserRepository(mock.DB)
+
+	userID := uuid.New()
+	friendID := uuid.New()
+
+	mock.Mock.ExpectBegin()
+
+	mock.Mock.ExpectExec(`DELETE FROM "friend_lists"`).
+		WillReturnError(fmt.Errorf("database error"))
+
+	mock.Mock.ExpectRollback()
+
+	err := repo.RemoveFriendAndSharedItems(context.Background(), userID, friendID)
+
+	assert.Error(t, err)
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())
 }

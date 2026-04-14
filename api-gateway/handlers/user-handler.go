@@ -55,6 +55,37 @@ func (h *UserHandler) GetUser(c *fiber.Ctx) error {
 	})
 }
 
+func (h *UserHandler) GetUsersByEmail(c *fiber.Ctx) error {
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	var req domain.SearchEmailRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.GetUsersByEmail(ctx, &pb.GetUserByEmailRequest{
+		Email: req.Email,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	userInfo := mapper.ToUserList(res.User)
+
+	return c.JSON(fiber.Map{
+		"status": "get userInfo success",
+		"data":   userInfo,
+	})
+}
+
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	userID, ok := c.Locals("user_id").(string)
 	if !ok || userID == "" {
@@ -378,5 +409,31 @@ func (h *UserHandler) GetCloseFriends(c *fiber.Ctx) error {
 	log.Println(friendInfo[0].IsClose)
 	return c.JSON(fiber.Map{
 		"data": friendInfo,
+	})
+}
+
+func (h *UserHandler) DeleteFriend(c *fiber.Ctx) error {
+	targetID := c.Params("id")
+	userID, ok := c.Locals("user_id").(string)
+	if !ok || userID == "" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
+	defer cancel()
+
+	res, err := h.client.DeleteFriend(ctx, &pb.FriendRequest{
+		Id:     userID,
+		UserId: targetID,
+	})
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"status": "delete friend success",
+		"data":   res,
 	})
 }

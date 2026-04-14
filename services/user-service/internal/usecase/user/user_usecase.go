@@ -64,6 +64,18 @@ func (u *UserUsecase) GetUser(ctx context.Context, req *pb.GetUserByIDRequest) (
 	}, nil
 }
 
+func (u *UserUsecase) GetUsersByEmail(ctx context.Context, req *pb.GetUserByEmailRequest) (*pb.UserInfoResponse, error) {
+	user, err := u.userRepo.GetUsersByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.UserInfoResponse{
+		Success: true,
+		User:    utils.ToUserProtoSlice(user),
+	}, nil
+}
+
 func (u *UserUsecase) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error) {
 	id, err := utils.ParseUUID(req.Id)
 	if err != nil {

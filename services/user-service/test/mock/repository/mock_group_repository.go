@@ -113,7 +113,7 @@ func (m *MockGroupRepository) RemoveMemberAndTheirSharedItems(
 	return args.Error(0)
 }
 
-func (m *MockGroupRepository) DeleteGroup(
+func (m *MockGroupRepository) DeleteGroupCompletely(
 	ctx context.Context,
 	groupID uuid.UUID,
 ) error {

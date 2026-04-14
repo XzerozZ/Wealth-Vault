@@ -137,6 +137,86 @@ func TestUserUsecase_GetUser(t *testing.T) {
 	})
 }
 
+func TestUserUsecase_GetUsersByEmail(t *testing.T) {
+	ctx := context.Background()
+	email := "gemini@example.com"
+
+	t.Run("Success - users found", func(t *testing.T) {
+		mockRepo := new(mock_repo.MockUserRepository)
+		uc := usecase.NewUserUsecase(mockRepo, nil, nil, nil, nil)
+
+		expectedUsers := []*domain.User{
+			{
+				ID:       uuid.New(),
+				Username: "gemini_1",
+				Email:    email,
+			},
+			{
+				ID:       uuid.New(),
+				Username: "gemini_2",
+				Email:    email,
+			},
+		}
+
+		mockRepo.
+			On("GetUsersByEmail", ctx, email).
+			Return(expectedUsers, nil).
+			Once()
+
+		res, err := uc.GetUsersByEmail(ctx, &pb.GetUserByEmailRequest{
+			Email: email,
+		})
+
+		assert.NoError(t, err)
+		assert.NotNil(t, res)
+		assert.True(t, res.Success)
+		assert.Len(t, res.User, 2)
+		assert.Equal(t, "gemini_1", res.User[0].Username)
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("Repository returns error", func(t *testing.T) {
+		mockRepo := new(mock_repo.MockUserRepository)
+		uc := usecase.NewUserUsecase(mockRepo, nil, nil, nil, nil)
+
+		mockRepo.
+			On("GetUsersByEmail", ctx, email).
+			Return(nil, errors.New("database error")).
+			Once()
+
+		res, err := uc.GetUsersByEmail(ctx, &pb.GetUserByEmailRequest{
+			Email: email,
+		})
+
+		assert.Error(t, err)
+		assert.Nil(t, res)
+		assert.Equal(t, "database error", err.Error())
+
+		mockRepo.AssertExpectations(t)
+	})
+
+	t.Run("Empty result", func(t *testing.T) {
+		mockRepo := new(mock_repo.MockUserRepository)
+		uc := usecase.NewUserUsecase(mockRepo, nil, nil, nil, nil)
+
+		mockRepo.
+			On("GetUsersByEmail", ctx, "unknown@example.com").
+			Return([]*domain.User{}, nil).
+			Once()
+
+		res, err := uc.GetUsersByEmail(ctx, &pb.GetUserByEmailRequest{
+			Email: "unknown@example.com",
+		})
+
+		assert.NoError(t, err)
+		assert.True(t, res.Success)
+		assert.Len(t, res.User, 0)
+
+		mockRepo.AssertExpectations(t)
+	})
+}
+
 func TestUserUsecase_UpdateUser(t *testing.T) {
 	ctx := context.Background()
 

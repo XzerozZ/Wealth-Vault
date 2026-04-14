@@ -12,6 +12,7 @@ import "proto/user/message.proto";
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
   rpc GetUser(GetUserByIDRequest) returns (UserResponse);
+  rpc GetUsersByEmail(GetUserByEmailRequest) returns (UserInfoResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc GetFriendList(GetUserByIDRequest) returns (FriendListResponse);
   rpc GetPendingRequests(GetUserByIDRequest) returns (FriendListResponse);
@@ -20,6 +21,7 @@ service UserService {
   rpc GetItemsSharedByFriend(GetItemsSharedByFriendRequest) returns (GetItemsSharedByFriendResponse);
   rpc SetCloseFriend(SetCloseFriendRequest) returns (SetCloseFriendResponse);
   rpc GetCloseFriends(GetCloseFriendsRequest) returns (GetCloseFriendsResponse);
+  rpc DeleteFriend(FriendRequest) returns (FriendResponse);
 
   rpc CreateGroup(CreateGroupRequest) returns (GroupResponse);
   rpc GetAllGroup(AllGroupRequest) returns (AllGroupResponse);

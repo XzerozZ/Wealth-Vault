@@ -155,13 +155,16 @@ func TestGroupUsecase(t *testing.T) {
 		assert.Nil(t, resp)
 	})
 
-	t.Run("DeleteGroup - success", func(t *testing.T) {
+	t.Run("DeleteGroupCompletely - success", func(t *testing.T) {
 		groupID := uuid.New()
 		userID := uuid.New()
 		group := &domain.Group{ID: groupID, CreatedBy: userID}
 
-		mockGroupRepo.On("GetGroup", mock.Anything, groupID).Return(group, int64(1), nil).Once()
-		mockGroupRepo.On("DeleteGroup", mock.Anything, groupID).Return(nil).Once()
+		mockGroupRepo.On("GetGroup", mock.Anything, groupID).
+			Return(group, int64(1), nil).Once()
+
+		mockGroupRepo.On("DeleteGroupCompletely", mock.Anything, groupID).
+			Return(nil).Once()
 
 		resp, err := uc.DeleteGroup(ctx, &pb.DeleteGroupRequest{
 			GroupId: groupID.String(),
@@ -169,6 +172,9 @@ func TestGroupUsecase(t *testing.T) {
 		})
 
 		assert.NoError(t, err)
+		assert.NotNil(t, resp)
 		assert.True(t, resp.Success)
+
+		mockGroupRepo.AssertExpectations(t)
 	})
 }

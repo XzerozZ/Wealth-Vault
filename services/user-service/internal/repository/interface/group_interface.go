@@ -25,5 +25,5 @@ type GroupRepository interface {
 
 	// ------ Delete and Remove ------
 	RemoveMemberAndTheirSharedItems(ctx context.Context, groupID, memberID uuid.UUID, logEntry *domain.GroupLog) error
-	DeleteGroup(ctx context.Context, groupID uuid.UUID) error
+	DeleteGroupCompletely(ctx context.Context, groupID uuid.UUID) error
 }
