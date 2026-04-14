@@ -243,3 +243,55 @@ func TestGetCloseFriends_Usecase(t *testing.T) {
 
 	userRepo.AssertExpectations(t)
 }
+
+func TestDeleteFriend(t *testing.T) {
+	ctx := context.Background()
+
+	userRepo := new(mock_repo.MockUserRepository)
+	pub := new(mock_event.MockEventPublisher)
+	uc := usecase.NewUserUsecase(userRepo, nil, nil, pub, nil)
+
+	u1 := uuid.New()
+	u2 := uuid.New()
+
+	t.Run("DeleteFriend - success", func(t *testing.T) {
+		userRepo.
+			On("CheckFriendship", ctx, u1, u2).
+			Return(true, "ACCEPTED", nil).
+			Once()
+
+		userRepo.
+			On("RemoveFriendAndSharedItems", ctx, u1, u2).
+			Return(nil).
+			Once()
+
+		res, err := uc.DeleteFriend(ctx, &pb.FriendRequest{
+			Id:     u1.String(),
+			UserId: u2.String(),
+		})
+
+		assert.NoError(t, err)
+		assert.True(t, res.Success)
+		userRepo.AssertExpectations(t)
+	})
+
+	t.Run("DeleteFriend - friendship not found", func(t *testing.T) {
+		u3 := uuid.New()
+		u4 := uuid.New()
+
+		userRepo.
+			On("CheckFriendship", ctx, u3, u4).
+			Return(false, "", nil).
+			Once()
+
+		res, err := uc.DeleteFriend(ctx, &pb.FriendRequest{
+			Id:     u3.String(),
+			UserId: u4.String(),
+		})
+
+		assert.Error(t, err)
+		assert.Equal(t, "friendship not found", err.Error())
+		assert.Nil(t, res)
+		userRepo.AssertExpectations(t)
+	})
+}

@@ -227,3 +227,32 @@ func (u *UserUsecase) GetPendingRequests(ctx context.Context, req *pb.GetUserByI
 		Friends: pendingUsers,
 	}, nil
 }
+
+func (u *UserUsecase) DeleteFriend(ctx context.Context, req *pb.FriendRequest) (*pb.FriendResponse, error) {
+	userID, err := utils.ParseUUID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	friendID, err := utils.ParseUUID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	exists, _, err := u.userRepo.CheckFriendship(ctx, userID, friendID)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return nil, errors.New("friendship not found")
+	}
+
+	if err := u.userRepo.RemoveFriendAndSharedItems(ctx, userID, friendID); err != nil {
+		return &pb.FriendResponse{Success: false}, err
+	}
+
+	return &pb.FriendResponse{
+		Success: true,
+	}, nil
+}

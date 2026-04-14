@@ -29,6 +29,10 @@ type UpdateRequest struct {
 	SharedEnabled string `json:"shared_enabled" form:"shared_enabled"     mask:"share_enabled"`
 }
 
+type SearchEmailRequest struct {
+	Email string `json:"email" form:"email"`
+}
+
 type AddFriendRequest struct {
 	RequesterID string `json:"requester_id" form:"requester_id"`
 }

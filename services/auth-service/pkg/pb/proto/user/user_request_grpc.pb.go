@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	UserService_CreateUser_FullMethodName                    = "/user.UserService/CreateUser"
 	UserService_GetUser_FullMethodName                       = "/user.UserService/GetUser"
+	UserService_GetUsersByEmail_FullMethodName               = "/user.UserService/GetUsersByEmail"
 	UserService_UpdateUser_FullMethodName                    = "/user.UserService/UpdateUser"
 	UserService_GetFriendList_FullMethodName                 = "/user.UserService/GetFriendList"
 	UserService_GetPendingRequests_FullMethodName            = "/user.UserService/GetPendingRequests"
@@ -29,6 +30,7 @@ const (
 	UserService_GetItemsSharedByFriend_FullMethodName        = "/user.UserService/GetItemsSharedByFriend"
 	UserService_SetCloseFriend_FullMethodName                = "/user.UserService/SetCloseFriend"
 	UserService_GetCloseFriends_FullMethodName               = "/user.UserService/GetCloseFriends"
+	UserService_DeleteFriend_FullMethodName                  = "/user.UserService/DeleteFriend"
 	UserService_CreateGroup_FullMethodName                   = "/user.UserService/CreateGroup"
 	UserService_GetAllGroup_FullMethodName                   = "/user.UserService/GetAllGroup"
 	UserService_GetGroup_FullMethodName                      = "/user.UserService/GetGroup"
@@ -58,6 +60,7 @@ const (
 type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUser(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	GetUsersByEmail(ctx context.Context, in *GetUserByEmailRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetFriendList(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*FriendListResponse, error)
 	GetPendingRequests(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*FriendListResponse, error)
@@ -66,6 +69,7 @@ type UserServiceClient interface {
 	GetItemsSharedByFriend(ctx context.Context, in *GetItemsSharedByFriendRequest, opts ...grpc.CallOption) (*GetItemsSharedByFriendResponse, error)
 	SetCloseFriend(ctx context.Context, in *SetCloseFriendRequest, opts ...grpc.CallOption) (*SetCloseFriendResponse, error)
 	GetCloseFriends(ctx context.Context, in *GetCloseFriendsRequest, opts ...grpc.CallOption) (*GetCloseFriendsResponse, error)
+	DeleteFriend(ctx context.Context, in *FriendRequest, opts ...grpc.CallOption) (*FriendResponse, error)
 	CreateGroup(ctx context.Context, in *CreateGroupRequest, opts ...grpc.CallOption) (*GroupResponse, error)
 	GetAllGroup(ctx context.Context, in *AllGroupRequest, opts ...grpc.CallOption) (*AllGroupResponse, error)
 	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GroupResponse, error)
@@ -111,6 +115,16 @@ func (c *userServiceClient) GetUser(ctx context.Context, in *GetUserByIDRequest,
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUsersByEmail(ctx context.Context, in *GetUserByEmailRequest, opts ...grpc.CallOption) (*UserInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserInfoResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUsersByEmail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -191,6 +205,16 @@ func (c *userServiceClient) GetCloseFriends(ctx context.Context, in *GetCloseFri
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetCloseFriendsResponse)
 	err := c.cc.Invoke(ctx, UserService_GetCloseFriends_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) DeleteFriend(ctx context.Context, in *FriendRequest, opts ...grpc.CallOption) (*FriendResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FriendResponse)
+	err := c.cc.Invoke(ctx, UserService_DeleteFriend_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -413,6 +437,7 @@ func (c *userServiceClient) GetPrivateMessages(ctx context.Context, in *GetPriva
 type UserServiceServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*UserResponse, error)
 	GetUser(context.Context, *GetUserByIDRequest) (*UserResponse, error)
+	GetUsersByEmail(context.Context, *GetUserByEmailRequest) (*UserInfoResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
 	GetFriendList(context.Context, *GetUserByIDRequest) (*FriendListResponse, error)
 	GetPendingRequests(context.Context, *GetUserByIDRequest) (*FriendListResponse, error)
@@ -421,6 +446,7 @@ type UserServiceServer interface {
 	GetItemsSharedByFriend(context.Context, *GetItemsSharedByFriendRequest) (*GetItemsSharedByFriendResponse, error)
 	SetCloseFriend(context.Context, *SetCloseFriendRequest) (*SetCloseFriendResponse, error)
 	GetCloseFriends(context.Context, *GetCloseFriendsRequest) (*GetCloseFriendsResponse, error)
+	DeleteFriend(context.Context, *FriendRequest) (*FriendResponse, error)
 	CreateGroup(context.Context, *CreateGroupRequest) (*GroupResponse, error)
 	GetAllGroup(context.Context, *AllGroupRequest) (*AllGroupResponse, error)
 	GetGroup(context.Context, *GetGroupRequest) (*GroupResponse, error)
@@ -458,6 +484,9 @@ func (UnimplementedUserServiceServer) CreateUser(context.Context, *CreateUserReq
 func (UnimplementedUserServiceServer) GetUser(context.Context, *GetUserByIDRequest) (*UserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUser not implemented")
 }
+func (UnimplementedUserServiceServer) GetUsersByEmail(context.Context, *GetUserByEmailRequest) (*UserInfoResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUsersByEmail not implemented")
+}
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUser not implemented")
 }
@@ -481,6 +510,9 @@ func (UnimplementedUserServiceServer) SetCloseFriend(context.Context, *SetCloseF
 }
 func (UnimplementedUserServiceServer) GetCloseFriends(context.Context, *GetCloseFriendsRequest) (*GetCloseFriendsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCloseFriends not implemented")
+}
+func (UnimplementedUserServiceServer) DeleteFriend(context.Context, *FriendRequest) (*FriendResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteFriend not implemented")
 }
 func (UnimplementedUserServiceServer) CreateGroup(context.Context, *CreateGroupRequest) (*GroupResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateGroup not implemented")
@@ -598,6 +630,24 @@ func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetUser(ctx, req.(*GetUserByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUsersByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserByEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUsersByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUsersByEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUsersByEmail(ctx, req.(*GetUserByEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -742,6 +792,24 @@ func _UserService_GetCloseFriends_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetCloseFriends(ctx, req.(*GetCloseFriendsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_DeleteFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FriendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).DeleteFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_DeleteFriend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).DeleteFriend(ctx, req.(*FriendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1140,6 +1208,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetUser_Handler,
 		},
 		{
+			MethodName: "GetUsersByEmail",
+			Handler:    _UserService_GetUsersByEmail_Handler,
+		},
+		{
 			MethodName: "UpdateUser",
 			Handler:    _UserService_UpdateUser_Handler,
 		},
@@ -1170,6 +1242,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCloseFriends",
 			Handler:    _UserService_GetCloseFriends_Handler,
+		},
+		{
+			MethodName: "DeleteFriend",
+			Handler:    _UserService_DeleteFriend_Handler,
 		},
 		{
 			MethodName: "CreateGroup",

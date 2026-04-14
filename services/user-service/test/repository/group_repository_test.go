@@ -199,20 +199,28 @@ func TestRemoveMemberAndTheirSharedItems(t *testing.T) {
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())
 }
 
-func TestDeleteGroup(t *testing.T) {
+func TestDeleteGroupCompletely(t *testing.T) {
 	mock := testutil.NewMockDB(t)
 	defer mock.Close()
 	repo := repository.NewGroupRepository(mock.DB)
 
 	groupID := uuid.New()
-
 	mock.Mock.ExpectBegin()
+	mock.Mock.ExpectExec(`(?i)DELETE FROM "group_items" WHERE group_id = \$1`).
+		WithArgs(groupID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
+	mock.Mock.ExpectExec(`(?i)DELETE FROM "group_members" WHERE group_id = \$1`).
+		WithArgs(groupID).
+		WillReturnResult(sqlmock.NewResult(0, 1))
+
 	mock.Mock.ExpectExec(`(?i)DELETE FROM "groups" WHERE id = \$1`).
 		WithArgs(groupID).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+
 	mock.Mock.ExpectCommit()
 
-	err := repo.DeleteGroup(context.Background(), groupID)
+	err := repo.DeleteGroupCompletely(context.Background(), groupID)
 
 	assert.NoError(t, err)
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())

@@ -43,6 +43,15 @@ func (h *UserGRPCHandler) GetUser(ctx context.Context, req *pb.GetUserByIDReques
 	return res, nil
 }
 
+func (h *UserGRPCHandler) GetUsersByEmail(ctx context.Context, req *pb.GetUserByEmailRequest) (*pb.UserInfoResponse, error) {
+	res, err := h.usecase.GetUsersByEmail(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error) {
 	res, err := h.usecase.UpdateUser(ctx, req)
 	if err != nil {
@@ -216,6 +225,15 @@ func (h *UserGRPCHandler) SetCloseFriend(ctx context.Context, req *pb.SetCloseFr
 
 func (h *UserGRPCHandler) GetCloseFriends(ctx context.Context, req *pb.GetCloseFriendsRequest) (*pb.GetCloseFriendsResponse, error) {
 	res, err := h.usecase.GetCloseFriends(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (h *UserGRPCHandler) DeleteFriend(ctx context.Context, req *pb.FriendRequest) (*pb.FriendResponse, error) {
+	res, err := h.usecase.DeleteFriend(ctx, req)
 	if err != nil {
 		return nil, err
 	}

@@ -91,9 +91,11 @@ func TestProcessSingleUserLegacy(t *testing.T) {
 			},
 		}
 
-		assetClient.
-			On("GetAllAssetIDs", ctx, mock.Anything).
-			Return(&assetPb.GetMyAssetsResponse{}, nil)
+		assetClient.On("GetAllAssetIDs",
+			mock.Anything,
+			mock.AnythingOfType("*pb.GetMyAssetsRequest"),
+			mock.Anything,
+		).Return(&assetPb.GetMyAssetsResponse{}, nil)
 
 		userRepo.
 			On("MarkAutoShareTriggered", ctx, userID).
@@ -127,9 +129,11 @@ func TestProcessSingleUserLegacy(t *testing.T) {
 			CashIds:    []string{"cash1"},
 		}
 
-		assetClient.
-			On("GetAllAssetIDs", ctx, mock.Anything).
-			Return(assets, nil)
+		assetClient.On("GetAllAssetIDs",
+			mock.Anything,
+			mock.AnythingOfType("*pb.GetMyAssetsRequest"),
+			mock.Anything,
+		).Return(assets, nil).Once()
 
 		itemUC.
 			On("BatchShareAssets", ctx, mock.Anything).

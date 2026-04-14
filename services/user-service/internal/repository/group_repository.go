@@ -169,10 +169,24 @@ func (r *GroupRepository) RemoveMemberAndTheirSharedItems(ctx context.Context, g
 	})
 }
 
-func (r *GroupRepository) DeleteGroup(ctx context.Context, groupID uuid.UUID) error {
-	return r.db.WithContext(ctx).Where("id = ?", groupID).Delete(&domain.Group{}).Error
-}
-
 func (r *GroupRepository) CreateLog(ctx context.Context, log *domain.GroupLog) error {
 	return r.db.WithContext(ctx).Create(log).Error
+}
+
+func (r *GroupRepository) DeleteGroupCompletely(ctx context.Context, groupID uuid.UUID) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("group_id = ?", groupID).Delete(&domain.GroupItem{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("group_id = ?", groupID).Delete(&domain.GroupMember{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("id = ?", groupID).Delete(&domain.Group{}).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }

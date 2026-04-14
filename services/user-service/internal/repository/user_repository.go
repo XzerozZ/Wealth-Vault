@@ -33,6 +33,15 @@ func (r *UserRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain.Use
 	return &user, nil
 }
 
+func (r *UserRepository) GetUsersByEmail(ctx context.Context, email string) ([]*domain.User, error) {
+	var users []*domain.User
+	if err := r.db.WithContext(ctx).Where("email = ?", email).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
 func (r *UserRepository) UpdateUser(ctx context.Context, user *domain.User, mask []string) (*domain.User, error) {
 	tx := r.db.WithContext(ctx).Model(user).Where("id = ?", user.ID)
 	if len(mask) > 0 {

@@ -307,7 +307,7 @@ func (u *GroupUsecase) DeleteGroup(ctx context.Context, req *pb.DeleteGroupReque
 		return nil, errors.New("only creator can delete group")
 	}
 
-	if err := u.groupRepo.DeleteGroup(ctx, groupID); err != nil {
+	if err := u.groupRepo.DeleteGroupCompletely(ctx, groupID); err != nil {
 		return nil, err
 	}
 

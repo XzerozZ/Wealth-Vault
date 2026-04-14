@@ -28,6 +28,17 @@ func (m *MockUserRepository) GetUser(ctx context.Context, id uuid.UUID) (*domain
 	return user, args.Error(1)
 }
 
+func (m *MockUserRepository) GetUsersByEmail(ctx context.Context, email string) ([]*domain.User, error) {
+	args := m.Called(ctx, email)
+
+	var user []*domain.User
+	if args.Get(0) != nil {
+		user = args.Get(0).([]*domain.User)
+	}
+
+	return user, args.Error(1)
+}
+
 func (m *MockUserRepository) UpdateUser(ctx context.Context, user *domain.User, mask []string) (*domain.User, error) {
 	args := m.Called(ctx, user, mask)
 

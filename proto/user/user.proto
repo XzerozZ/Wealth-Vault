@@ -32,6 +32,10 @@ message GetUserByIDRequest {
   string id = 1;
 }
 
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
 message UpdateUserRequest {
   string id = 1;          
   string firstname = 2;
@@ -48,6 +52,11 @@ message UpdateUserRequest {
 message UserResponse {
   bool success = 1;
   User user = 2;
+}
+
+message UserInfoResponse {
+  bool success = 1;
+  repeated User user = 2;
 }
 
 message FriendRequest {

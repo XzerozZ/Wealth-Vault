@@ -2,6 +2,7 @@ package repository_test
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"testing"
 	"wealth-vault/user-service/internal/domain"
@@ -48,6 +49,53 @@ func TestGetUser(t *testing.T) {
 	assert.NotNil(t, user)
 	assert.Equal(t, expectedID, user.ID)
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())
+}
+
+func TestGetUsersByEmail(t *testing.T) {
+	mock := testutil.NewMockDB(t)
+	defer mock.Close()
+	repo := repository.NewUserRepository(mock.DB)
+
+	email := "test@gmail.com"
+	userID := uuid.New()
+
+	t.Run("GetUsersByEmail - Success", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{"id", "email", "username"}).
+			AddRow(userID, email, "testuser")
+
+		mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
+			WithArgs(email).
+			WillReturnRows(rows)
+
+		res, err := repo.GetUsersByEmail(context.Background(), email)
+
+		assert.NoError(t, err)
+		assert.Len(t, res, 1)
+		assert.Equal(t, email, res[0].Email)
+		assert.Equal(t, userID, res[0].ID)
+	})
+
+	t.Run("GetUsersByEmail - Not Found", func(t *testing.T) {
+		mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
+			WithArgs("notfound@gmail.com").
+			WillReturnRows(sqlmock.NewRows([]string{"id", "email", "username"}))
+
+		res, err := repo.GetUsersByEmail(context.Background(), "notfound@gmail.com")
+
+		assert.NoError(t, err)
+		assert.Len(t, res, 0)
+	})
+
+	t.Run("GetUsersByEmail - DB Error", func(t *testing.T) {
+		mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE email = $1`)).
+			WithArgs(email).
+			WillReturnError(fmt.Errorf("db connection error"))
+
+		res, err := repo.GetUsersByEmail(context.Background(), email)
+
+		assert.Error(t, err)
+		assert.Nil(t, res)
+	})
 }
 
 func TestUpdateUser(t *testing.T) {
