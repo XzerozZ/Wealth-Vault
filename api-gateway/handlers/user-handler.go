@@ -73,6 +73,7 @@ func (h *UserHandler) GetUsersByEmail(c *fiber.Ctx) error {
 
 	res, err := h.client.GetUsersByEmail(ctx, &pb.GetUserByEmailRequest{
 		Email: req.Email,
+		Id:    userID,
 	})
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})

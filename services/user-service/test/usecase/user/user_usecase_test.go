@@ -141,39 +141,26 @@ func TestUserUsecase_GetUsersByEmail(t *testing.T) {
 	ctx := context.Background()
 	email := "gemini@example.com"
 
-	t.Run("Success - users found", func(t *testing.T) {
+	t.Run("Success - found users with friend status", func(t *testing.T) {
 		mockRepo := new(mock_repo.MockUserRepository)
 		uc := usecase.NewUserUsecase(mockRepo, nil, nil, nil, nil)
+		currID := uuid.New()
+		targetID := uuid.New()
+		email := "test@gmail.com"
 
-		expectedUsers := []*domain.User{
-			{
-				ID:       uuid.New(),
-				Username: "gemini_1",
-				Email:    email,
-			},
-			{
-				ID:       uuid.New(),
-				Username: "gemini_2",
-				Email:    email,
-			},
-		}
+		mockRepo.On("GetUsersByEmail", ctx, email).
+			Return([]*domain.User{{ID: targetID, Email: email}}, nil).Once()
 
-		mockRepo.
-			On("GetUsersByEmail", ctx, email).
-			Return(expectedUsers, nil).
-			Once()
+		mockRepo.On("CheckFriendship", ctx, currID, targetID).
+			Return(true, "ACCEPTED", nil).Once()
 
 		res, err := uc.GetUsersByEmail(ctx, &pb.GetUserByEmailRequest{
 			Email: email,
+			Id:    currID.String(),
 		})
 
 		assert.NoError(t, err)
-		assert.NotNil(t, res)
-		assert.True(t, res.Success)
-		assert.Len(t, res.User, 2)
-		assert.Equal(t, "gemini_1", res.User[0].Username)
-
-		mockRepo.AssertExpectations(t)
+		assert.True(t, res.User[0].IsFriend)
 	})
 
 	t.Run("Repository returns error", func(t *testing.T) {

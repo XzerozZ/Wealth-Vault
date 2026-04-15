@@ -15,6 +15,7 @@ type User struct {
 	SharedEnabled *bool      `json:"shared_enabled"`
 	CreatedAt     time.Time  `json:"created_at"`
 	UpdatedAt     time.Time  `json:"updated_at"`
+	IsFriend      bool       `json:"is_friend"`
 	IsClose       bool       `json:"is_close"`
 }
 
