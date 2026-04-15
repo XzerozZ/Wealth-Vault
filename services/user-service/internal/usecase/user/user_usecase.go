@@ -65,14 +65,29 @@ func (u *UserUsecase) GetUser(ctx context.Context, req *pb.GetUserByIDRequest) (
 }
 
 func (u *UserUsecase) GetUsersByEmail(ctx context.Context, req *pb.GetUserByEmailRequest) (*pb.UserInfoResponse, error) {
-	user, err := u.userRepo.GetUsersByEmail(ctx, req.Email)
+	users, err := u.userRepo.GetUsersByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
 
+	currentUserID, _ := utils.ParseUUID(req.Id)
+	var userProtos []*pb.User
+	for _, user := range users {
+		proto := utils.ToUserProto(user)
+
+		if user.ID == currentUserID {
+			proto.IsFriend = false
+		} else {
+			isFriend, status, _ := u.userRepo.CheckFriendship(ctx, currentUserID, user.ID)
+			proto.IsFriend = isFriend && status == "ACCEPTED"
+		}
+
+		userProtos = append(userProtos, proto)
+	}
+
 	return &pb.UserInfoResponse{
 		Success: true,
-		User:    utils.ToUserProtoSlice(user),
+		User:    userProtos,
 	}, nil
 }
 

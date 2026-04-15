@@ -20,7 +20,8 @@ message User {
   bool sharedenabled = 10;
   google.protobuf.Timestamp created_at = 11;
   google.protobuf.Timestamp updated_at = 12;
-  bool is_close_friend = 13;
+  bool is_friend = 13;
+  bool is_close_friend = 14;
 }
 
 message CreateUserRequest {
@@ -34,6 +35,7 @@ message GetUserByIDRequest {
 
 message GetUserByEmailRequest {
   string email = 1;
+  string id = 2;
 }
 
 message UpdateUserRequest {
