@@ -22,12 +22,22 @@ func TestAssetUsecase(t *testing.T) {
 	assetID := uuid.New()
 
 	t.Run("CheckExists_Success", func(t *testing.T) {
-		req := &pb.CheckAssetRequest{Id: assetID.String(), UserId: userID.String(), Type: "account"}
-		repo.On("CheckExists", ctx, "account", assetID, userID).Return(true, nil).Once()
+		req := &pb.CheckAssetRequest{
+			Id:     assetID.String(),
+			UserId: userID.String(),
+			Type:   "account",
+		}
+		expectedName := "My Savings Account"
 
+		repo.On("CheckExists", ctx, "account", assetID, userID).
+			Return(expectedName, true, nil).Once()
 		res, err := uc.CheckExists(ctx, req)
+
 		assert.NoError(t, err)
+		assert.NotNil(t, res)
 		assert.True(t, res.Exists)
+		assert.Equal(t, expectedName, res.Name)
+
 		repo.AssertExpectations(t)
 	})
 

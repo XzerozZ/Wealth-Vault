@@ -11,6 +11,11 @@ type AssetIDResult struct {
 	ID   string
 }
 
+type AssetBasicInfo struct {
+	ID   uuid.UUID
+	Name string
+}
+
 type AssetSummary struct {
 	ID        uuid.UUID
 	Type      string

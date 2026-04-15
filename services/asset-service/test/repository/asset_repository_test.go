@@ -2,6 +2,8 @@ package repository_test
 
 import (
 	"context"
+	"fmt"
+	"regexp"
 	"testing"
 	"time"
 	"wealth-vault/asset-service/internal/repository"
@@ -13,59 +15,50 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCheckExists_Account_Found(t *testing.T) {
+func TestGetAssetName(t *testing.T) {
 	mock := testutil.NewMockDB(t)
 	defer mock.Close()
-
 	repo := repository.NewAssetRepository(mock.DB)
 
-	id := uuid.New()
-	uid := uuid.New()
-	rows := sqlmock.NewRows([]string{"count"}).AddRow(1)
+	assetID := uuid.New()
+	userID := uuid.New()
+	expectedName := "My Savings Account"
 
-	mock.Mock.ExpectQuery(`SELECT count`).
-		WithArgs(id, uid).
-		WillReturnRows(rows)
+	t.Run("GetAssetName - Success (Account)", func(t *testing.T) {
+		rows := sqlmock.NewRows([]string{"name"}).AddRow(expectedName)
+		mock.Mock.ExpectQuery(`(?i)SELECT "name" FROM "accounts" WHERE \(id = \$1 AND user_id = \$2\).*`).
+			WithArgs(assetID, userID).
+			WillReturnRows(rows)
 
-	exists, err := repo.CheckExists(context.Background(), "account", id, uid)
+		name, exists, err := repo.CheckExists(context.Background(), "account", assetID, userID)
 
-	assert.NoError(t, err)
-	assert.True(t, exists)
-	assert.NoError(t, mock.Mock.ExpectationsWereMet())
-}
+		assert.NoError(t, err)
+		assert.True(t, exists)
+		assert.Equal(t, expectedName, name)
+	})
 
-func TestCheckExists_NotFound(t *testing.T) {
-	mock := testutil.NewMockDB(t)
-	defer mock.Close()
+	t.Run("GetAssetName - Not Found", func(t *testing.T) {
+		mock.Mock.ExpectQuery(`(?i)SELECT "name" FROM "investments" WHERE .*`).
+			WithArgs(assetID, userID).
+			WillReturnRows(sqlmock.NewRows([]string{"name"}))
 
-	repo := repository.NewAssetRepository(mock.DB)
+		name, exists, err := repo.CheckExists(context.Background(), "investment", assetID, userID)
 
-	id := uuid.New()
-	uid := uuid.New()
+		assert.NoError(t, err)
+		assert.False(t, exists)
+		assert.Equal(t, "", name)
+	})
 
-	rows := sqlmock.NewRows([]string{"count"}).AddRow(0)
+	t.Run("GetAssetName - Database Error", func(t *testing.T) {
+		mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT name FROM`)).
+			WillReturnError(fmt.Errorf("connection refused"))
 
-	mock.Mock.ExpectQuery(`SELECT count`).
-		WithArgs(id, uid).
-		WillReturnRows(rows)
+		name, exists, err := repo.CheckExists(context.Background(), "cash", assetID, userID)
 
-	exists, err := repo.CheckExists(context.Background(), "account", id, uid)
-
-	assert.NoError(t, err)
-	assert.False(t, exists)
-	assert.NoError(t, mock.Mock.ExpectationsWereMet())
-}
-
-func TestCheckExists_InvalidType(t *testing.T) {
-	mock := testutil.NewMockDB(t)
-	defer mock.Close()
-
-	repo := repository.NewAssetRepository(mock.DB)
-
-	exists, err := repo.CheckExists(context.Background(), "invalid", uuid.New(), uuid.New())
-
-	assert.NoError(t, err)
-	assert.False(t, exists)
+		assert.Error(t, err)
+		assert.False(t, exists)
+		assert.Equal(t, "", name)
+	})
 }
 
 func TestGetAllAssets_Success(t *testing.T) {
