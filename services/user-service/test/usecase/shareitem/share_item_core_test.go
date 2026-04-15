@@ -97,7 +97,8 @@ func TestShareItemUsecase_ShareItem(t *testing.T) {
 		mockMail.On(
 			"SendShareInvitation",
 			mock.Anything,
-			mock.AnythingOfType("domain.SendEmailRequest"),
+			mock.Anything,
+			mock.Anything,
 		).Return(nil)
 
 		mockAsset.On("CheckAssetExists", mock.Anything, mock.Anything, mock.Anything).
@@ -159,15 +160,14 @@ func TestShareItemUsecase_ShareItem(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, resp.Finish)
 		assert.Eventually(t, func() bool {
-			return mockMail.AssertExpectations(t) &&
-				mockMsg.AssertExpectations(t) &&
-				mockGroup.AssertExpectations(t) &&
-				mockUser.AssertExpectations(t) &&
-				mockPub.AssertExpectations(t)
+			return mockMail.AssertExpectations(t)
 		}, 1*time.Second, 50*time.Millisecond)
 
 		mockItem.AssertExpectations(t)
 		mockGroup.AssertExpectations(t)
+		mockUser.AssertExpectations(t)
+		mockMsg.AssertExpectations(t)
 		mockAsset.AssertExpectations(t)
+		mockPub.AssertExpectations(t)
 	})
 }

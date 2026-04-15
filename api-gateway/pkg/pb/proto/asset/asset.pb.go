@@ -434,6 +434,7 @@ func (x *CheckAssetRequest) GetType() string {
 type CheckAssetResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Exists        bool                   `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -473,6 +474,13 @@ func (x *CheckAssetResponse) GetExists() bool {
 		return x.Exists
 	}
 	return false
+}
+
+func (x *CheckAssetResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
 }
 
 type GetMyAssetsRequest struct {
@@ -811,9 +819,10 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\x11CheckAssetRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04type\x18\x03 \x01(\tR\x04type\",\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\"@\n" +
 	"\x12CheckAssetResponse\x12\x16\n" +
-	"\x06exists\x18\x01 \x01(\bR\x06exists\"-\n" +
+	"\x06exists\x18\x01 \x01(\bR\x06exists\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"-\n" +
 	"\x12GetMyAssetsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"\x80\x02\n" +
 	"\x13GetMyAssetsResponse\x12\x1f\n" +

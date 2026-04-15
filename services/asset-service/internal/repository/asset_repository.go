@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"wealth-vault/asset-service/internal/domain"
 
 	"github.com/google/uuid"
@@ -51,33 +53,38 @@ func (r *AssetRepository) GetAllAssetIDs(ctx context.Context, userID uuid.UUID) 
 	return assetMap, nil
 }
 
-func (r *AssetRepository) CheckExists(ctx context.Context, entityType string, id uuid.UUID, uid uuid.UUID) (bool, error) {
-	var count int64
+func (r *AssetRepository) CheckExists(ctx context.Context, entityType string, id uuid.UUID, uid uuid.UUID) (string, bool, error) {
+	var name string
 	var err error
+	db := r.db.WithContext(ctx)
 
 	switch entityType {
 	case "account":
-		err = r.db.WithContext(ctx).Model(&domain.Account{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+		err = db.Model(&domain.Account{}).Select("name").Where("id = ? AND user_id = ?", id, uid).Row().Scan(&name)
 	case "investment":
-		err = r.db.WithContext(ctx).Model(&domain.Investment{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+		err = db.Model(&domain.Investment{}).Select("name").Where("id = ? AND user_id = ?", id, uid).Row().Scan(&name)
 	case "insurance":
-		err = r.db.WithContext(ctx).Model(&domain.Insurance{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+		err = db.Model(&domain.Insurance{}).Select("name").Where("id = ? AND user_id = ?", id, uid).Row().Scan(&name)
 	case "building":
-		err = r.db.WithContext(ctx).Model(&domain.Building{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+		err = db.Model(&domain.Building{}).Select("name").Where("id = ? AND user_id = ?", id, uid).Row().Scan(&name)
 	case "land":
-		err = r.db.WithContext(ctx).Model(&domain.Land{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+		err = db.Model(&domain.Land{}).Select("name").Where("id = ? AND user_id = ?", id, uid).Row().Scan(&name) // สมมติว่าที่ดินใช้ land_title
 	case "cash":
-		err = r.db.WithContext(ctx).Model(&domain.Cash{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+		err = db.Model(&domain.Cash{}).Select("name").Where("id = ? AND user_id = ?", id, uid).Row().Scan(&name)
 	case "liability":
-		err = r.db.WithContext(ctx).Model(&domain.Liability{}).Where("id = ? AND user_id = ?", id, uid).Count(&count).Error
+		err = db.Model(&domain.Liability{}).Select("name").Where("id = ? AND user_id = ?", id, uid).Row().Scan(&name)
 	default:
-		return false, nil
+		return "", false, nil
 	}
 
 	if err != nil {
-		return false, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", false, nil
+		}
+		return "", false, err
 	}
-	return count > 0, nil
+
+	return name, true, nil
 }
 
 func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error) {

@@ -22,13 +22,14 @@ func (u *AssetUsecase) CheckExists(ctx context.Context, req *pb.CheckAssetReques
 		return nil, err
 	}
 
-	res, err := u.r.CheckExists(ctx, req.Type, id, uid)
+	name, exist, err := u.r.CheckExists(ctx, req.Type, id, uid)
 	if err != nil {
 		return nil, err
 	}
 
 	return &pb.CheckAssetResponse{
-		Exists: res,
+		Exists: exist,
+		Name:   name,
 	}, nil
 }
 

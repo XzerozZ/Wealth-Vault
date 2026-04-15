@@ -67,8 +67,8 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 		assetDisplayName := fmt.Sprintf("%s shared item", entityType)
 		assetNotifyMap := make(map[string]bool)
 
-		u.prepareGroupShares(ctx, req.Groups, userID, senderName, entityID, entityType, assetDisplayName, now, agg, assetNotifyMap)
-		u.prepareFriendShares(ctx, req.Friends, userID, entityID, entityType, assetDisplayName, now, agg, assetNotifyMap)
+		u.prepareGroupShares(ctx, req.Groups, userID, senderName, entityID, entityType, assetDisplayName, res.Name, now, agg, assetNotifyMap)
+		u.prepareFriendShares(ctx, req.Friends, userID, entityID, entityType, assetDisplayName, res.Name, now, agg, assetNotifyMap)
 		u.prepareEmailShares(req.Emails, userID, entityID, entityType, now, agg)
 
 		if len(assetNotifyMap) > 0 {
@@ -89,7 +89,7 @@ func (u *ShareItemUsecase) ShareItem(ctx context.Context, req *pb.ShareItemReque
 	return u.executeShareTransaction(ctx, agg)
 }
 
-func (u *ShareItemUsecase) prepareGroupShares(ctx context.Context, targets []*pb.ShareTarget, userID uuid.UUID, senderName string, entityID uuid.UUID, entityType string, assetDisplayName string, now time.Time, agg *ShareAggregator, notifyMap map[string]bool) {
+func (u *ShareItemUsecase) prepareGroupShares(ctx context.Context, targets []*pb.ShareTarget, userID uuid.UUID, senderName string, entityID uuid.UUID, entityType string, assetDisplayName string, assetName string, now time.Time, agg *ShareAggregator, notifyMap map[string]bool) {
 	for _, target := range targets {
 		groupID, err := uuid.Parse(target.Id)
 		if err != nil {
@@ -132,6 +132,7 @@ func (u *ShareItemUsecase) prepareGroupShares(ctx context.Context, targets []*pb
 			"action":    "share_item",
 			"item_type": entityType,
 			"item_id":   entityID.String(),
+			"item_name": assetName,
 			"shared_at": shareTime.Format(time.RFC3339),
 		})
 
@@ -155,6 +156,7 @@ func (u *ShareItemUsecase) prepareGroupShares(ctx context.Context, targets []*pb
 			"asset_id":       entityID.String(),
 			"asset_type":     entityType,
 			"snapshot_title": assetDisplayName,
+			"item_name":      assetName,
 			"action_url":     fmt.Sprintf("/asset/%s/%s", entityType, entityID),
 		})
 
@@ -169,7 +171,7 @@ func (u *ShareItemUsecase) prepareGroupShares(ctx context.Context, targets []*pb
 	}
 }
 
-func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*pb.ShareTarget, userID uuid.UUID, entityID uuid.UUID, entityType string, assetDisplayName string, now time.Time, agg *ShareAggregator, notifyMap map[string]bool) {
+func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*pb.ShareTarget, userID uuid.UUID, entityID uuid.UUID, entityType string, assetDisplayName string, assetName string, now time.Time, agg *ShareAggregator, notifyMap map[string]bool) {
 	for _, target := range targets {
 		friendID, err := uuid.Parse(target.Id)
 		if err != nil {
@@ -198,6 +200,7 @@ func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*p
 			"action":    "share_to_friend",
 			"item_type": entityType,
 			"item_id":   entityID.String(),
+			"item_name": assetName,
 		})
 
 		agg.friendLogs = append(agg.friendLogs, domain.FriendLog{
@@ -213,6 +216,7 @@ func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*p
 			"asset_id":       entityID.String(),
 			"asset_type":     entityType,
 			"snapshot_title": assetDisplayName,
+			"item_name":      assetName,
 		})
 
 		agg.privateMsgs = append(agg.privateMsgs, domain.PrivateMessage{
