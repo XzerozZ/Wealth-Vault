@@ -10,7 +10,11 @@ import (
 
 func (r *UserRepository) GetFriendList(ctx context.Context, userID uuid.UUID) ([]domain.FriendList, error) {
 	var friendLists []domain.FriendList
-	err := r.db.WithContext(ctx).Where("user_id = ? AND status = ?", userID, "ACCEPTED").Preload("Friend").Find(&friendLists).Error
+	err := r.db.WithContext(ctx).
+		Where("user_id = ? AND status = ? AND friend_id != ?", userID, "ACCEPTED", userID).
+		Preload("Friend").
+		Find(&friendLists).Error
+
 	if err != nil {
 		return nil, err
 	}

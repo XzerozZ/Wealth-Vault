@@ -23,18 +23,26 @@ func TestGetFriendList(t *testing.T) {
 	userID := uuid.New()
 	friendID := uuid.New()
 
-	mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "friend_lists" WHERE user_id = $1 AND status = $2`)).
-		WithArgs(userID, "ACCEPTED").
-		WillReturnRows(sqlmock.NewRows([]string{"user_id", "friend_id", "status"}).AddRow(userID, friendID, "ACCEPTED"))
+	mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "friend_lists" WHERE user_id = $1 AND status = $2 AND friend_id != $3`)).
+		WithArgs(userID, "ACCEPTED", userID).
+		WillReturnRows(sqlmock.NewRows([]string{"user_id", "friend_id", "status"}).
+			AddRow(userID, friendID, "ACCEPTED"))
 
-	mock.Mock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "users" WHERE "users"."id" = $1`)).
+	mock.Mock.ExpectQuery(`(?i)SELECT \* FROM "users" WHERE "users"\."id" = \$1.*`).
 		WithArgs(friendID).
-		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(friendID))
+		WillReturnRows(sqlmock.NewRows([]string{"id", "username"}).
+			AddRow(friendID, "FriendUser"))
 
 	res, err := repo.GetFriendList(context.Background(), userID)
 
 	assert.NoError(t, err)
 	assert.Len(t, res, 1)
+
+	if len(res) > 0 {
+		assert.Equal(t, friendID, res[0].FriendID)
+		assert.NotNil(t, res[0].Friend)
+	}
+
 	assert.NoError(t, mock.Mock.ExpectationsWereMet())
 }
 
