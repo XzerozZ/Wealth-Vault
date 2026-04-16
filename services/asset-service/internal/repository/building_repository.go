@@ -45,7 +45,7 @@ func (r *BuildingRepository) GetBuildingByIDs(ctx context.Context, ids []uuid.UU
 
 func (r *BuildingRepository) GetBatchBuildingByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Building, error) {
 	var items []*domain.Building
-	if err := r.db.WithContext(ctx).Unscoped().Preload("Location").Where("id IN ?", ids).Find(&items).Error; err != nil {
+	if err := r.db.WithContext(ctx).Unscoped().Preload("Location").Preload("Files").Where("id IN ?", ids).Find(&items).Error; err != nil {
 		return nil, err
 	}
 

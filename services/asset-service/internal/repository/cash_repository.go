@@ -44,7 +44,7 @@ func (r *CashRepository) GetCashByIDs(ctx context.Context, ids []uuid.UUID) ([]*
 
 func (r *CashRepository) GetBatchCashByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Cash, error) {
 	var items []*domain.Cash
-	if err := r.db.WithContext(ctx).Unscoped().Where("id IN ?", ids).Find(&items).Error; err != nil {
+	if err := r.db.WithContext(ctx).Unscoped().Preload("Files").Where("id IN ?", ids).Find(&items).Error; err != nil {
 		return nil, err
 	}
 

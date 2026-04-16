@@ -44,7 +44,7 @@ func (r *InsuranceRepository) GetInsuranceByIDs(ctx context.Context, ids []uuid.
 
 func (r *InsuranceRepository) GetBatchInsuranceByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Insurance, error) {
 	var items []*domain.Insurance
-	if err := r.db.WithContext(ctx).Unscoped().Where("id IN ?", ids).Find(&items).Error; err != nil {
+	if err := r.db.WithContext(ctx).Unscoped().Preload("Files").Where("id IN ?", ids).Find(&items).Error; err != nil {
 		return nil, err
 	}
 

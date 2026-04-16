@@ -45,7 +45,7 @@ func (r *LandRepository) GetLandByIDs(ctx context.Context, ids []uuid.UUID) ([]*
 
 func (r *LandRepository) GetBatchLandByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Land, error) {
 	var items []*domain.Land
-	if err := r.db.WithContext(ctx).Unscoped().Preload("Location").Where("id IN ?", ids).Find(&items).Error; err != nil {
+	if err := r.db.WithContext(ctx).Unscoped().Preload("Location").Preload("Files").Where("id IN ?", ids).Find(&items).Error; err != nil {
 		return nil, err
 	}
 
