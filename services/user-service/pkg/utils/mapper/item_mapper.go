@@ -47,6 +47,11 @@ ProcessActive:
 		locationText = fmt.Sprintf("%s, %s", b.Location.District, b.Location.Province)
 	}
 
+	imageURL := ""
+	if len(b.Files) > 0 && b.Files[0] != nil {
+		imageURL = b.Files[0].Url
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Building{
 			Building: &pb.BuildingPreview{
@@ -55,7 +60,7 @@ ProcessActive:
 				Amount:       b.Amount,
 				LocationText: locationText,
 				TypeName:     b.Type.String(),
-				Image:        b.Files[0].Url,
+				Image:        imageURL,
 			},
 		},
 	}
@@ -84,6 +89,11 @@ ProcessActive:
 		locationText = fmt.Sprintf("%s, %s", l.Location.District, l.Location.Province)
 	}
 
+	imageURL := ""
+	if len(l.Files) > 0 && l.Files[0] != nil {
+		imageURL = l.Files[0].Url
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Land{
 			Land: &pb.LandPreview{
@@ -93,7 +103,7 @@ ProcessActive:
 				Area:         l.Area,
 				Amount:       l.Amount,
 				LocationText: locationText,
-				Image:        l.Files[0].Url,
+				Image:        imageURL,
 			},
 		},
 	}
@@ -119,6 +129,11 @@ func MapAccountToPreview(a *assetPb.Account) *pb.AssetPreview {
 	}
 
 ProcessActive:
+	imageURL := ""
+	if len(a.Files) > 0 && a.Files[0] != nil {
+		imageURL = a.Files[0].Url
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Account{
 			Account: &pb.AccountPreview{
@@ -127,7 +142,7 @@ ProcessActive:
 				BankName:      a.BankName,
 				Amount:        a.Amount,
 				AccountNumber: utils.MaskBankAccount(a.BankAcc),
-				Image:         a.Files[0].Url,
+				Image:         imageURL,
 			},
 		},
 	}
@@ -151,13 +166,18 @@ func MapCashToPreview(c *assetPb.Cash) *pb.AssetPreview {
 	}
 
 ProcessActive:
+	imageURL := ""
+	if len(c.Files) > 0 && c.Files[0] != nil {
+		imageURL = c.Files[0].Url
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Cash{
 			Cash: &pb.CashPreview{
 				Id:     c.Id,
 				Name:   c.Name,
 				Amount: c.Amount,
-				Image:  c.Files[0].Url,
+				Image:  imageURL,
 			},
 		},
 	}
@@ -186,6 +206,11 @@ ProcessActive:
 		expDateStr = i.ExpDate.AsTime().String()
 	}
 
+	imageURL := ""
+	if len(i.Files) > 0 && i.Files[0] != nil {
+		imageURL = i.Files[0].Url
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Insurance{
 			Insurance: &pb.InsurancePreview{
@@ -196,7 +221,7 @@ ProcessActive:
 				PolNum:         i.PolNum,
 				CoverageAmount: i.CoverageAmount,
 				ExpDateText:    expDateStr,
-				Image:          i.Files[0].Url,
+				Image:          imageURL,
 			},
 		},
 	}
@@ -220,6 +245,11 @@ func MapInvestmentToPreview(inv *assetPb.Investment) *pb.AssetPreview {
 	}
 
 ProcessActive:
+	imageURL := ""
+	if len(inv.Files) > 0 && inv.Files[0] != nil {
+		imageURL = inv.Files[0].Url
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Investment{
 			Investment: &pb.InvestmentPreview{
@@ -228,7 +258,7 @@ ProcessActive:
 				TypeName: inv.Type.String(),
 				Symbol:   inv.Symbol,
 				Amount:   inv.Amount,
-				Image:    inv.Files[0].Url,
+				Image:    imageURL,
 			},
 		},
 	}
@@ -252,6 +282,11 @@ func MapLiabilityToPreview(l *assetPb.Liability) *pb.AssetPreview {
 	}
 
 ProcessActive:
+	imageURL := ""
+	if len(l.Files) > 0 && l.Files[0] != nil {
+		imageURL = l.Files[0].Url
+	}
+
 	return &pb.AssetPreview{
 		Asset: &pb.AssetPreview_Liability{
 			Liability: &pb.LiabilityPreview{
@@ -260,7 +295,7 @@ ProcessActive:
 				TypeName:  l.Type.String(),
 				Creditor:  l.Creditor,
 				Principal: l.Principal,
-				Image:     l.Files[0].Url,
+				Image:     imageURL,
 			},
 		},
 	}
