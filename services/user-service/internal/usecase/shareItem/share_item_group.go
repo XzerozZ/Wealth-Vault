@@ -124,6 +124,21 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 	}
 
 	go func() {
+		logMetaJSON, _ := json.Marshal(map[string]interface{}{"action": "add_member", "target_ids": req.TargetUserIds, "added_count": len(newMembers)})
+		u.groupRepo.CreateLog(context.Background(), &domain.GroupLog{
+			GroupID: groupID, LogType: LogTypeSystem,
+			Messages: fmt.Sprintf("%s เพิ่มสมาชิกใหม่ %d คน", senderName, len(newMembers)), Metadata: string(logMetaJSON), CreatedBy: senderID,
+		})
+
+		msgContent := fmt.Sprintf("%s เพิ่ม %s เข้ากลุ่ม", senderName, strings.Join(addedNames, ", "))
+		u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
+			GroupID: groupID, SenderID: senderID, MsgType: MsgTypeSystemAlert, Content: msgContent, Metadata: "{}", CreatedAt: time.Now(),
+		}})
+
+		u.publisher.Publish(TopicGroupActivity, domain.GroupActivityEvent{
+			GroupID: req.GroupId, ActivityType: "MEMBER_ADDED", Payload: fmt.Sprintf("%s เพิ่มสมาชิกใหม่", senderName), ActorID: req.UserId, OccurredAt: time.Now().Unix(),
+		})
+
 		for i, uid := range targetUUIDs {
 			userName := addedNames[i]
 			promptMeta, _ := json.Marshal(map[string]interface{}{
@@ -142,21 +157,6 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 				CreatedAt: time.Now(),
 			}})
 		}
-
-		logMetaJSON, _ := json.Marshal(map[string]interface{}{"action": "add_member", "target_ids": req.TargetUserIds, "added_count": len(newMembers)})
-		u.groupRepo.CreateLog(context.Background(), &domain.GroupLog{
-			GroupID: groupID, LogType: LogTypeSystem,
-			Messages: fmt.Sprintf("%s เพิ่มสมาชิกใหม่ %d คน", senderName, len(newMembers)), Metadata: string(logMetaJSON), CreatedBy: senderID,
-		})
-
-		msgContent := fmt.Sprintf("%s เพิ่ม %s เข้ากลุ่ม", senderName, strings.Join(addedNames, ", "))
-		u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
-			GroupID: groupID, SenderID: senderID, MsgType: MsgTypeSystemAlert, Content: msgContent, Metadata: "{}", CreatedAt: time.Now(),
-		}})
-
-		u.publisher.Publish(TopicGroupActivity, domain.GroupActivityEvent{
-			GroupID: req.GroupId, ActivityType: "MEMBER_ADDED", Payload: fmt.Sprintf("%s เพิ่มสมาชิกใหม่", senderName), ActorID: req.UserId, OccurredAt: time.Now().Unix(),
-		})
 	}()
 
 	return &pb.ActionResponse{Success: true}, nil
@@ -212,7 +212,10 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 			"completed_at":       time.Now().Unix(),
 		})
 
-		u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, targetID, string(newMeta))
+		err := u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, ownerID, targetID, string(newMeta))
+		if err != nil {
+			log.Printf("Failed to update message metadata: %v", err)
+		}
 	}()
 
 	return &pb.ActionResponse{Success: true}, nil
