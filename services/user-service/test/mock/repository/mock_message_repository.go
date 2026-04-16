@@ -61,7 +61,7 @@ func (m *MockMsgRepository) GetPrivateMessages(
 	return result, args.Error(1)
 }
 
-func (m *MockMsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, targetID uuid.UUID, newMetadata string) error {
-	args := m.Called(ctx, groupID, targetID, newMetadata)
+func (m *MockMsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error {
+	args := m.Called(ctx, groupID, ownerID, targetID, newMetadata)
 	return args.Error(0)
 }

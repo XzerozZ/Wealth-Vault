@@ -16,5 +16,5 @@ type MsgRepository interface {
 	GetGroupMessages(ctx context.Context, groupID string) ([]domain.GroupMessage, error)
 	GetPrivateMessages(ctx context.Context, userID, friendID string) ([]domain.PrivateMessage, error)
 
-	UpdateGrantMessageStatus(ctx context.Context, groupID, targetID uuid.UUID, newMetadata string) error
+	UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error
 }

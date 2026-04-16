@@ -48,9 +48,12 @@ func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID
 	return msgs, nil
 }
 
-func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, targetID uuid.UUID, newMetadata string) error {
-	return r.db.WithContext(ctx).Model(&domain.GroupMessage{}).Where("group_id = ?", groupID).
+func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error {
+	return r.db.WithContext(ctx).Model(&domain.GroupMessage{}).
+		Where("group_id = ?", groupID).
+		Where("sender_id = ?", ownerID).
 		Where("metadata LIKE ?", "%"+targetID.String()+"%").
 		Where("metadata LIKE '%GRANT_ACCESS_PROMPT%'").
+		Where("metadata LIKE '%\"is_completed\":false%'").
 		Update("metadata", newMetadata).Error
 }
