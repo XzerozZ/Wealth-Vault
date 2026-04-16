@@ -97,3 +97,12 @@ message GetCloseFriendsRequest {
 message GetCloseFriendsResponse {
   repeated User friends  = 1;
 }
+
+message CheckFriendshipRequest {
+  string user_id = 1;
+  string target_id = 2;
+}
+
+message CheckFriendshipResponse {
+  bool is_friend = 1;
+}

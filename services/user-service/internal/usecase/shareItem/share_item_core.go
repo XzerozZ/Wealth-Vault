@@ -201,6 +201,7 @@ func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*p
 			"item_type": entityType,
 			"item_id":   entityID.String(),
 			"item_name": assetName,
+			"shared_at": shareTime.Format(time.RFC3339),
 		})
 
 		agg.friendLogs = append(agg.friendLogs, domain.FriendLog{
@@ -217,6 +218,7 @@ func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*p
 			"asset_type":     entityType,
 			"snapshot_title": assetDisplayName,
 			"item_name":      assetName,
+			"action_url":     fmt.Sprintf("/asset/%s/%s", entityType, entityID),
 		})
 
 		agg.privateMsgs = append(agg.privateMsgs, domain.PrivateMessage{

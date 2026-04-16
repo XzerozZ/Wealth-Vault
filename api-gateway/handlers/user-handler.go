@@ -268,6 +268,18 @@ func (h *UserHandler) GetFriendProfile(c *fiber.Ctx) error {
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
 	defer cancel()
 
+	var isFriend bool
+
+	if userID != "" {
+		friendCheck, err := h.client.CheckFriendship(ctx, &pb.CheckFriendshipRequest{
+			UserId:   userID,
+			TargetId: targetID,
+		})
+		if err == nil {
+			isFriend = friendCheck.IsFriend
+		}
+	}
+
 	shareRes, err := h.client.GetItemsSharedByFriend(c.Context(), &pb.GetItemsSharedByFriendRequest{
 		UserId:   userID,
 		FriendId: targetID,
@@ -283,6 +295,7 @@ func (h *UserHandler) GetFriendProfile(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
 
+	res.User.IsFriend = isFriend
 	userInfo := mapper.ToUserDomain(res.User)
 	itemInfo := mapper.MapAllFriendItemsToDomain(shareRes.AssetDetail)
 

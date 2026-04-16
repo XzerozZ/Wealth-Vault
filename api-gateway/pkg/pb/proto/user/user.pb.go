@@ -931,6 +931,102 @@ func (x *GetCloseFriendsResponse) GetFriends() []*User {
 	return nil
 }
 
+type CheckFriendshipRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TargetId      string                 `protobuf:"bytes,2,opt,name=target_id,json=targetId,proto3" json:"target_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckFriendshipRequest) Reset() {
+	*x = CheckFriendshipRequest{}
+	mi := &file_proto_user_user_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckFriendshipRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckFriendshipRequest) ProtoMessage() {}
+
+func (x *CheckFriendshipRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_user_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckFriendshipRequest.ProtoReflect.Descriptor instead.
+func (*CheckFriendshipRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_user_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CheckFriendshipRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CheckFriendshipRequest) GetTargetId() string {
+	if x != nil {
+		return x.TargetId
+	}
+	return ""
+}
+
+type CheckFriendshipResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IsFriend      bool                   `protobuf:"varint,1,opt,name=is_friend,json=isFriend,proto3" json:"is_friend,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckFriendshipResponse) Reset() {
+	*x = CheckFriendshipResponse{}
+	mi := &file_proto_user_user_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckFriendshipResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckFriendshipResponse) ProtoMessage() {}
+
+func (x *CheckFriendshipResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_user_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckFriendshipResponse.ProtoReflect.Descriptor instead.
+func (*CheckFriendshipResponse) Descriptor() ([]byte, []int) {
+	return file_proto_user_user_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CheckFriendshipResponse) GetIsFriend() bool {
+	if x != nil {
+		return x.IsFriend
+	}
+	return false
+}
+
 var File_proto_user_user_proto protoreflect.FileDescriptor
 
 const file_proto_user_user_proto_rawDesc = "" +
@@ -1008,7 +1104,12 @@ const file_proto_user_user_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"?\n" +
 	"\x17GetCloseFriendsResponse\x12$\n" +
 	"\afriends\x18\x01 \x03(\v2\n" +
-	".user.UserR\afriendsB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	".user.UserR\afriends\"N\n" +
+	"\x16CheckFriendshipRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\ttarget_id\x18\x02 \x01(\tR\btargetId\"6\n" +
+	"\x17CheckFriendshipResponse\x12\x1b\n" +
+	"\tis_friend\x18\x01 \x01(\bR\bisFriendB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_user_user_proto_rawDescOnce sync.Once
@@ -1022,7 +1123,7 @@ func file_proto_user_user_proto_rawDescGZIP() []byte {
 	return file_proto_user_user_proto_rawDescData
 }
 
-var file_proto_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_proto_user_user_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_proto_user_user_proto_goTypes = []any{
 	(*User)(nil),                    // 0: user.User
 	(*CreateUserRequest)(nil),       // 1: user.CreateUserRequest
@@ -1039,15 +1140,17 @@ var file_proto_user_user_proto_goTypes = []any{
 	(*SetCloseFriendResponse)(nil),  // 12: user.SetCloseFriendResponse
 	(*GetCloseFriendsRequest)(nil),  // 13: user.GetCloseFriendsRequest
 	(*GetCloseFriendsResponse)(nil), // 14: user.GetCloseFriendsResponse
-	(*timestamppb.Timestamp)(nil),   // 15: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),   // 16: google.protobuf.FieldMask
+	(*CheckFriendshipRequest)(nil),  // 15: user.CheckFriendshipRequest
+	(*CheckFriendshipResponse)(nil), // 16: user.CheckFriendshipResponse
+	(*timestamppb.Timestamp)(nil),   // 17: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),   // 18: google.protobuf.FieldMask
 }
 var file_proto_user_user_proto_depIdxs = []int32{
-	15, // 0: user.User.birthday:type_name -> google.protobuf.Timestamp
-	15, // 1: user.User.created_at:type_name -> google.protobuf.Timestamp
-	15, // 2: user.User.updated_at:type_name -> google.protobuf.Timestamp
-	15, // 3: user.UpdateUserRequest.birthday:type_name -> google.protobuf.Timestamp
-	16, // 4: user.UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
+	17, // 0: user.User.birthday:type_name -> google.protobuf.Timestamp
+	17, // 1: user.User.created_at:type_name -> google.protobuf.Timestamp
+	17, // 2: user.User.updated_at:type_name -> google.protobuf.Timestamp
+	17, // 3: user.UpdateUserRequest.birthday:type_name -> google.protobuf.Timestamp
+	18, // 4: user.UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
 	0,  // 5: user.UserResponse.user:type_name -> user.User
 	0,  // 6: user.UserInfoResponse.user:type_name -> user.User
 	0,  // 7: user.FriendListResponse.friends:type_name -> user.User
@@ -1071,7 +1174,7 @@ func file_proto_user_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_user_user_proto_rawDesc), len(file_proto_user_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   15,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
