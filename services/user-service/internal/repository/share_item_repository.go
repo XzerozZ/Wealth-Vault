@@ -374,7 +374,7 @@ func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUser
 		)
 	`
 
-	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, friendID, myUserID).Scan(&items).Error
+	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, friendID, myUserID, myUserID).Scan(&items).Error
 	if err != nil {
 		return nil, err
 	}
