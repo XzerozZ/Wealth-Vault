@@ -153,11 +153,27 @@ func (r *GroupRepository) UpdateGroup(ctx context.Context, group *domain.Group, 
 
 func (r *GroupRepository) RemoveMemberAndTheirSharedItems(ctx context.Context, groupID, memberID uuid.UUID, logEntry *domain.GroupLog) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("group_id = ? AND owner_id = ?", groupID, memberID).Delete(&domain.GroupItem{}).Error; err != nil {
+		itemIDsQuery := tx.Model(&domain.GroupItem{}).
+			Select("id").
+			Where("group_id = ? AND owner_id = ?", groupID, memberID)
+
+		if err := tx.Where("group_item_id IN (?)", itemIDsQuery).
+			Delete(&domain.GroupItemViewer{}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Where("group_id = ? AND user_id = ?", groupID, memberID).Delete(&domain.GroupMember{}).Error; err != nil {
+		if err := tx.Where("group_id = ? AND owner_id = ?", groupID, memberID).
+			Delete(&domain.GroupItem{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("viewer_id = ?", memberID).
+			Delete(&domain.GroupItemViewer{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("group_id = ? AND user_id = ?", groupID, memberID).
+			Delete(&domain.GroupMember{}).Error; err != nil {
 			return err
 		}
 
@@ -175,15 +191,24 @@ func (r *GroupRepository) CreateLog(ctx context.Context, log *domain.GroupLog) e
 
 func (r *GroupRepository) DeleteGroupCompletely(ctx context.Context, groupID uuid.UUID) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("group_id = ?", groupID).Delete(&domain.GroupItem{}).Error; err != nil {
+		itemIDsQuery := tx.Model(&domain.GroupItem{}).Select("id").Where("group_id = ?", groupID)
+		if err := tx.Where("group_item_id IN (?)", itemIDsQuery).
+			Delete(&domain.GroupItemViewer{}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Where("group_id = ?", groupID).Delete(&domain.GroupMember{}).Error; err != nil {
+		if err := tx.Where("group_id = ?", groupID).
+			Delete(&domain.GroupItem{}).Error; err != nil {
 			return err
 		}
 
-		if err := tx.Where("id = ?", groupID).Delete(&domain.Group{}).Error; err != nil {
+		if err := tx.Where("group_id = ?", groupID).
+			Delete(&domain.GroupMember{}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Where("id = ?", groupID).
+			Delete(&domain.Group{}).Error; err != nil {
 			return err
 		}
 
