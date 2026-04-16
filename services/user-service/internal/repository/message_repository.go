@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"wealth-vault/user-service/internal/domain"
 
 	"github.com/google/uuid"
@@ -58,6 +57,8 @@ func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, o
 		AND metadata->>'target_user_id' = ? 
 		AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
 		AND (metadata->>'is_completed')::boolean = false
+		ORDER BY created_at DESC
+		LIMIT 1
 	`
 
 	result := r.db.WithContext(ctx).Exec(query,
@@ -69,10 +70,6 @@ func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, o
 
 	if result.Error != nil {
 		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("no pending grant message found")
 	}
 
 	return nil
