@@ -187,6 +187,7 @@ ProcessActive:
 			Insurance: &pb.InsurancePreview{
 				Id:             i.Id,
 				TypeName:       i.Type.String(),
+				Name:           i.Name,
 				CompanyName:    i.CompanyName,
 				PolNum:         i.PolNum,
 				CoverageAmount: i.CoverageAmount,

@@ -414,11 +414,12 @@ func (x *CashPreview) GetAmount() float64 {
 type InsurancePreview struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	CompanyName    string                 `protobuf:"bytes,2,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
-	TypeName       string                 `protobuf:"bytes,3,opt,name=type_name,json=typeName,proto3" json:"type_name,omitempty"`
-	PolNum         string                 `protobuf:"bytes,4,opt,name=pol_num,json=polNum,proto3" json:"pol_num,omitempty"`
-	CoverageAmount float64                `protobuf:"fixed64,5,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
-	ExpDateText    string                 `protobuf:"bytes,6,opt,name=exp_date_text,json=expDateText,proto3" json:"exp_date_text,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	CompanyName    string                 `protobuf:"bytes,3,opt,name=company_name,json=companyName,proto3" json:"company_name,omitempty"`
+	TypeName       string                 `protobuf:"bytes,4,opt,name=type_name,json=typeName,proto3" json:"type_name,omitempty"`
+	PolNum         string                 `protobuf:"bytes,5,opt,name=pol_num,json=polNum,proto3" json:"pol_num,omitempty"`
+	CoverageAmount float64                `protobuf:"fixed64,6,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
+	ExpDateText    string                 `protobuf:"bytes,7,opt,name=exp_date_text,json=expDateText,proto3" json:"exp_date_text,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -456,6 +457,13 @@ func (*InsurancePreview) Descriptor() ([]byte, []int) {
 func (x *InsurancePreview) GetId() string {
 	if x != nil {
 		return x.Id
+	}
+	return ""
+}
+
+func (x *InsurancePreview) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
@@ -823,14 +831,15 @@ const file_proto_user_preview_proto_rawDesc = "" +
 	"\vCashPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06amount\x18\x03 \x01(\x01R\x06amount\"\xc8\x01\n" +
+	"\x06amount\x18\x03 \x01(\x01R\x06amount\"\xdc\x01\n" +
 	"\x10InsurancePreview\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fcompany_name\x18\x02 \x01(\tR\vcompanyName\x12\x1b\n" +
-	"\ttype_name\x18\x03 \x01(\tR\btypeName\x12\x17\n" +
-	"\apol_num\x18\x04 \x01(\tR\x06polNum\x12'\n" +
-	"\x0fcoverage_amount\x18\x05 \x01(\x01R\x0ecoverageAmount\x12\"\n" +
-	"\rexp_date_text\x18\x06 \x01(\tR\vexpDateText\"l\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
+	"\fcompany_name\x18\x03 \x01(\tR\vcompanyName\x12\x1b\n" +
+	"\ttype_name\x18\x04 \x01(\tR\btypeName\x12\x17\n" +
+	"\apol_num\x18\x05 \x01(\tR\x06polNum\x12'\n" +
+	"\x0fcoverage_amount\x18\x06 \x01(\x01R\x0ecoverageAmount\x12\"\n" +
+	"\rexp_date_text\x18\a \x01(\tR\vexpDateText\"l\n" +
 	"\x11InvestmentPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +

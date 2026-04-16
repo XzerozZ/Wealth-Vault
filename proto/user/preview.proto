@@ -41,11 +41,12 @@ message CashPreview {
 
 message InsurancePreview {
   string id = 1;
-  string company_name = 2;
-  string type_name = 3;   
-  string pol_num = 4;
-  double coverage_amount = 5; 
-  string exp_date_text = 6; 
+  string name = 2;
+  string company_name = 3;
+  string type_name = 4;   
+  string pol_num = 5;
+  double coverage_amount = 6; 
+  string exp_date_text = 7; 
 }
 
 message InvestmentPreview {
