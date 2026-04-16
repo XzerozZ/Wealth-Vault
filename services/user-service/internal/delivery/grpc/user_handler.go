@@ -241,6 +241,15 @@ func (h *UserGRPCHandler) DeleteFriend(ctx context.Context, req *pb.FriendReques
 	return res, nil
 }
 
+func (h *UserGRPCHandler) CheckFriendship(ctx context.Context, req *pb.CheckFriendshipRequest) (*pb.CheckFriendshipResponse, error) {
+	res, err := h.usecase.VerifyFriendship(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (h *UserGRPCHandler) RemoveMember(ctx context.Context, req *pb.RemoveMemberRequest) (*pb.ActionResponse, error) {
 	res, err := h.gusecase.RemoveMember(ctx, req)
 	if err != nil {

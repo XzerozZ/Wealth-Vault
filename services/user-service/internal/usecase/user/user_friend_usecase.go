@@ -256,3 +256,38 @@ func (u *UserUsecase) DeleteFriend(ctx context.Context, req *pb.FriendRequest) (
 		Success: true,
 	}, nil
 }
+
+func (u *UserUsecase) VerifyFriendship(ctx context.Context, req *pb.CheckFriendshipRequest) (*pb.CheckFriendshipResponse, error) {
+	userID, err := utils.ParseUUID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	friendID, err := utils.ParseUUID(req.TargetId)
+	if err != nil {
+		return nil, err
+	}
+
+	if userID == friendID {
+		return &pb.CheckFriendshipResponse{
+			IsFriend: true,
+		}, nil
+	}
+
+	isRelated, status, err := u.userRepo.CheckFriendship(ctx, userID, friendID)
+	if err != nil {
+		return &pb.CheckFriendshipResponse{
+			IsFriend: false,
+		}, err
+	}
+
+	if isRelated && status == "ACCEPTED" {
+		return &pb.CheckFriendshipResponse{
+			IsFriend: true,
+		}, nil
+	}
+
+	return &pb.CheckFriendshipResponse{
+		IsFriend: false,
+	}, nil
+}

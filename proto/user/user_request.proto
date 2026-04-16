@@ -15,6 +15,7 @@ service UserService {
   rpc GetUsersByEmail(GetUserByEmailRequest) returns (UserInfoResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc GetFriendList(GetUserByIDRequest) returns (FriendListResponse);
+  rpc CheckFriendship(CheckFriendshipRequest) returns (CheckFriendshipResponse);
   rpc GetPendingRequests(GetUserByIDRequest) returns (FriendListResponse);
   rpc AddFriend(FriendRequest) returns (FriendResponse);
   rpc AcceptFriend(AcceptFriendRequest) returns (FriendResponse);

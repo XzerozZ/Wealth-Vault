@@ -24,6 +24,7 @@ const (
 	UserService_GetUsersByEmail_FullMethodName               = "/user.UserService/GetUsersByEmail"
 	UserService_UpdateUser_FullMethodName                    = "/user.UserService/UpdateUser"
 	UserService_GetFriendList_FullMethodName                 = "/user.UserService/GetFriendList"
+	UserService_CheckFriendship_FullMethodName               = "/user.UserService/CheckFriendship"
 	UserService_GetPendingRequests_FullMethodName            = "/user.UserService/GetPendingRequests"
 	UserService_AddFriend_FullMethodName                     = "/user.UserService/AddFriend"
 	UserService_AcceptFriend_FullMethodName                  = "/user.UserService/AcceptFriend"
@@ -63,6 +64,7 @@ type UserServiceClient interface {
 	GetUsersByEmail(ctx context.Context, in *GetUserByEmailRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetFriendList(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*FriendListResponse, error)
+	CheckFriendship(ctx context.Context, in *CheckFriendshipRequest, opts ...grpc.CallOption) (*CheckFriendshipResponse, error)
 	GetPendingRequests(ctx context.Context, in *GetUserByIDRequest, opts ...grpc.CallOption) (*FriendListResponse, error)
 	AddFriend(ctx context.Context, in *FriendRequest, opts ...grpc.CallOption) (*FriendResponse, error)
 	AcceptFriend(ctx context.Context, in *AcceptFriendRequest, opts ...grpc.CallOption) (*FriendResponse, error)
@@ -145,6 +147,16 @@ func (c *userServiceClient) GetFriendList(ctx context.Context, in *GetUserByIDRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(FriendListResponse)
 	err := c.cc.Invoke(ctx, UserService_GetFriendList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) CheckFriendship(ctx context.Context, in *CheckFriendshipRequest, opts ...grpc.CallOption) (*CheckFriendshipResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckFriendshipResponse)
+	err := c.cc.Invoke(ctx, UserService_CheckFriendship_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -440,6 +452,7 @@ type UserServiceServer interface {
 	GetUsersByEmail(context.Context, *GetUserByEmailRequest) (*UserInfoResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UserResponse, error)
 	GetFriendList(context.Context, *GetUserByIDRequest) (*FriendListResponse, error)
+	CheckFriendship(context.Context, *CheckFriendshipRequest) (*CheckFriendshipResponse, error)
 	GetPendingRequests(context.Context, *GetUserByIDRequest) (*FriendListResponse, error)
 	AddFriend(context.Context, *FriendRequest) (*FriendResponse, error)
 	AcceptFriend(context.Context, *AcceptFriendRequest) (*FriendResponse, error)
@@ -492,6 +505,9 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq
 }
 func (UnimplementedUserServiceServer) GetFriendList(context.Context, *GetUserByIDRequest) (*FriendListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetFriendList not implemented")
+}
+func (UnimplementedUserServiceServer) CheckFriendship(context.Context, *CheckFriendshipRequest) (*CheckFriendshipResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CheckFriendship not implemented")
 }
 func (UnimplementedUserServiceServer) GetPendingRequests(context.Context, *GetUserByIDRequest) (*FriendListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetPendingRequests not implemented")
@@ -684,6 +700,24 @@ func _UserService_GetFriendList_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).GetFriendList(ctx, req.(*GetUserByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_CheckFriendship_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckFriendshipRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).CheckFriendship(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_CheckFriendship_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).CheckFriendship(ctx, req.(*CheckFriendshipRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1218,6 +1252,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFriendList",
 			Handler:    _UserService_GetFriendList_Handler,
+		},
+		{
+			MethodName: "CheckFriendship",
+			Handler:    _UserService_CheckFriendship_Handler,
 		},
 		{
 			MethodName: "GetPendingRequests",

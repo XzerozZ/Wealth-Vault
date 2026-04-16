@@ -66,7 +66,10 @@ func (r *UserRepository) UpdateFriendStatus(ctx context.Context, userID, friendI
 
 func (r *UserRepository) CheckFriendship(ctx context.Context, userID, friendID uuid.UUID) (bool, string, error) {
 	var friendList domain.FriendList
-	if err := r.db.WithContext(ctx).Where("user_id = ? AND friend_id = ?", userID, friendID).First(&friendList).Error; err != nil {
+	if err := r.db.WithContext(ctx).
+		Where("(user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
+			userID, friendID, friendID, userID).
+		First(&friendList).Error; err != nil {
 		return false, "", err
 	}
 
