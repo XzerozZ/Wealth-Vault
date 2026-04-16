@@ -363,9 +363,9 @@ func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUser
 
 		UNION
 
-		SELECT gi.id AS entity_id, 'group_item' AS entity_type 
+		SELECT gi.entity_id, gi.entity_type 
 		FROM group_items gi
-		JOIN group_item_viewers giv ON gi.id = giv.group_item_id
+		INNER JOIN group_item_viewers giv ON gi.id = giv.group_item_id
 		WHERE gi.owner_id = ? 
 		AND giv.viewer_id = ?
 	`
