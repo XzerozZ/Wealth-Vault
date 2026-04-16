@@ -79,10 +79,11 @@ type InsuranceDetail struct {
 }
 
 type InvestmentDetail struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Symbol   string `json:"symbol"`
-	TypeName string `json:"type_name"`
+	ID       string  `json:"id"`
+	Name     string  `json:"name"`
+	Symbol   string  `json:"symbol"`
+	TypeName string  `json:"type_name"`
+	Amount   float64 `json:"amount"`
 }
 
 type LiabilityDetail struct {
