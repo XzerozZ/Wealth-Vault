@@ -3,6 +3,7 @@ package mock
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 
 	"wealth-vault/user-service/internal/domain"
@@ -58,4 +59,9 @@ func (m *MockMsgRepository) GetPrivateMessages(
 	}
 
 	return result, args.Error(1)
+}
+
+func (m *MockMsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, targetID uuid.UUID, newMetadata string) error {
+	args := m.Called(ctx, groupID, targetID, newMetadata)
+	return args.Error(0)
 }

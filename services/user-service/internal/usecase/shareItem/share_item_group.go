@@ -124,6 +124,25 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 	}
 
 	go func() {
+		for i, uid := range targetUUIDs {
+			userName := addedNames[i]
+			promptMeta, _ := json.Marshal(map[string]interface{}{
+				"is_action_required": true,
+				"is_completed":       false,
+				"target_user_id":     uid.String(),
+				"type":               "GRANT_ACCESS_PROMPT",
+			})
+
+			u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
+				GroupID:   groupID,
+				SenderID:  senderID,
+				MsgType:   MsgTypeSystemAlert,
+				Content:   fmt.Sprintf("สมาชิกใหม่: %s เข้ากลุ่มแล้ว คุณต้องการแชร์รายการของคุณให้เขาหรือไม่?", userName),
+				Metadata:  string(promptMeta),
+				CreatedAt: time.Now(),
+			}})
+		}
+
 		logMetaJSON, _ := json.Marshal(map[string]interface{}{"action": "add_member", "target_ids": req.TargetUserIds, "added_count": len(newMembers)})
 		u.groupRepo.CreateLog(context.Background(), &domain.GroupLog{
 			GroupID: groupID, LogType: LogTypeSystem,
@@ -173,15 +192,28 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 	}
 
 	var viewers []domain.GroupItemViewer
-	for _, itemIDStr := range req.GroupItemIds {
-		if itemID, err := uuid.Parse(itemIDStr); err == nil {
-			viewers = append(viewers, domain.GroupItemViewer{GroupItemID: itemID, ViewerID: targetID, GrantedAt: time.Now()})
-		}
+	for _, id := range validItemIDs {
+		viewers = append(viewers, domain.GroupItemViewer{
+			GroupItemID: id,
+			ViewerID:    targetID,
+			GrantedAt:   time.Now(),
+		})
+	}
+	if err := u.itemRepo.BatchCreateViewers(ctx, viewers); err != nil {
+		return nil, err
 	}
 
-	if err := u.itemRepo.BatchCreateViewers(ctx, viewers); err != nil {
-		return nil, fmt.Errorf("failed to grant access: %v", err)
-	}
+	go func() {
+		newMeta, _ := json.Marshal(map[string]interface{}{
+			"is_action_required": true,
+			"is_completed":       true,
+			"target_user_id":     targetID.String(),
+			"type":               "GRANT_ACCESS_PROMPT",
+			"completed_at":       time.Now().Unix(),
+		})
+
+		u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, targetID, string(newMeta))
+	}()
 
 	return &pb.ActionResponse{Success: true}, nil
 }

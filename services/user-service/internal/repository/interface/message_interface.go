@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"wealth-vault/user-service/internal/domain"
+
+	"github.com/google/uuid"
 )
 
 type MsgRepository interface {
@@ -13,4 +15,6 @@ type MsgRepository interface {
 	// ------ Get Message ------
 	GetGroupMessages(ctx context.Context, groupID string) ([]domain.GroupMessage, error)
 	GetPrivateMessages(ctx context.Context, userID, friendID string) ([]domain.PrivateMessage, error)
+
+	UpdateGrantMessageStatus(ctx context.Context, groupID, targetID uuid.UUID, newMetadata string) error
 }
