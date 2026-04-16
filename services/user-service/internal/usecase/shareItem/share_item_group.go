@@ -212,7 +212,6 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 			"completed_at":       time.Now().Unix(),
 		})
 
-		fmt.Printf("Updating Msg: Group=%s, Owner=%s, Target=%s\n", groupID, ownerID, targetID)
 		err := u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, ownerID, targetID, string(newMeta))
 		if err != nil {
 			log.Printf("Failed to update message metadata: %v", err)
