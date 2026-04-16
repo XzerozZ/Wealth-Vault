@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"wealth-vault/user-service/internal/domain"
 
 	"github.com/google/uuid"
@@ -49,11 +50,30 @@ func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID
 }
 
 func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error {
-	return r.db.WithContext(ctx).Model(&domain.GroupMessage{}).
-		Where("group_id = ?", groupID).
-		Where("sender_id = ?", ownerID).
-		Where("metadata LIKE ?", "%"+targetID.String()+"%").
-		Where("metadata LIKE '%GRANT_ACCESS_PROMPT%'").
-		Where("metadata LIKE '%\"is_completed\":false%'").
-		Update("metadata", newMetadata).Error
+	query := `
+		UPDATE group_messages 
+		SET metadata = ?, updated_at = NOW()
+		WHERE group_id = ? 
+		AND sender_id = ? 
+		AND metadata->>'target_user_id' = ? 
+		AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
+		AND (metadata->>'is_completed')::boolean = false
+	`
+
+	result := r.db.WithContext(ctx).Exec(query,
+		newMetadata,
+		groupID,
+		ownerID,
+		targetID.String(),
+	)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no pending grant message found")
+	}
+
+	return nil
 }

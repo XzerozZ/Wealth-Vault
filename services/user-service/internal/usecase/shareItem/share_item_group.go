@@ -207,11 +207,12 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 		newMeta, _ := json.Marshal(map[string]interface{}{
 			"is_action_required": true,
 			"is_completed":       true,
-			"target_user_id":     ownerID.String(),
+			"target_user_id":     targetID.String(),
 			"type":               "GRANT_ACCESS_PROMPT",
 			"completed_at":       time.Now().Unix(),
 		})
 
+		fmt.Printf("Updating Msg: Group=%s, Owner=%s, Target=%s\n", groupID, ownerID, targetID)
 		err := u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, ownerID, targetID, string(newMeta))
 		if err != nil {
 			log.Printf("Failed to update message metadata: %v", err)
