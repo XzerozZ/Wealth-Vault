@@ -57,8 +57,6 @@ func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, o
 		AND metadata->>'target_user_id' = ? 
 		AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
 		AND (metadata->>'is_completed')::boolean = false
-		ORDER BY created_at DESC
-		LIMIT 1
 	`
 
 	result := r.db.WithContext(ctx).Exec(query,
