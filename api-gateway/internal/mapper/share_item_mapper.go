@@ -250,6 +250,7 @@ func MapAllFriendItemsToDomain(protoItems []*pb.SharedAssetPreview) []domain.Fri
 				dtoItem.Type = "insurance"
 				dtoItem.AssetDetail = domain.InsuranceDetail{
 					ID:             v.Insurance.Id,
+					Name:           v.Insurance.Name,
 					CompanyName:    v.Insurance.CompanyName,
 					TypeName:       v.Insurance.TypeName,
 					PolNum:         v.Insurance.PolNum,

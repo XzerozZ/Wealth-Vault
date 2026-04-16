@@ -70,6 +70,7 @@ type CashDetail struct {
 
 type InsuranceDetail struct {
 	ID             string  `json:"id"`
+	Name           string  `json:"name"`
 	CompanyName    string  `json:"company_name"`
 	TypeName       string  `json:"type"`
 	PolNum         string  `json:"pol_num"`
