@@ -206,6 +206,7 @@ type BuildingPreview struct {
 	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
 	LocationText  string                 `protobuf:"bytes,4,opt,name=location_text,json=locationText,proto3" json:"location_text,omitempty"`
 	TypeName      string                 `protobuf:"bytes,5,opt,name=type_name,json=typeName,proto3" json:"type_name,omitempty"`
+	Image         string                 `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -275,6 +276,13 @@ func (x *BuildingPreview) GetTypeName() string {
 	return ""
 }
 
+func (x *BuildingPreview) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
 type AccountPreview struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -282,6 +290,7 @@ type AccountPreview struct {
 	BankName      string                 `protobuf:"bytes,3,opt,name=bank_name,json=bankName,proto3" json:"bank_name,omitempty"`
 	AccountNumber string                 `protobuf:"bytes,4,opt,name=account_number,json=accountNumber,proto3" json:"account_number,omitempty"`
 	Amount        float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	Image         string                 `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -351,11 +360,19 @@ func (x *AccountPreview) GetAmount() float64 {
 	return 0
 }
 
+func (x *AccountPreview) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
 type CashPreview struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Amount        float64                `protobuf:"fixed64,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	Image         string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -411,6 +428,13 @@ func (x *CashPreview) GetAmount() float64 {
 	return 0
 }
 
+func (x *CashPreview) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
 type InsurancePreview struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -420,6 +444,7 @@ type InsurancePreview struct {
 	PolNum         string                 `protobuf:"bytes,5,opt,name=pol_num,json=polNum,proto3" json:"pol_num,omitempty"`
 	CoverageAmount float64                `protobuf:"fixed64,6,opt,name=coverage_amount,json=coverageAmount,proto3" json:"coverage_amount,omitempty"`
 	ExpDateText    string                 `protobuf:"bytes,7,opt,name=exp_date_text,json=expDateText,proto3" json:"exp_date_text,omitempty"`
+	Image          string                 `protobuf:"bytes,8,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -503,6 +528,13 @@ func (x *InsurancePreview) GetExpDateText() string {
 	return ""
 }
 
+func (x *InsurancePreview) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
 type InvestmentPreview struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -510,6 +542,7 @@ type InvestmentPreview struct {
 	Symbol        string                 `protobuf:"bytes,3,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	TypeName      string                 `protobuf:"bytes,4,opt,name=type_name,json=typeName,proto3" json:"type_name,omitempty"`
 	Amount        float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	Image         string                 `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -579,6 +612,13 @@ func (x *InvestmentPreview) GetAmount() float64 {
 	return 0
 }
 
+func (x *InvestmentPreview) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
 type LandPreview struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -587,6 +627,7 @@ type LandPreview struct {
 	Area          float64                `protobuf:"fixed64,4,opt,name=area,proto3" json:"area,omitempty"`
 	Amount        float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`
 	LocationText  string                 `protobuf:"bytes,6,opt,name=location_text,json=locationText,proto3" json:"location_text,omitempty"`
+	Image         string                 `protobuf:"bytes,7,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -663,6 +704,13 @@ func (x *LandPreview) GetLocationText() string {
 	return ""
 }
 
+func (x *LandPreview) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
+}
+
 type LiabilityPreview struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -670,6 +718,7 @@ type LiabilityPreview struct {
 	Creditor      string                 `protobuf:"bytes,3,opt,name=creditor,proto3" json:"creditor,omitempty"`
 	Principal     float64                `protobuf:"fixed64,4,opt,name=principal,proto3" json:"principal,omitempty"`
 	TypeName      string                 `protobuf:"bytes,5,opt,name=type_name,json=typeName,proto3" json:"type_name,omitempty"`
+	Image         string                 `protobuf:"bytes,6,opt,name=image,proto3" json:"image,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -735,6 +784,13 @@ func (x *LiabilityPreview) GetPrincipal() float64 {
 func (x *LiabilityPreview) GetTypeName() string {
 	if x != nil {
 		return x.TypeName
+	}
+	return ""
+}
+
+func (x *LiabilityPreview) GetImage() string {
+	if x != nil {
+		return x.Image
 	}
 	return ""
 }
@@ -823,23 +879,26 @@ const file_proto_user_preview_proto_rawDesc = "" +
 	"\x04land\x18\x06 \x01(\v2\x11.user.LandPreviewH\x00R\x04land\x126\n" +
 	"\tliability\x18\a \x01(\v2\x16.user.LiabilityPreviewH\x00R\tliability\x120\n" +
 	"\adeleted\x18\b \x01(\v2\x14.user.DeletedPreviewH\x00R\adeletedB\a\n" +
-	"\x05asset\"\x8f\x01\n" +
+	"\x05asset\"\xa5\x01\n" +
 	"\x0fBuildingPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06amount\x18\x03 \x01(\x01R\x06amount\x12#\n" +
 	"\rlocation_text\x18\x04 \x01(\tR\flocationText\x12\x1b\n" +
-	"\ttype_name\x18\x05 \x01(\tR\btypeName\"\x90\x01\n" +
+	"\ttype_name\x18\x05 \x01(\tR\btypeName\x12\x14\n" +
+	"\x05image\x18\x06 \x01(\tR\x05image\"\xa6\x01\n" +
 	"\x0eAccountPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\tbank_name\x18\x03 \x01(\tR\bbankName\x12%\n" +
 	"\x0eaccount_number\x18\x04 \x01(\tR\raccountNumber\x12\x16\n" +
-	"\x06amount\x18\x05 \x01(\x01R\x06amount\"I\n" +
+	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12\x14\n" +
+	"\x05image\x18\x06 \x01(\tR\x05image\"_\n" +
 	"\vCashPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
-	"\x06amount\x18\x03 \x01(\x01R\x06amount\"\xdc\x01\n" +
+	"\x06amount\x18\x03 \x01(\x01R\x06amount\x12\x14\n" +
+	"\x05image\x18\x04 \x01(\tR\x05image\"\xf2\x01\n" +
 	"\x10InsurancePreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12!\n" +
@@ -847,26 +906,30 @@ const file_proto_user_preview_proto_rawDesc = "" +
 	"\ttype_name\x18\x04 \x01(\tR\btypeName\x12\x17\n" +
 	"\apol_num\x18\x05 \x01(\tR\x06polNum\x12'\n" +
 	"\x0fcoverage_amount\x18\x06 \x01(\x01R\x0ecoverageAmount\x12\"\n" +
-	"\rexp_date_text\x18\a \x01(\tR\vexpDateText\"\x84\x01\n" +
+	"\rexp_date_text\x18\a \x01(\tR\vexpDateText\x12\x14\n" +
+	"\x05image\x18\b \x01(\tR\x05image\"\x9a\x01\n" +
 	"\x11InvestmentPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06symbol\x18\x03 \x01(\tR\x06symbol\x12\x1b\n" +
 	"\ttype_name\x18\x04 \x01(\tR\btypeName\x12\x16\n" +
-	"\x06amount\x18\x05 \x01(\x01R\x06amount\"\x9d\x01\n" +
+	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12\x14\n" +
+	"\x05image\x18\x06 \x01(\tR\x05image\"\xb3\x01\n" +
 	"\vLandPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
 	"\bdeed_num\x18\x03 \x01(\tR\adeedNum\x12\x12\n" +
 	"\x04area\x18\x04 \x01(\x01R\x04area\x12\x16\n" +
 	"\x06amount\x18\x05 \x01(\x01R\x06amount\x12#\n" +
-	"\rlocation_text\x18\x06 \x01(\tR\flocationText\"\x8d\x01\n" +
+	"\rlocation_text\x18\x06 \x01(\tR\flocationText\x12\x14\n" +
+	"\x05image\x18\a \x01(\tR\x05image\"\xa3\x01\n" +
 	"\x10LiabilityPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\bcreditor\x18\x03 \x01(\tR\bcreditor\x12\x1c\n" +
 	"\tprincipal\x18\x04 \x01(\x01R\tprincipal\x12\x1b\n" +
-	"\ttype_name\x18\x05 \x01(\tR\btypeName\"\x84\x01\n" +
+	"\ttype_name\x18\x05 \x01(\tR\btypeName\x12\x14\n" +
+	"\x05image\x18\x06 \x01(\tR\x05image\"\x84\x01\n" +
 	"\x0eDeletedPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
 	"\roriginal_name\x18\x02 \x01(\tR\foriginalName\x12#\n" +

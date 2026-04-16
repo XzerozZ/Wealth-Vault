@@ -43,6 +43,7 @@ type BuildingDetail struct {
 	Amount       float64 `json:"amount"`
 	LocationText string  `json:"location_text"`
 	TypeName     string  `json:"type"`
+	Image        string  `json:"image"`
 }
 
 type AccountDetail struct {
@@ -51,6 +52,7 @@ type AccountDetail struct {
 	BankName      string  `json:"bank_name"`
 	AccountNumber string  `json:"account_number"`
 	Amount        float64 `json:"amount"`
+	Image         string  `json:"image"`
 }
 
 type LandDetail struct {
@@ -60,12 +62,14 @@ type LandDetail struct {
 	Area         float64 `json:"area"`
 	Amount       float64 `json:"amount"`
 	LocationText string  `json:"location"`
+	Image        string  `json:"image"`
 }
 
 type CashDetail struct {
 	ID     string  `json:"id"`
 	Name   string  `json:"name"`
 	Amount float64 `json:"amount"`
+	Image  string  `json:"image"`
 }
 
 type InsuranceDetail struct {
@@ -76,6 +80,7 @@ type InsuranceDetail struct {
 	PolNum         string  `json:"pol_num"`
 	CoverageAmount float64 `json:"coverage_amount"`
 	ExpDateText    string  `json:"exp_date_text"`
+	Image          string  `json:"image"`
 }
 
 type InvestmentDetail struct {
@@ -84,6 +89,7 @@ type InvestmentDetail struct {
 	Symbol   string  `json:"symbol"`
 	TypeName string  `json:"type_name"`
 	Amount   float64 `json:"amount"`
+	Image    string  `json:"image"`
 }
 
 type LiabilityDetail struct {
@@ -92,6 +98,7 @@ type LiabilityDetail struct {
 	Creditor  string  `json:"creditor"`
 	Principal float64 `json:"principal"`
 	TypeName  string  `json:"type"`
+	Image     string  `json:"image"`
 }
 
 type DeletedDetail struct {

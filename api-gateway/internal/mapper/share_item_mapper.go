@@ -27,6 +27,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 					Amount:       v.Building.Amount,
 					LocationText: v.Building.LocationText,
 					TypeName:     v.Building.TypeName,
+					Image:        v.Building.Image,
 				}
 
 			case *pb.AssetPreview_Account:
@@ -37,6 +38,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 					BankName:      v.Account.BankName,
 					AccountNumber: v.Account.AccountNumber,
 					Amount:        v.Account.Amount,
+					Image:         v.Account.Image,
 				}
 
 			case *pb.AssetPreview_Land:
@@ -48,6 +50,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 					Area:         v.Land.Area,
 					Amount:       v.Land.Amount,
 					LocationText: v.Land.LocationText,
+					Image:        v.Land.Image,
 				}
 
 			case *pb.AssetPreview_Cash:
@@ -56,6 +59,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 					ID:     v.Cash.Id,
 					Name:   v.Cash.Name,
 					Amount: v.Cash.Amount,
+					Image:  v.Cash.Image,
 				}
 
 			case *pb.AssetPreview_Insurance:
@@ -67,6 +71,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 					PolNum:         v.Insurance.PolNum,
 					CoverageAmount: v.Insurance.CoverageAmount,
 					ExpDateText:    v.Insurance.ExpDateText,
+					Image:          v.Insurance.Image,
 				}
 
 			case *pb.AssetPreview_Investment:
@@ -76,6 +81,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 					Name:     v.Investment.Name,
 					Symbol:   v.Investment.Symbol,
 					TypeName: v.Investment.TypeName,
+					Image:    v.Investment.Image,
 				}
 
 			case *pb.AssetPreview_Liability:
@@ -86,6 +92,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 					Creditor:  v.Liability.Creditor,
 					Principal: v.Liability.Principal,
 					TypeName:  v.Liability.TypeName,
+					Image:     v.Liability.Image,
 				}
 			}
 		}
@@ -118,6 +125,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					Amount:       v.Building.Amount,
 					LocationText: v.Building.LocationText,
 					TypeName:     v.Building.TypeName,
+					Image:        v.Building.Image,
 				}
 
 			case *pb.AssetPreview_Account:
@@ -128,6 +136,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					BankName:      v.Account.BankName,
 					AccountNumber: v.Account.AccountNumber,
 					Amount:        v.Account.Amount,
+					Image:         v.Account.Image,
 				}
 
 			case *pb.AssetPreview_Land:
@@ -139,6 +148,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					Area:         v.Land.Area,
 					Amount:       v.Land.Amount,
 					LocationText: v.Land.LocationText,
+					Image:        v.Land.Image,
 				}
 
 			case *pb.AssetPreview_Cash:
@@ -147,6 +157,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					ID:     v.Cash.Id,
 					Name:   v.Cash.Name,
 					Amount: v.Cash.Amount,
+					Image:  v.Cash.Image,
 				}
 
 			case *pb.AssetPreview_Insurance:
@@ -158,6 +169,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					PolNum:         v.Insurance.PolNum,
 					CoverageAmount: v.Insurance.CoverageAmount,
 					ExpDateText:    v.Insurance.ExpDateText,
+					Image:          v.Insurance.Image,
 				}
 
 			case *pb.AssetPreview_Investment:
@@ -167,6 +179,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					Name:     v.Investment.Name,
 					Symbol:   v.Investment.Symbol,
 					TypeName: v.Investment.TypeName,
+					Image:    v.Investment.Image,
 				}
 
 			case *pb.AssetPreview_Liability:
@@ -177,6 +190,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 					Creditor:  v.Liability.Creditor,
 					Principal: v.Liability.Principal,
 					TypeName:  v.Liability.TypeName,
+					Image:     v.Liability.Image,
 				}
 
 			case *pb.AssetPreview_Deleted:

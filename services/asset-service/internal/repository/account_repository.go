@@ -44,7 +44,7 @@ func (r *AccountRepository) GetAccountByIDs(ctx context.Context, ids []uuid.UUID
 
 func (r *AccountRepository) GetBatchAccountByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Account, error) {
 	var items []*domain.Account
-	if err := r.db.WithContext(ctx).Unscoped().Where("id IN ?", ids).Find(&items).Error; err != nil {
+	if err := r.db.WithContext(ctx).Unscoped().Preload("Files").Where("id IN ?", ids).Find(&items).Error; err != nil {
 		return nil, err
 	}
 

@@ -55,6 +55,7 @@ ProcessActive:
 				Amount:       b.Amount,
 				LocationText: locationText,
 				TypeName:     b.Type.String(),
+				Image:        b.Files[0].Url,
 			},
 		},
 	}
@@ -92,6 +93,7 @@ ProcessActive:
 				Area:         l.Area,
 				Amount:       l.Amount,
 				LocationText: locationText,
+				Image:        l.Files[0].Url,
 			},
 		},
 	}
@@ -125,6 +127,7 @@ ProcessActive:
 				BankName:      a.BankName,
 				Amount:        a.Amount,
 				AccountNumber: utils.MaskBankAccount(a.BankAcc),
+				Image:         a.Files[0].Url,
 			},
 		},
 	}
@@ -154,6 +157,7 @@ ProcessActive:
 				Id:     c.Id,
 				Name:   c.Name,
 				Amount: c.Amount,
+				Image:  c.Files[0].Url,
 			},
 		},
 	}
@@ -192,6 +196,7 @@ ProcessActive:
 				PolNum:         i.PolNum,
 				CoverageAmount: i.CoverageAmount,
 				ExpDateText:    expDateStr,
+				Image:          i.Files[0].Url,
 			},
 		},
 	}
@@ -223,6 +228,7 @@ ProcessActive:
 				TypeName: inv.Type.String(),
 				Symbol:   inv.Symbol,
 				Amount:   inv.Amount,
+				Image:    inv.Files[0].Url,
 			},
 		},
 	}
@@ -254,6 +260,7 @@ ProcessActive:
 				TypeName:  l.Type.String(),
 				Creditor:  l.Creditor,
 				Principal: l.Principal,
+				Image:     l.Files[0].Url,
 			},
 		},
 	}

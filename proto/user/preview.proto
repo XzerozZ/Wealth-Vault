@@ -23,6 +23,7 @@ message BuildingPreview {
   double amount = 3;   
   string location_text = 4;
   string type_name = 5;
+  string image = 6;
 }
 
 message AccountPreview {
@@ -31,12 +32,14 @@ message AccountPreview {
   string bank_name = 3;  
   string account_number = 4;
   double amount = 5;  
+  string image = 6;
 }
 
 message CashPreview {
   string id = 1;
   string name = 2;
   double amount = 3;
+  string image = 4;
 }
 
 message InsurancePreview {
@@ -47,6 +50,7 @@ message InsurancePreview {
   string pol_num = 5;
   double coverage_amount = 6; 
   string exp_date_text = 7; 
+  string image = 8;
 }
 
 message InvestmentPreview {
@@ -55,6 +59,7 @@ message InvestmentPreview {
   string symbol = 3;     
   string type_name = 4;  
   double amount = 5;
+  string image = 6;
 }
 
 message LandPreview {
@@ -64,6 +69,7 @@ message LandPreview {
   double area = 4;     
   double amount = 5;   
   string location_text = 6;
+  string image = 7;
 }
 
 message LiabilityPreview {
@@ -72,6 +78,7 @@ message LiabilityPreview {
   string creditor = 3;
   double principal = 4;  
   string type_name = 5;
+  string image = 6;
 }
 
 message DeletedPreview {

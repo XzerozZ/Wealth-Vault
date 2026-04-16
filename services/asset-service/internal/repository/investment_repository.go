@@ -44,7 +44,7 @@ func (r *InvestmentRepository) GetInvestmentByIDs(ctx context.Context, ids []uui
 
 func (r *InvestmentRepository) GetBatchInvestmentByIDs(ctx context.Context, ids []uuid.UUID) ([]*domain.Investment, error) {
 	var items []*domain.Investment
-	if err := r.db.WithContext(ctx).Unscoped().Where("id IN ?", ids).Find(&items).Error; err != nil {
+	if err := r.db.WithContext(ctx).Unscoped().Preload("Files").Where("id IN ?", ids).Find(&items).Error; err != nil {
 		return nil, err
 	}
 
