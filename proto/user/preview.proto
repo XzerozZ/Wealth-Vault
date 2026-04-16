@@ -54,6 +54,7 @@ message InvestmentPreview {
   string name = 2;
   string symbol = 3;     
   string type_name = 4;  
+  double amount = 5;
 }
 
 message LandPreview {

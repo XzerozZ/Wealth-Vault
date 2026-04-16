@@ -222,6 +222,7 @@ ProcessActive:
 				Name:     inv.Name,
 				TypeName: inv.Type.String(),
 				Symbol:   inv.Symbol,
+				Amount:   inv.Amount,
 			},
 		},
 	}

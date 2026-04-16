@@ -265,6 +265,7 @@ func MapAllFriendItemsToDomain(protoItems []*pb.SharedAssetPreview) []domain.Fri
 					Name:     v.Investment.Name,
 					Symbol:   v.Investment.Symbol,
 					TypeName: v.Investment.TypeName,
+					Amount:   v.Investment.Amount,
 				}
 
 			case *pb.AssetPreview_Liability:

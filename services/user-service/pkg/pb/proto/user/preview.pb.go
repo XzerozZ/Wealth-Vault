@@ -509,6 +509,7 @@ type InvestmentPreview struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Symbol        string                 `protobuf:"bytes,3,opt,name=symbol,proto3" json:"symbol,omitempty"`
 	TypeName      string                 `protobuf:"bytes,4,opt,name=type_name,json=typeName,proto3" json:"type_name,omitempty"`
+	Amount        float64                `protobuf:"fixed64,5,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -569,6 +570,13 @@ func (x *InvestmentPreview) GetTypeName() string {
 		return x.TypeName
 	}
 	return ""
+}
+
+func (x *InvestmentPreview) GetAmount() float64 {
+	if x != nil {
+		return x.Amount
+	}
+	return 0
 }
 
 type LandPreview struct {
@@ -839,12 +847,13 @@ const file_proto_user_preview_proto_rawDesc = "" +
 	"\ttype_name\x18\x04 \x01(\tR\btypeName\x12\x17\n" +
 	"\apol_num\x18\x05 \x01(\tR\x06polNum\x12'\n" +
 	"\x0fcoverage_amount\x18\x06 \x01(\x01R\x0ecoverageAmount\x12\"\n" +
-	"\rexp_date_text\x18\a \x01(\tR\vexpDateText\"l\n" +
+	"\rexp_date_text\x18\a \x01(\tR\vexpDateText\"\x84\x01\n" +
 	"\x11InvestmentPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06symbol\x18\x03 \x01(\tR\x06symbol\x12\x1b\n" +
-	"\ttype_name\x18\x04 \x01(\tR\btypeName\"\x9d\x01\n" +
+	"\ttype_name\x18\x04 \x01(\tR\btypeName\x12\x16\n" +
+	"\x06amount\x18\x05 \x01(\x01R\x06amount\"\x9d\x01\n" +
 	"\vLandPreview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
