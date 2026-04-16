@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 	"time"
+	"wealth-vault/api-gateway/internal/mapper"
 	assetPb "wealth-vault/api-gateway/pkg/pb/proto/asset"
 	userPb "wealth-vault/api-gateway/pkg/pb/proto/user"
 
@@ -110,8 +111,8 @@ func (h *InfoHandler) Dashboard(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"assets":      assetsRes.Assets,
-		"liabilities": assetsRes.Liabilities,
+		"assets":      mapper.ToAssetList(assetsRes.Assets),
+		"liabilities": mapper.ToAssetList(assetsRes.Liabilities),
 		"net_worth": fiber.Map{
 			"count":             netWorthRes.ItemCount,
 			"total_assets":      netWorthRes.AssetsValue,
