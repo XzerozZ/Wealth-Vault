@@ -357,20 +357,24 @@ func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUser
 	var items []domain.SharedItemSummary
 
 	query := `
-        SELECT entity_id, entity_type 
-        FROM friend_items 
-        WHERE owner_id = ? AND friend_id = ? 
+		SELECT entity_id, entity_type 
+		FROM friend_items 
+		WHERE owner_id = ? AND friend_id = ? 
 
-        UNION
+		UNION
 
-        SELECT gi.id AS entity_id, 'group_item' AS entity_type 
-        FROM group_items gi
-        INNER JOIN group_item_viewers giv ON gi.id = giv.group_item_id
-        WHERE gi.owner_id = ?             
-        AND giv.viewer_id = ?
-    `
+		SELECT gi.id AS entity_id, 'group_item' AS entity_type 
+		FROM group_items gi
+		INNER JOIN group_item_viewers giv ON gi.id = giv.group_item_id
+		WHERE gi.owner_id = ? 
+		AND giv.viewer_id = ?
+		AND EXISTS (
+			SELECT 1 FROM group_members 
+			WHERE group_id = gi.group_id AND user_id = ?
+		)
+	`
 
-	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, friendID, myUserID, myUserID).Scan(&items).Error
+	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, friendID, myUserID).Scan(&items).Error
 	if err != nil {
 		return nil, err
 	}
