@@ -207,7 +207,7 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 		newMeta, _ := json.Marshal(map[string]interface{}{
 			"is_action_required": true,
 			"is_completed":       true,
-			"target_user_id":     targetID.String(),
+			"target_user_id":     ownerID.String(),
 			"type":               "GRANT_ACCESS_PROMPT",
 			"completed_at":       time.Now().Unix(),
 		})
