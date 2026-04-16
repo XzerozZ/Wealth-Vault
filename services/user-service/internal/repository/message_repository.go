@@ -4,6 +4,7 @@ import (
 	"context"
 	"wealth-vault/user-service/internal/domain"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -45,4 +46,11 @@ func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID
 	}
 
 	return msgs, nil
+}
+
+func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, targetID uuid.UUID, newMetadata string) error {
+	return r.db.WithContext(ctx).Model(&domain.GroupMessage{}).Where("group_id = ?", groupID).
+		Where("metadata LIKE ?", "%"+targetID.String()+"%").
+		Where("metadata LIKE '%GRANT_ACCESS_PROMPT%'").
+		Update("metadata", newMetadata).Error
 }
