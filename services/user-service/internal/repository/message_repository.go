@@ -27,13 +27,14 @@ func (r *MsgRepository) CreatePrivateMessage(ctx context.Context, log []domain.P
 func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, userID string) ([]domain.GroupMessage, error) {
 	var msgs []domain.GroupMessage
 	if err := r.db.WithContext(ctx).
-		Joins("JOIN group_members ON group_members.group_id = group_messages.group_id").
-		Where("group_messages.group_id = ?", groupID).
-		Where("group_members.user_id = ?", userID).
+		Table("group_messages").
+		Joins("JOIN group_members ON group_members.group_id::uuid = group_messages.group_id::uuid").
+		Where("group_messages.group_id = ?::uuid", groupID).
+		Where("group_members.user_id = ?::uuid", userID).
 		Where("group_messages.created_at >= group_members.joined_at").
 		Where(
-			r.db.Where("group_messages.sender_id = ?", userID).
-				Or("group_messages.msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}), // เห็นข้อความกลางที่ทุกคนแชร์ร่วมกัน
+			r.db.Where("group_messages.sender_id = ?::uuid", userID).
+				Or("group_messages.msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}),
 		).
 		Order("group_messages.created_at DESC").
 		Preload("Sender").

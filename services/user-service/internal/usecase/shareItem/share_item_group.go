@@ -165,7 +165,7 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 				u.msgRepo.CreateMessage(bgCtx, []domain.GroupMessage{{
 					GroupID:   groupID,
 					SenderID:  m.ID,
-					MsgType:   MsgTypeSystemAlert,
+					MsgType:   MsgTypeGrantAccess,
 					Content:   fmt.Sprintf("คุณต้องการแชร์รายการของคุณให้ %s หรือไม่?", newNames),
 					Metadata:  string(promptMeta),
 					CreatedAt: time.Now(),
