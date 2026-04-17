@@ -245,6 +245,21 @@ func (h *GroupItemHandler) GetItemsForSelection(c *fiber.Ctx) error {
 		})
 	}
 
+	for _, asset := range assetRes.Liabilities {
+		isShared := false
+		if _, exists := sharedMap[strings.ToLower(asset.Id)]; exists {
+			isShared = true
+		}
+
+		response = append(response, domain.AssetSelection{
+			ID:       asset.Id,
+			Type:     asset.Type,
+			Name:     asset.Name,
+			Value:    asset.Value,
+			IsShared: isShared,
+		})
+	}
+
 	return c.JSON(fiber.Map{
 		"items": response,
 	})
