@@ -24,10 +24,20 @@ func (r *MsgRepository) CreatePrivateMessage(ctx context.Context, log []domain.P
 	return r.db.WithContext(ctx).Create(&log).Error
 }
 
-func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string) ([]domain.GroupMessage, error) {
+func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, userID string) ([]domain.GroupMessage, error) {
 	var msgs []domain.GroupMessage
-	if err := r.db.WithContext(ctx).Where("group_id = ?", groupID).Order("created_at DESC").
-		Preload("Sender").Find(&msgs).Error; err != nil {
+	if err := r.db.WithContext(ctx).
+		Joins("JOIN group_members ON group_members.group_id = group_messages.group_id").
+		Where("group_messages.group_id = ?", groupID).
+		Where("group_members.user_id = ?", userID).
+		Where("group_messages.created_at >= group_members.joined_at").
+		Where(
+			r.db.Where("group_messages.sender_id = ?", userID).
+				Or("group_messages.msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}), // เห็นข้อความกลางที่ทุกคนแชร์ร่วมกัน
+		).
+		Order("group_messages.created_at DESC").
+		Preload("Sender").
+		Find(&msgs).Error; err != nil {
 		return nil, err
 	}
 

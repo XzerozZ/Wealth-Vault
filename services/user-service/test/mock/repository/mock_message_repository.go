@@ -34,9 +34,10 @@ func (m *MockMsgRepository) CreatePrivateMessage(
 func (m *MockMsgRepository) GetGroupMessages(
 	ctx context.Context,
 	groupID string,
+	userID string,
 ) ([]domain.GroupMessage, error) {
 
-	args := m.Called(ctx, groupID)
+	args := m.Called(ctx, groupID, userID)
 
 	var result []domain.GroupMessage
 	if args.Get(0) != nil {
