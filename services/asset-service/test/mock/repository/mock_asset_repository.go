@@ -36,3 +36,8 @@ func (m *MockAssetRepository) GetNetWorthOverview(ctx context.Context, uid uuid.
 	args := m.Called(ctx, uid)
 	return args.Get(0).(*domain.NetWorthOverview), args.Error(1)
 }
+
+func (m *MockAssetRepository) GetAllAssetSelection(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error) {
+	args := m.Called(ctx, uid)
+	return args.Get(0).([]domain.AssetSummary), args.Get(1).([]domain.AssetSummary), args.Error(2)
+}

@@ -193,10 +193,6 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 		return nil, err
 	}
 
-	if len(req.GroupItemIds) == 0 {
-		return nil, errors.New("no items selected")
-	}
-
 	if isMember, err := u.itemRepo.IsGroupMember(ctx, groupID, targetID); err != nil || !isMember {
 		return nil, errors.New("target user is not a member of this group")
 	}

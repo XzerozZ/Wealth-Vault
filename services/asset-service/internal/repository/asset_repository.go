@@ -87,7 +87,7 @@ func (r *AssetRepository) CheckExists(ctx context.Context, entityType string, id
 	return name, true, nil
 }
 
-func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error) {
+func (r *AssetRepository) GetAllAssetSelection(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error) {
 	var assets []domain.AssetSummary
 	var liabilities []domain.AssetSummary
 
@@ -101,7 +101,8 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 		SELECT id, 'investment' as type, name, amount as value, created_at FROM investments WHERE user_id = ? AND deleted_at IS NULL
 		UNION ALL
 		SELECT id, 'land' as type, name, amount as value, created_at FROM lands WHERE user_id = ? AND deleted_at IS NULL
-		ORDER BY value DESC LIMIT 10
+		UNION ALL
+		SELECT id, 'insurance' as type, name, 0 as value, created_at FROM insurances WHERE user_id = ? AND deleted_at IS NULL
 	`
 	if err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid).Scan(&assets).Error; err != nil {
 		return nil, nil, err
@@ -109,8 +110,7 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 
 	liabilityQuery := `
 		SELECT id, 'liability' as type, name, principal as value, created_at 
-		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense'
-		ORDER BY value DESC LIMIT 10
+		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL
 	`
 	if err := r.db.WithContext(ctx).Raw(liabilityQuery, uid).Scan(&liabilities).Error; err != nil {
 		return nil, nil, err
@@ -152,6 +152,59 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 	}
 
 	return assets, liabilities, nil
+}
+
+func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error) {
+	var assets []domain.AssetSummary
+	var liabilities []domain.AssetSummary
+
+	assetQuery := `
+        SELECT id, 'account' as type, name, amount as value, created_at
+        FROM accounts WHERE user_id = ? AND deleted_at IS NULL
+
+        UNION ALL
+
+        SELECT id, 'building' as type, name, amount as value, created_at
+        FROM buildings WHERE user_id = ? AND deleted_at IS NULL
+
+        UNION ALL
+
+        SELECT id, 'cash' as type, name, amount as value, created_at
+        FROM cashes WHERE user_id = ? AND deleted_at IS NULL
+
+        UNION ALL
+
+        SELECT id, 'investment' as type, name, amount as value, created_at
+        FROM investments WHERE user_id = ? AND deleted_at IS NULL
+
+        UNION ALL
+
+        SELECT id, 'land' as type, name, amount as value, created_at
+        FROM lands WHERE user_id = ? AND deleted_at IS NULL
+        ORDER BY value DESC
+        LIMIT 10
+
+    `
+
+	liabilityQuery := `
+        SELECT id, 'liability' as type, name, principal as value, created_at
+        FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense'
+        ORDER BY value DESC
+        LIMIT 10
+    `
+
+	err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid).Scan(&assets).Error
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = r.db.WithContext(ctx).Raw(liabilityQuery, uid).Scan(&liabilities).Error
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return assets, liabilities, nil
+
 }
 
 func (r *AssetRepository) GetAssetCount(ctx context.Context, uid uuid.UUID) (int64, error) {

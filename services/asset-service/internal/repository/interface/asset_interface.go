@@ -9,6 +9,7 @@ import (
 
 type AssetRepository interface {
 	GetAllAssetIDs(ctx context.Context, userID uuid.UUID) (map[string][]string, error)
+	GetAllAssetSelection(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error)
 	CheckExists(ctx context.Context, entityType string, id uuid.UUID, uid uuid.UUID) (string, bool, error)
 	GetAllAssets(ctx context.Context, uid uuid.UUID) ([]domain.AssetSummary, []domain.AssetSummary, error)
 	GetAssetCount(ctx context.Context, uid uuid.UUID) (int64, error)
