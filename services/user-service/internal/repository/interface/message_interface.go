@@ -13,7 +13,7 @@ type MsgRepository interface {
 	CreatePrivateMessage(ctx context.Context, log []domain.PrivateMessage) error
 
 	// ------ Get Message ------
-	GetGroupMessages(ctx context.Context, groupID string) ([]domain.GroupMessage, error)
+	GetGroupMessages(ctx context.Context, groupID string, userID string) ([]domain.GroupMessage, error)
 	GetPrivateMessages(ctx context.Context, userID, friendID string) ([]domain.PrivateMessage, error)
 
 	UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error

@@ -57,6 +57,7 @@ func TestGetGroupMessages(t *testing.T) {
 	repo := repository.NewMsgRepository(mock.DB)
 
 	groupID := uuid.New().String()
+	userID := uuid.New().String()
 	senderID := uuid.New()
 
 	queryRegex := `^SELECT .* FROM "group_messages" WHERE group_id = \$1 ORDER BY created_at DESC$`
@@ -68,7 +69,7 @@ func TestGetGroupMessages(t *testing.T) {
 		WithArgs(senderID).
 		WillReturnRows(sqlmock.NewRows([]string{"id", "username"}).AddRow(senderID, "TestUser"))
 
-	res, err := repo.GetGroupMessages(context.Background(), groupID)
+	res, err := repo.GetGroupMessages(context.Background(), groupID, userID)
 
 	assert.NoError(t, err)
 	assert.Len(t, res, 1)

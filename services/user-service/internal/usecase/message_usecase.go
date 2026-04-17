@@ -41,7 +41,7 @@ func (u *MessageUsecase) GetGroupMessages(ctx context.Context, req *pb.GetGroupM
 		return nil, errors.New("unauthorized")
 	}
 
-	msgs, err := u.msgRepo.GetGroupMessages(ctx, req.GroupId)
+	msgs, err := u.msgRepo.GetGroupMessages(ctx, req.GroupId, req.UserId)
 	if err != nil {
 		return nil, err
 	}
