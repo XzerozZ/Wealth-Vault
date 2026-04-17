@@ -44,7 +44,7 @@ func NewAssetCronJob(
 func (j *AssetCronJob) Start() {
 	bkk, _ := time.LoadLocation("Asia/Bangkok")
 	j.cron = cron.New(cron.WithLocation(bkk))
-	_, err := j.cron.AddFunc("*/1 * * * *", j.sendNoti)
+	_, err := j.cron.AddFunc("0 10 * * *", j.sendNoti)
 	if err != nil {
 		log.Fatalf("Error adding cron job: %v", err)
 	}

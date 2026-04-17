@@ -104,7 +104,7 @@ func (r *AssetRepository) GetAllAssetSelection(ctx context.Context, uid uuid.UUI
 		UNION ALL
 		SELECT id, 'insurance' as type, name, 0 as value, created_at FROM insurances WHERE user_id = ? AND deleted_at IS NULL
 	`
-	if err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid).Scan(&assets).Error; err != nil {
+	if err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid, uid).Scan(&assets).Error; err != nil {
 		return nil, nil, err
 	}
 
