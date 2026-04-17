@@ -139,5 +139,6 @@ type AssetSelection struct {
 	Type     string  `json:"type"`
 	Name     string  `json:"name"`
 	Value    float64 `json:"value"`
+	Image    string  `json:"image"`
 	IsShared bool    `json:"is_shared"`
 }

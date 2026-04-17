@@ -625,7 +625,8 @@ type AssetSummary struct {
 	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	Value         float64                `protobuf:"fixed64,4,opt,name=value,proto3" json:"value,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Image         string                 `protobuf:"bytes,5,opt,name=image,proto3" json:"image,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -686,6 +687,13 @@ func (x *AssetSummary) GetValue() float64 {
 		return x.Value
 	}
 	return 0
+}
+
+func (x *AssetSummary) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
 }
 
 func (x *AssetSummary) GetCreatedAt() *timestamppb.Timestamp {
@@ -833,14 +841,15 @@ const file_proto_asset_asset_proto_rawDesc = "" +
 	"\rinsurance_ids\x18\x04 \x03(\tR\finsuranceIds\x12%\n" +
 	"\x0einvestment_ids\x18\x05 \x03(\tR\rinvestmentIds\x12\x19\n" +
 	"\bland_ids\x18\x06 \x03(\tR\alandIds\x12#\n" +
-	"\rliability_ids\x18\a \x03(\tR\fliabilityIds\"\x97\x01\n" +
+	"\rliability_ids\x18\a \x03(\tR\fliabilityIds\"\xad\x01\n" +
 	"\fAssetSummary\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
-	"\x05value\x18\x04 \x01(\x01R\x05value\x129\n" +
+	"\x05value\x18\x04 \x01(\x01R\x05value\x12\x14\n" +
+	"\x05image\x18\x05 \x01(\tR\x05image\x129\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\".\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\".\n" +
 	"\x13GetAllAssetsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"z\n" +
 	"\x14GetAllAssetsResponse\x12+\n" +

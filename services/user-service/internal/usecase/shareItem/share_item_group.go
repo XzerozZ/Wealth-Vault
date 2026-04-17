@@ -124,38 +124,53 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 	}
 
 	go func() {
+		bgCtx := context.Background()
 		logMetaJSON, _ := json.Marshal(map[string]interface{}{"action": "add_member", "target_ids": req.TargetUserIds, "added_count": len(newMembers)})
-		u.groupRepo.CreateLog(context.Background(), &domain.GroupLog{
+		u.groupRepo.CreateLog(bgCtx, &domain.GroupLog{
 			GroupID: groupID, LogType: LogTypeSystem,
 			Messages: fmt.Sprintf("%s เพิ่มสมาชิกใหม่ %d คน", senderName, len(newMembers)), Metadata: string(logMetaJSON), CreatedBy: senderID,
 		})
 
 		msgContent := fmt.Sprintf("%s เพิ่ม %s เข้ากลุ่ม", senderName, strings.Join(addedNames, ", "))
-		u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
-			GroupID: groupID, SenderID: senderID, MsgType: MsgTypeSystemAlert, Content: msgContent, Metadata: "{}", CreatedAt: time.Now(),
+		u.msgRepo.CreateMessage(bgCtx, []domain.GroupMessage{{
+			GroupID: groupID, SenderID: senderID, MsgType: MsgTypeSystemAlert, Content: msgContent, CreatedAt: time.Now(),
 		}})
 
 		u.publisher.Publish(TopicGroupActivity, domain.GroupActivityEvent{
 			GroupID: req.GroupId, ActivityType: "MEMBER_ADDED", Payload: fmt.Sprintf("%s เพิ่มสมาชิกใหม่", senderName), ActorID: req.UserId, OccurredAt: time.Now().Unix(),
 		})
 
-		for i, uid := range targetUUIDs {
-			userName := addedNames[i]
-			promptMeta, _ := json.Marshal(map[string]interface{}{
-				"is_action_required": true,
-				"is_completed":       false,
-				"target_user_id":     uid.String(),
-				"type":               "GRANT_ACCESS_PROMPT",
-			})
+		existingMembers, _, _ := u.groupRepo.GetMember(bgCtx, groupID)
+		for i, newID := range targetUUIDs {
+			newNames := addedNames[i]
+			for _, m := range existingMembers {
+				isNew := false
+				for _, tid := range targetUUIDs {
+					if m.ID == tid {
+						isNew = true
+						break
+					}
+				}
+				if isNew {
+					continue
+				}
 
-			u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
-				GroupID:   groupID,
-				SenderID:  senderID,
-				MsgType:   MsgTypeSystemAlert,
-				Content:   fmt.Sprintf("สมาชิกใหม่: %s เข้ากลุ่มแล้ว คุณต้องการแชร์รายการของคุณให้เขาหรือไม่?", userName),
-				Metadata:  string(promptMeta),
-				CreatedAt: time.Now(),
-			}})
+				promptMeta, _ := json.Marshal(map[string]interface{}{
+					"is_action_required": true,
+					"is_completed":       false,
+					"target_user_id":     newID.String(),
+					"type":               "GRANT_ACCESS_PROMPT",
+				})
+
+				u.msgRepo.CreateMessage(bgCtx, []domain.GroupMessage{{
+					GroupID:   groupID,
+					SenderID:  m.ID,
+					MsgType:   MsgTypeSystemAlert,
+					Content:   fmt.Sprintf("คุณต้องการแชร์รายการของคุณให้ %s หรือไม่?", newNames),
+					Metadata:  string(promptMeta),
+					CreatedAt: time.Now(),
+				}})
+			}
 		}
 	}()
 

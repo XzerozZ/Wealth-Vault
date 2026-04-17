@@ -234,6 +234,7 @@ func (u *GroupUsecase) RemoveMember(ctx context.Context, req *pb.RemoveMemberReq
 		return nil, err
 	}
 
+	_ = u.msgRepo.CloseAllGrantPromptsForTarget(context.Background(), groupID, targetID)
 	u.DispatchMemberRemoved(group, req, adminName)
 
 	return &pb.ActionResponse{
@@ -280,6 +281,7 @@ func (u *GroupUsecase) LeaveGroup(ctx context.Context, req *pb.LeaveGroupRequest
 		return nil, err
 	}
 
+	_ = u.msgRepo.CloseAllGrantPromptsForTarget(context.Background(), groupID, userID)
 	u.DispatchMemberLeft(group, req, userName)
 
 	return &pb.ActionResponse{

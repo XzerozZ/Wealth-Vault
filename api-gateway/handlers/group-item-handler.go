@@ -241,6 +241,23 @@ func (h *GroupItemHandler) GetItemsForSelection(c *fiber.Ctx) error {
 			Type:     asset.Type,
 			Name:     asset.Name,
 			Value:    asset.Value,
+			Image:    asset.Image,
+			IsShared: isShared,
+		})
+	}
+
+	for _, asset := range assetRes.Liabilities {
+		isShared := false
+		if _, exists := sharedMap[strings.ToLower(asset.Id)]; exists {
+			isShared = true
+		}
+
+		response = append(response, domain.AssetSelection{
+			ID:       asset.Id,
+			Type:     asset.Type,
+			Name:     asset.Name,
+			Value:    asset.Value,
+			Image:    asset.Image,
 			IsShared: isShared,
 		})
 	}

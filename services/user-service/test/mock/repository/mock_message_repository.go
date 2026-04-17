@@ -65,3 +65,8 @@ func (m *MockMsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupI
 	args := m.Called(ctx, groupID, ownerID, targetID, newMetadata)
 	return args.Error(0)
 }
+
+func (m *MockMsgRepository) CloseAllGrantPromptsForTarget(ctx context.Context, groupID, targetID uuid.UUID) error {
+	args := m.Called(ctx, groupID, targetID)
+	return args.Error(0)
+}
