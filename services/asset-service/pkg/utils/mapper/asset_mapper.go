@@ -8,11 +8,19 @@ import (
 )
 
 func ToAssetSummaryProto(d domain.AssetSummary) *pb.AssetSummary {
+	imageURL := ""
+	if len(d.Files) > 0 {
+		if d.Files[0].Link != "" {
+			imageURL = d.Files[0].Link
+		}
+	}
+
 	return &pb.AssetSummary{
 		Id:        d.ID.String(),
 		Type:      d.Type,
 		Name:      d.Name,
 		Value:     d.Value,
+		Image:     imageURL,
 		CreatedAt: timestamppb.New(d.CreatedAt),
 	}
 }

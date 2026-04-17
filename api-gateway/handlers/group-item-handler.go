@@ -241,6 +241,7 @@ func (h *GroupItemHandler) GetItemsForSelection(c *fiber.Ctx) error {
 			Type:     asset.Type,
 			Name:     asset.Name,
 			Value:    asset.Value,
+			Image:    asset.Image,
 			IsShared: isShared,
 		})
 	}
@@ -256,6 +257,7 @@ func (h *GroupItemHandler) GetItemsForSelection(c *fiber.Ctx) error {
 			Type:     asset.Type,
 			Name:     asset.Name,
 			Value:    asset.Value,
+			Image:    asset.Image,
 			IsShared: isShared,
 		})
 	}

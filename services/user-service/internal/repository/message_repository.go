@@ -50,25 +50,35 @@ func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID
 
 func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error {
 	query := `
-		UPDATE group_messages 
-		SET metadata = ?, updated_at = NOW()
-		WHERE group_id = ? 
-		AND sender_id = ? 
-		AND metadata->>'target_user_id' = ? 
-		AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
-		AND (metadata->>'is_completed')::boolean = false
-	`
+        WITH target_msg AS (
+            SELECT id FROM group_messages
+            WHERE group_id = ? 
+            AND sender_id = ? 
+            AND metadata->>'target_user_id' = ? 
+            AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
+            AND (metadata->>'is_completed')::boolean = false
+        )
+        UPDATE group_messages
+        SET metadata = ?, updated_at = NOW()
+        FROM target_msg
+        WHERE group_messages.id = target_msg.id
+    `
+	result := r.db.WithContext(ctx).Exec(query, groupID, ownerID, targetID.String(), newMetadata)
+	return result.Error
+}
 
-	result := r.db.WithContext(ctx).Exec(query,
-		newMetadata,
-		groupID,
-		ownerID,
-		targetID.String(),
-	)
+func (r *MsgRepository) CloseAllGrantPromptsForTarget(ctx context.Context, groupID, targetID uuid.UUID) error {
+	statusMeta := `{"is_action_required": true, "is_completed": true, "status": "member_left"}`
 
-	if result.Error != nil {
-		return result.Error
-	}
+	query := `
+        UPDATE group_messages 
+        SET metadata = ?::jsonb,
+            updated_at = NOW()
+        WHERE group_id = ? 
+        AND metadata->>'target_user_id' = ? 
+        AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
+        AND (metadata->>'is_completed')::boolean = false
+    `
 
-	return nil
+	return r.db.WithContext(ctx).Exec(query, statusMeta, groupID, targetID.String()).Error
 }

@@ -91,49 +91,69 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 	var assets []domain.AssetSummary
 	var liabilities []domain.AssetSummary
 
+	// 1. ดึงข้อมูล Assets (UNION ALL)
 	assetQuery := `
-		SELECT id, 'account' as type, name, amount as value, created_at 
-		FROM accounts WHERE user_id = ? AND deleted_at IS NULL
-
+		SELECT id, 'account' as type, name, amount as value, created_at FROM accounts WHERE user_id = ? AND deleted_at IS NULL
 		UNION ALL
-
-		SELECT id, 'building' as type, name, amount as value, created_at 
-		FROM buildings WHERE user_id = ? AND deleted_at IS NULL
-
+		SELECT id, 'building' as type, name, amount as value, created_at FROM buildings WHERE user_id = ? AND deleted_at IS NULL
 		UNION ALL
-
-		SELECT id, 'cash' as type, name, amount as value, created_at 
-		FROM cashes WHERE user_id = ? AND deleted_at IS NULL
-
+		SELECT id, 'cash' as type, name, amount as value, created_at FROM cashes WHERE user_id = ? AND deleted_at IS NULL
 		UNION ALL
-
-		SELECT id, 'investment' as type, name, amount as value, created_at 
-		FROM investments WHERE user_id = ? AND deleted_at IS NULL
-
+		SELECT id, 'investment' as type, name, amount as value, created_at FROM investments WHERE user_id = ? AND deleted_at IS NULL
 		UNION ALL
-
-		SELECT id, 'land' as type, name, amount as value, created_at 
-		FROM lands WHERE user_id = ? AND deleted_at IS NULL
-
-		ORDER BY value DESC
-		LIMIT 10
+		SELECT id, 'land' as type, name, amount as value, created_at FROM lands WHERE user_id = ? AND deleted_at IS NULL
+		ORDER BY value DESC LIMIT 10
 	`
-
-	liabilityQuery := `
-		SELECT id, 'liability' as type, name, principal as value, created_at 
-		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense'
-		ORDER BY value DESC
-		LIMIT 10
-	`
-
-	err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid).Scan(&assets).Error
-	if err != nil {
+	if err := r.db.WithContext(ctx).Raw(assetQuery, uid, uid, uid, uid, uid).Scan(&assets).Error; err != nil {
 		return nil, nil, err
 	}
 
-	err = r.db.WithContext(ctx).Raw(liabilityQuery, uid).Scan(&liabilities).Error
-	if err != nil {
+	// 2. ดึงข้อมูล Liabilities
+	liabilityQuery := `
+		SELECT id, 'liability' as type, name, principal as value, created_at 
+		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense'
+		ORDER BY value DESC LIMIT 10
+	`
+	if err := r.db.WithContext(ctx).Raw(liabilityQuery, uid).Scan(&liabilities).Error; err != nil {
 		return nil, nil, err
+	}
+
+	// --- ส่วนที่ดึงไฟล์แรกแบบรวดเดียว (Batch Fetch First File) ---
+
+	// รวบรวม ID ทั้งหมด
+	var allIDs []uuid.UUID
+	for _, a := range assets {
+		allIDs = append(allIDs, a.ID)
+	}
+	for _, l := range liabilities {
+		allIDs = append(allIDs, l.ID)
+	}
+
+	if len(allIDs) > 0 {
+		var firstFiles []domain.FileAssociate
+		fileQuery := `
+			SELECT DISTINCT ON (entity_id) * FROM file_associates 
+			WHERE entity_id IN ? 
+			ORDER BY entity_id, created_at ASC
+		`
+		r.db.WithContext(ctx).Raw(fileQuery, allIDs).Scan(&firstFiles)
+
+		fileMap := make(map[uuid.UUID][]domain.FileAssociate)
+		for _, f := range firstFiles {
+			fileMap[f.EntityID] = []domain.FileAssociate{f}
+		}
+
+		for i := range assets {
+			if f, ok := fileMap[assets[i].ID]; ok {
+				assets[i].Files = f
+			}
+		}
+
+		for i := range liabilities {
+			if f, ok := fileMap[liabilities[i].ID]; ok {
+				liabilities[i].Files = f
+			}
+		}
 	}
 
 	return assets, liabilities, nil

@@ -21,6 +21,7 @@ type AssetSummary struct {
 	Type      string
 	Name      string
 	Value     float64
+	Files     []FileAssociate
 	CreatedAt time.Time
 }
 
