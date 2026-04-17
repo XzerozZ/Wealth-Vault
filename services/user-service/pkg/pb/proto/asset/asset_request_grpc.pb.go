@@ -19,52 +19,53 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AssetService_CreateAccount_FullMethodName      = "/asset.AssetService/CreateAccount"
-	AssetService_UpdateAccount_FullMethodName      = "/asset.AssetService/UpdateAccount"
-	AssetService_GetAccount_FullMethodName         = "/asset.AssetService/GetAccount"
-	AssetService_GetAccountByID_FullMethodName     = "/asset.AssetService/GetAccountByID"
-	AssetService_DeleteAccount_FullMethodName      = "/asset.AssetService/DeleteAccount"
-	AssetService_CreateCash_FullMethodName         = "/asset.AssetService/CreateCash"
-	AssetService_UpdateCash_FullMethodName         = "/asset.AssetService/UpdateCash"
-	AssetService_GetCash_FullMethodName            = "/asset.AssetService/GetCash"
-	AssetService_GetCashByID_FullMethodName        = "/asset.AssetService/GetCashByID"
-	AssetService_DeleteCash_FullMethodName         = "/asset.AssetService/DeleteCash"
-	AssetService_CreateInvestment_FullMethodName   = "/asset.AssetService/CreateInvestment"
-	AssetService_UpdateInvestment_FullMethodName   = "/asset.AssetService/UpdateInvestment"
-	AssetService_GetInvestment_FullMethodName      = "/asset.AssetService/GetInvestment"
-	AssetService_GetInvestmentByID_FullMethodName  = "/asset.AssetService/GetInvestmentByID"
-	AssetService_DeleteInvestment_FullMethodName   = "/asset.AssetService/DeleteInvestment"
-	AssetService_CreateBuilding_FullMethodName     = "/asset.AssetService/CreateBuilding"
-	AssetService_UpdateBuilding_FullMethodName     = "/asset.AssetService/UpdateBuilding"
-	AssetService_GetBuilding_FullMethodName        = "/asset.AssetService/GetBuilding"
-	AssetService_GetBuildingByID_FullMethodName    = "/asset.AssetService/GetBuildingByID"
-	AssetService_DeleteBuilding_FullMethodName     = "/asset.AssetService/DeleteBuilding"
-	AssetService_CreateLand_FullMethodName         = "/asset.AssetService/CreateLand"
-	AssetService_UpdateLand_FullMethodName         = "/asset.AssetService/UpdateLand"
-	AssetService_GetLand_FullMethodName            = "/asset.AssetService/GetLand"
-	AssetService_GetLandByID_FullMethodName        = "/asset.AssetService/GetLandByID"
-	AssetService_DeleteLand_FullMethodName         = "/asset.AssetService/DeleteLand"
-	AssetService_CreateInsurance_FullMethodName    = "/asset.AssetService/CreateInsurance"
-	AssetService_UpdateInsurance_FullMethodName    = "/asset.AssetService/UpdateInsurance"
-	AssetService_GetInsurance_FullMethodName       = "/asset.AssetService/GetInsurance"
-	AssetService_GetInsuranceByID_FullMethodName   = "/asset.AssetService/GetInsuranceByID"
-	AssetService_DeleteInsurance_FullMethodName    = "/asset.AssetService/DeleteInsurance"
-	AssetService_CreateLiability_FullMethodName    = "/asset.AssetService/CreateLiability"
-	AssetService_GetLiability_FullMethodName       = "/asset.AssetService/GetLiability"
-	AssetService_GetLiabilityByID_FullMethodName   = "/asset.AssetService/GetLiabilityByID"
-	AssetService_UpdateLiability_FullMethodName    = "/asset.AssetService/UpdateLiability"
-	AssetService_DeleteLiability_FullMethodName    = "/asset.AssetService/DeleteLiability"
-	AssetService_CheckAssetExists_FullMethodName   = "/asset.AssetService/CheckAssetExists"
-	AssetService_GetBatchAccount_FullMethodName    = "/asset.AssetService/GetBatchAccount"
-	AssetService_GetBatchCash_FullMethodName       = "/asset.AssetService/GetBatchCash"
-	AssetService_GetBatchInvestment_FullMethodName = "/asset.AssetService/GetBatchInvestment"
-	AssetService_GetBatchInsurance_FullMethodName  = "/asset.AssetService/GetBatchInsurance"
-	AssetService_GetBatchBuilding_FullMethodName   = "/asset.AssetService/GetBatchBuilding"
-	AssetService_GetBatchLand_FullMethodName       = "/asset.AssetService/GetBatchLand"
-	AssetService_GetBatchLiability_FullMethodName  = "/asset.AssetService/GetBatchLiability"
-	AssetService_GetNetWorth_FullMethodName        = "/asset.AssetService/GetNetWorth"
-	AssetService_GetAllAssetIDs_FullMethodName     = "/asset.AssetService/GetAllAssetIDs"
-	AssetService_GetAllAssets_FullMethodName       = "/asset.AssetService/GetAllAssets"
+	AssetService_CreateAccount_FullMethodName         = "/asset.AssetService/CreateAccount"
+	AssetService_UpdateAccount_FullMethodName         = "/asset.AssetService/UpdateAccount"
+	AssetService_GetAccount_FullMethodName            = "/asset.AssetService/GetAccount"
+	AssetService_GetAccountByID_FullMethodName        = "/asset.AssetService/GetAccountByID"
+	AssetService_DeleteAccount_FullMethodName         = "/asset.AssetService/DeleteAccount"
+	AssetService_CreateCash_FullMethodName            = "/asset.AssetService/CreateCash"
+	AssetService_UpdateCash_FullMethodName            = "/asset.AssetService/UpdateCash"
+	AssetService_GetCash_FullMethodName               = "/asset.AssetService/GetCash"
+	AssetService_GetCashByID_FullMethodName           = "/asset.AssetService/GetCashByID"
+	AssetService_DeleteCash_FullMethodName            = "/asset.AssetService/DeleteCash"
+	AssetService_CreateInvestment_FullMethodName      = "/asset.AssetService/CreateInvestment"
+	AssetService_UpdateInvestment_FullMethodName      = "/asset.AssetService/UpdateInvestment"
+	AssetService_GetInvestment_FullMethodName         = "/asset.AssetService/GetInvestment"
+	AssetService_GetInvestmentByID_FullMethodName     = "/asset.AssetService/GetInvestmentByID"
+	AssetService_DeleteInvestment_FullMethodName      = "/asset.AssetService/DeleteInvestment"
+	AssetService_CreateBuilding_FullMethodName        = "/asset.AssetService/CreateBuilding"
+	AssetService_UpdateBuilding_FullMethodName        = "/asset.AssetService/UpdateBuilding"
+	AssetService_GetBuilding_FullMethodName           = "/asset.AssetService/GetBuilding"
+	AssetService_GetBuildingByID_FullMethodName       = "/asset.AssetService/GetBuildingByID"
+	AssetService_DeleteBuilding_FullMethodName        = "/asset.AssetService/DeleteBuilding"
+	AssetService_CreateLand_FullMethodName            = "/asset.AssetService/CreateLand"
+	AssetService_UpdateLand_FullMethodName            = "/asset.AssetService/UpdateLand"
+	AssetService_GetLand_FullMethodName               = "/asset.AssetService/GetLand"
+	AssetService_GetLandByID_FullMethodName           = "/asset.AssetService/GetLandByID"
+	AssetService_DeleteLand_FullMethodName            = "/asset.AssetService/DeleteLand"
+	AssetService_CreateInsurance_FullMethodName       = "/asset.AssetService/CreateInsurance"
+	AssetService_UpdateInsurance_FullMethodName       = "/asset.AssetService/UpdateInsurance"
+	AssetService_GetInsurance_FullMethodName          = "/asset.AssetService/GetInsurance"
+	AssetService_GetInsuranceByID_FullMethodName      = "/asset.AssetService/GetInsuranceByID"
+	AssetService_DeleteInsurance_FullMethodName       = "/asset.AssetService/DeleteInsurance"
+	AssetService_CreateLiability_FullMethodName       = "/asset.AssetService/CreateLiability"
+	AssetService_GetLiability_FullMethodName          = "/asset.AssetService/GetLiability"
+	AssetService_GetLiabilityByID_FullMethodName      = "/asset.AssetService/GetLiabilityByID"
+	AssetService_UpdateLiability_FullMethodName       = "/asset.AssetService/UpdateLiability"
+	AssetService_DeleteLiability_FullMethodName       = "/asset.AssetService/DeleteLiability"
+	AssetService_CheckAssetExists_FullMethodName      = "/asset.AssetService/CheckAssetExists"
+	AssetService_GetBatchAccount_FullMethodName       = "/asset.AssetService/GetBatchAccount"
+	AssetService_GetBatchCash_FullMethodName          = "/asset.AssetService/GetBatchCash"
+	AssetService_GetBatchInvestment_FullMethodName    = "/asset.AssetService/GetBatchInvestment"
+	AssetService_GetBatchInsurance_FullMethodName     = "/asset.AssetService/GetBatchInsurance"
+	AssetService_GetBatchBuilding_FullMethodName      = "/asset.AssetService/GetBatchBuilding"
+	AssetService_GetBatchLand_FullMethodName          = "/asset.AssetService/GetBatchLand"
+	AssetService_GetBatchLiability_FullMethodName     = "/asset.AssetService/GetBatchLiability"
+	AssetService_GetNetWorth_FullMethodName           = "/asset.AssetService/GetNetWorth"
+	AssetService_GetAllAssetIDs_FullMethodName        = "/asset.AssetService/GetAllAssetIDs"
+	AssetService_GetAllAssets_FullMethodName          = "/asset.AssetService/GetAllAssets"
+	AssetService_GetAllAssetsSelection_FullMethodName = "/asset.AssetService/GetAllAssetsSelection"
 )
 
 // AssetServiceClient is the client API for AssetService service.
@@ -125,6 +126,7 @@ type AssetServiceClient interface {
 	GetNetWorth(ctx context.Context, in *GetNetWorthRequest, opts ...grpc.CallOption) (*GetNetWorthResponse, error)
 	GetAllAssetIDs(ctx context.Context, in *GetMyAssetsRequest, opts ...grpc.CallOption) (*GetMyAssetsResponse, error)
 	GetAllAssets(ctx context.Context, in *GetAllAssetsRequest, opts ...grpc.CallOption) (*GetAllAssetsResponse, error)
+	GetAllAssetsSelection(ctx context.Context, in *GetAllAssetsRequest, opts ...grpc.CallOption) (*GetAllAssetsResponse, error)
 }
 
 type assetServiceClient struct {
@@ -595,6 +597,16 @@ func (c *assetServiceClient) GetAllAssets(ctx context.Context, in *GetAllAssetsR
 	return out, nil
 }
 
+func (c *assetServiceClient) GetAllAssetsSelection(ctx context.Context, in *GetAllAssetsRequest, opts ...grpc.CallOption) (*GetAllAssetsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAllAssetsResponse)
+	err := c.cc.Invoke(ctx, AssetService_GetAllAssetsSelection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AssetServiceServer is the server API for AssetService service.
 // All implementations must embed UnimplementedAssetServiceServer
 // for forward compatibility.
@@ -653,6 +665,7 @@ type AssetServiceServer interface {
 	GetNetWorth(context.Context, *GetNetWorthRequest) (*GetNetWorthResponse, error)
 	GetAllAssetIDs(context.Context, *GetMyAssetsRequest) (*GetMyAssetsResponse, error)
 	GetAllAssets(context.Context, *GetAllAssetsRequest) (*GetAllAssetsResponse, error)
+	GetAllAssetsSelection(context.Context, *GetAllAssetsRequest) (*GetAllAssetsResponse, error)
 	mustEmbedUnimplementedAssetServiceServer()
 }
 
@@ -800,6 +813,9 @@ func (UnimplementedAssetServiceServer) GetAllAssetIDs(context.Context, *GetMyAss
 }
 func (UnimplementedAssetServiceServer) GetAllAssets(context.Context, *GetAllAssetsRequest) (*GetAllAssetsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAllAssets not implemented")
+}
+func (UnimplementedAssetServiceServer) GetAllAssetsSelection(context.Context, *GetAllAssetsRequest) (*GetAllAssetsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllAssetsSelection not implemented")
 }
 func (UnimplementedAssetServiceServer) mustEmbedUnimplementedAssetServiceServer() {}
 func (UnimplementedAssetServiceServer) testEmbeddedByValue()                      {}
@@ -1650,6 +1666,24 @@ func _AssetService_GetAllAssets_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AssetService_GetAllAssetsSelection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllAssetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AssetServiceServer).GetAllAssetsSelection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AssetService_GetAllAssetsSelection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AssetServiceServer).GetAllAssetsSelection(ctx, req.(*GetAllAssetsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AssetService_ServiceDesc is the grpc.ServiceDesc for AssetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1840,6 +1874,10 @@ var AssetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllAssets",
 			Handler:    _AssetService_GetAllAssets_Handler,
+		},
+		{
+			MethodName: "GetAllAssetsSelection",
+			Handler:    _AssetService_GetAllAssetsSelection_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -24,7 +24,7 @@ var File_proto_asset_asset_request_proto protoreflect.FileDescriptor
 
 const file_proto_asset_asset_request_proto_rawDesc = "" +
 	"\n" +
-	"\x1fproto/asset/asset_request.proto\x12\x05asset\x1a\x17proto/asset/asset.proto\x1a\x1bproto/asset/liability.proto\x1a\x19proto/asset/account.proto\x1a\x16proto/asset/cash.proto\x1a\x1cproto/asset/investment.proto\x1a\x1aproto/asset/building.proto\x1a\x16proto/asset/land.proto\x1a\x1bproto/asset/insurance.proto2\xf1\x19\n" +
+	"\x1fproto/asset/asset_request.proto\x12\x05asset\x1a\x17proto/asset/asset.proto\x1a\x1bproto/asset/liability.proto\x1a\x19proto/asset/account.proto\x1a\x16proto/asset/cash.proto\x1a\x1cproto/asset/investment.proto\x1a\x1aproto/asset/building.proto\x1a\x16proto/asset/land.proto\x1a\x1bproto/asset/insurance.proto2\xc3\x1a\n" +
 	"\fAssetService\x12D\n" +
 	"\rCreateAccount\x12\x1b.asset.CreateAccountRequest\x1a\x16.asset.AccountResponse\x12D\n" +
 	"\rUpdateAccount\x12\x1b.asset.UpdateAccountRequest\x1a\x16.asset.AccountResponse\x12A\n" +
@@ -78,7 +78,8 @@ const file_proto_asset_asset_request_proto_rawDesc = "" +
 	"\x11GetBatchLiability\x12\x19.asset.GetBatchIdsRequest\x1a\x1d.asset.LiabilityArrayResponse\x12D\n" +
 	"\vGetNetWorth\x12\x19.asset.GetNetWorthRequest\x1a\x1a.asset.GetNetWorthResponse\x12G\n" +
 	"\x0eGetAllAssetIDs\x12\x19.asset.GetMyAssetsRequest\x1a\x1a.asset.GetMyAssetsResponse\x12G\n" +
-	"\fGetAllAssets\x12\x1a.asset.GetAllAssetsRequest\x1a\x1b.asset.GetAllAssetsResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\fGetAllAssets\x12\x1a.asset.GetAllAssetsRequest\x1a\x1b.asset.GetAllAssetsResponse\x12P\n" +
+	"\x15GetAllAssetsSelection\x12\x1a.asset.GetAllAssetsRequest\x1a\x1b.asset.GetAllAssetsResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var file_proto_asset_asset_request_proto_goTypes = []any{
 	(*CreateAccountRequest)(nil),    // 0: asset.CreateAccountRequest
@@ -174,54 +175,56 @@ var file_proto_asset_asset_request_proto_depIdxs = []int32{
 	22, // 43: asset.AssetService.GetNetWorth:input_type -> asset.GetNetWorthRequest
 	23, // 44: asset.AssetService.GetAllAssetIDs:input_type -> asset.GetMyAssetsRequest
 	24, // 45: asset.AssetService.GetAllAssets:input_type -> asset.GetAllAssetsRequest
-	25, // 46: asset.AssetService.CreateAccount:output_type -> asset.AccountResponse
-	25, // 47: asset.AssetService.UpdateAccount:output_type -> asset.AccountResponse
-	26, // 48: asset.AssetService.GetAccount:output_type -> asset.AccountArrayResponse
-	25, // 49: asset.AssetService.GetAccountByID:output_type -> asset.AccountResponse
-	27, // 50: asset.AssetService.DeleteAccount:output_type -> asset.DeleteAssetResponse
-	28, // 51: asset.AssetService.CreateCash:output_type -> asset.CashResponse
-	28, // 52: asset.AssetService.UpdateCash:output_type -> asset.CashResponse
-	29, // 53: asset.AssetService.GetCash:output_type -> asset.CashArrayResponse
-	28, // 54: asset.AssetService.GetCashByID:output_type -> asset.CashResponse
-	27, // 55: asset.AssetService.DeleteCash:output_type -> asset.DeleteAssetResponse
-	30, // 56: asset.AssetService.CreateInvestment:output_type -> asset.InvestmentResponse
-	30, // 57: asset.AssetService.UpdateInvestment:output_type -> asset.InvestmentResponse
-	31, // 58: asset.AssetService.GetInvestment:output_type -> asset.InvestmentArrayResponse
-	30, // 59: asset.AssetService.GetInvestmentByID:output_type -> asset.InvestmentResponse
-	27, // 60: asset.AssetService.DeleteInvestment:output_type -> asset.DeleteAssetResponse
-	32, // 61: asset.AssetService.CreateBuilding:output_type -> asset.BuildingResponse
-	32, // 62: asset.AssetService.UpdateBuilding:output_type -> asset.BuildingResponse
-	33, // 63: asset.AssetService.GetBuilding:output_type -> asset.BuildingArrayResponse
-	32, // 64: asset.AssetService.GetBuildingByID:output_type -> asset.BuildingResponse
-	27, // 65: asset.AssetService.DeleteBuilding:output_type -> asset.DeleteAssetResponse
-	34, // 66: asset.AssetService.CreateLand:output_type -> asset.LandResponse
-	34, // 67: asset.AssetService.UpdateLand:output_type -> asset.LandResponse
-	35, // 68: asset.AssetService.GetLand:output_type -> asset.LandArrayResponse
-	34, // 69: asset.AssetService.GetLandByID:output_type -> asset.LandResponse
-	27, // 70: asset.AssetService.DeleteLand:output_type -> asset.DeleteAssetResponse
-	36, // 71: asset.AssetService.CreateInsurance:output_type -> asset.InsuranceResponse
-	36, // 72: asset.AssetService.UpdateInsurance:output_type -> asset.InsuranceResponse
-	37, // 73: asset.AssetService.GetInsurance:output_type -> asset.InsuranceArrayResponse
-	36, // 74: asset.AssetService.GetInsuranceByID:output_type -> asset.InsuranceResponse
-	27, // 75: asset.AssetService.DeleteInsurance:output_type -> asset.DeleteAssetResponse
-	38, // 76: asset.AssetService.CreateLiability:output_type -> asset.LiabilityResponse
-	39, // 77: asset.AssetService.GetLiability:output_type -> asset.LiabilityArrayResponse
-	38, // 78: asset.AssetService.GetLiabilityByID:output_type -> asset.LiabilityResponse
-	38, // 79: asset.AssetService.UpdateLiability:output_type -> asset.LiabilityResponse
-	40, // 80: asset.AssetService.DeleteLiability:output_type -> asset.DeleteLiabilityResponse
-	41, // 81: asset.AssetService.CheckAssetExists:output_type -> asset.CheckAssetResponse
-	26, // 82: asset.AssetService.GetBatchAccount:output_type -> asset.AccountArrayResponse
-	29, // 83: asset.AssetService.GetBatchCash:output_type -> asset.CashArrayResponse
-	31, // 84: asset.AssetService.GetBatchInvestment:output_type -> asset.InvestmentArrayResponse
-	37, // 85: asset.AssetService.GetBatchInsurance:output_type -> asset.InsuranceArrayResponse
-	33, // 86: asset.AssetService.GetBatchBuilding:output_type -> asset.BuildingArrayResponse
-	35, // 87: asset.AssetService.GetBatchLand:output_type -> asset.LandArrayResponse
-	39, // 88: asset.AssetService.GetBatchLiability:output_type -> asset.LiabilityArrayResponse
-	42, // 89: asset.AssetService.GetNetWorth:output_type -> asset.GetNetWorthResponse
-	43, // 90: asset.AssetService.GetAllAssetIDs:output_type -> asset.GetMyAssetsResponse
-	44, // 91: asset.AssetService.GetAllAssets:output_type -> asset.GetAllAssetsResponse
-	46, // [46:92] is the sub-list for method output_type
-	0,  // [0:46] is the sub-list for method input_type
+	24, // 46: asset.AssetService.GetAllAssetsSelection:input_type -> asset.GetAllAssetsRequest
+	25, // 47: asset.AssetService.CreateAccount:output_type -> asset.AccountResponse
+	25, // 48: asset.AssetService.UpdateAccount:output_type -> asset.AccountResponse
+	26, // 49: asset.AssetService.GetAccount:output_type -> asset.AccountArrayResponse
+	25, // 50: asset.AssetService.GetAccountByID:output_type -> asset.AccountResponse
+	27, // 51: asset.AssetService.DeleteAccount:output_type -> asset.DeleteAssetResponse
+	28, // 52: asset.AssetService.CreateCash:output_type -> asset.CashResponse
+	28, // 53: asset.AssetService.UpdateCash:output_type -> asset.CashResponse
+	29, // 54: asset.AssetService.GetCash:output_type -> asset.CashArrayResponse
+	28, // 55: asset.AssetService.GetCashByID:output_type -> asset.CashResponse
+	27, // 56: asset.AssetService.DeleteCash:output_type -> asset.DeleteAssetResponse
+	30, // 57: asset.AssetService.CreateInvestment:output_type -> asset.InvestmentResponse
+	30, // 58: asset.AssetService.UpdateInvestment:output_type -> asset.InvestmentResponse
+	31, // 59: asset.AssetService.GetInvestment:output_type -> asset.InvestmentArrayResponse
+	30, // 60: asset.AssetService.GetInvestmentByID:output_type -> asset.InvestmentResponse
+	27, // 61: asset.AssetService.DeleteInvestment:output_type -> asset.DeleteAssetResponse
+	32, // 62: asset.AssetService.CreateBuilding:output_type -> asset.BuildingResponse
+	32, // 63: asset.AssetService.UpdateBuilding:output_type -> asset.BuildingResponse
+	33, // 64: asset.AssetService.GetBuilding:output_type -> asset.BuildingArrayResponse
+	32, // 65: asset.AssetService.GetBuildingByID:output_type -> asset.BuildingResponse
+	27, // 66: asset.AssetService.DeleteBuilding:output_type -> asset.DeleteAssetResponse
+	34, // 67: asset.AssetService.CreateLand:output_type -> asset.LandResponse
+	34, // 68: asset.AssetService.UpdateLand:output_type -> asset.LandResponse
+	35, // 69: asset.AssetService.GetLand:output_type -> asset.LandArrayResponse
+	34, // 70: asset.AssetService.GetLandByID:output_type -> asset.LandResponse
+	27, // 71: asset.AssetService.DeleteLand:output_type -> asset.DeleteAssetResponse
+	36, // 72: asset.AssetService.CreateInsurance:output_type -> asset.InsuranceResponse
+	36, // 73: asset.AssetService.UpdateInsurance:output_type -> asset.InsuranceResponse
+	37, // 74: asset.AssetService.GetInsurance:output_type -> asset.InsuranceArrayResponse
+	36, // 75: asset.AssetService.GetInsuranceByID:output_type -> asset.InsuranceResponse
+	27, // 76: asset.AssetService.DeleteInsurance:output_type -> asset.DeleteAssetResponse
+	38, // 77: asset.AssetService.CreateLiability:output_type -> asset.LiabilityResponse
+	39, // 78: asset.AssetService.GetLiability:output_type -> asset.LiabilityArrayResponse
+	38, // 79: asset.AssetService.GetLiabilityByID:output_type -> asset.LiabilityResponse
+	38, // 80: asset.AssetService.UpdateLiability:output_type -> asset.LiabilityResponse
+	40, // 81: asset.AssetService.DeleteLiability:output_type -> asset.DeleteLiabilityResponse
+	41, // 82: asset.AssetService.CheckAssetExists:output_type -> asset.CheckAssetResponse
+	26, // 83: asset.AssetService.GetBatchAccount:output_type -> asset.AccountArrayResponse
+	29, // 84: asset.AssetService.GetBatchCash:output_type -> asset.CashArrayResponse
+	31, // 85: asset.AssetService.GetBatchInvestment:output_type -> asset.InvestmentArrayResponse
+	37, // 86: asset.AssetService.GetBatchInsurance:output_type -> asset.InsuranceArrayResponse
+	33, // 87: asset.AssetService.GetBatchBuilding:output_type -> asset.BuildingArrayResponse
+	35, // 88: asset.AssetService.GetBatchLand:output_type -> asset.LandArrayResponse
+	39, // 89: asset.AssetService.GetBatchLiability:output_type -> asset.LiabilityArrayResponse
+	42, // 90: asset.AssetService.GetNetWorth:output_type -> asset.GetNetWorthResponse
+	43, // 91: asset.AssetService.GetAllAssetIDs:output_type -> asset.GetMyAssetsResponse
+	44, // 92: asset.AssetService.GetAllAssets:output_type -> asset.GetAllAssetsResponse
+	44, // 93: asset.AssetService.GetAllAssetsSelection:output_type -> asset.GetAllAssetsResponse
+	47, // [47:94] is the sub-list for method output_type
+	0,  // [0:47] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

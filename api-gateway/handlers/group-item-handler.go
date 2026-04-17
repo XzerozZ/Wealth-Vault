@@ -204,7 +204,7 @@ func (h *GroupItemHandler) GetItemsForSelection(c *fiber.Ctx) error {
 	g, ctx := errgroup.WithContext(c.Context())
 	g.Go(func() error {
 		var err error
-		assetRes, err = h.assetClient.GetAllAssets(ctx, &assetpb.GetAllAssetsRequest{
+		assetRes, err = h.assetClient.GetAllAssetsSelection(ctx, &assetpb.GetAllAssetsRequest{
 			UserId: userID,
 		})
 		return err

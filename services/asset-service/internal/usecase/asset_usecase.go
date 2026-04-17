@@ -55,6 +55,25 @@ func (u *AssetUsecase) GetAllAssetIDs(ctx context.Context, req *pb.GetMyAssetsRe
 	}, nil
 }
 
+func (u *AssetUsecase) GetAllAssetsSelection(ctx context.Context, req *pb.GetAllAssetsRequest) (*pb.GetAllAssetsResponse, error) {
+	uid, err := utils.ParseID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	assets, lias, err := u.r.GetAllAssetSelection(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	pbAssets := mapper.ToAssetSummaryProtoList(assets)
+	pbLias := mapper.ToAssetSummaryProtoList(lias)
+	return &pb.GetAllAssetsResponse{
+		Assets:      pbAssets,
+		Liabilities: pbLias,
+	}, nil
+}
+
 func (u *AssetUsecase) GetAllAssets(ctx context.Context, req *pb.GetAllAssetsRequest) (*pb.GetAllAssetsResponse, error) {
 	uid, err := utils.ParseID(req.UserId)
 	if err != nil {

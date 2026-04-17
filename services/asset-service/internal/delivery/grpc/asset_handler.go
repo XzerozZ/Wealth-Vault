@@ -434,6 +434,15 @@ func (h *AssetGRPCHandler) GetAllAssetIDs(ctx context.Context, req *pb.GetMyAsse
 	return res, nil
 }
 
+func (h *AssetGRPCHandler) GetAllAssetsSelection(ctx context.Context, req *pb.GetAllAssetsRequest) (*pb.GetAllAssetsResponse, error) {
+	res, err := h.assetusecase.GetAllAssets(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (h *AssetGRPCHandler) GetAllAssets(ctx context.Context, req *pb.GetAllAssetsRequest) (*pb.GetAllAssetsResponse, error) {
 	res, err := h.assetusecase.GetAllAssets(ctx, req)
 	if err != nil {
