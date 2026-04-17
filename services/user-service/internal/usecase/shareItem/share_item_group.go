@@ -193,6 +193,11 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 		return nil, err
 	}
 
+	if len(req.GroupItemIds) == 0 {
+		go u.updateMessageToCompleted(groupID, ownerID, targetID)
+		return &pb.ActionResponse{Success: true}, nil
+	}
+
 	if isMember, err := u.itemRepo.IsGroupMember(ctx, groupID, targetID); err != nil || !isMember {
 		return nil, errors.New("target user is not a member of this group")
 	}
@@ -214,20 +219,22 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 		return nil, err
 	}
 
-	go func() {
-		newMeta, _ := json.Marshal(map[string]interface{}{
-			"is_action_required": true,
-			"is_completed":       true,
-			"target_user_id":     targetID.String(),
-			"type":               "GRANT_ACCESS_PROMPT",
-			"completed_at":       time.Now().Unix(),
-		})
-
-		err := u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, ownerID, targetID, string(newMeta))
-		if err != nil {
-			log.Printf("Failed to update message metadata: %v", err)
-		}
-	}()
+	go u.updateMessageToCompleted(groupID, ownerID, targetID)
 
 	return &pb.ActionResponse{Success: true}, nil
+}
+
+func (u *ShareItemUsecase) updateMessageToCompleted(groupID, ownerID, targetID uuid.UUID) {
+	newMeta, _ := json.Marshal(map[string]interface{}{
+		"is_action_required": true,
+		"is_completed":       true,
+		"target_user_id":     targetID.String(),
+		"type":               "GRANT_ACCESS_PROMPT",
+		"completed_at":       time.Now().Unix(),
+	})
+
+	err := u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, ownerID, targetID, string(newMeta))
+	if err != nil {
+		log.Printf("Failed to update message metadata: %v", err)
+	}
 }
