@@ -56,6 +56,7 @@ const (
 
 	MsgTypeAssetCard   = "ASSET_CARD"
 	MsgTypeSystemAlert = "SYSTEM_ALERT"
+	MsgTypeGrantAccess = "GRANT_ACCESS"
 
 	TopicItemShared       = "noti.item.shared"
 	TopicGroupActivity    = "noti.group.activity"

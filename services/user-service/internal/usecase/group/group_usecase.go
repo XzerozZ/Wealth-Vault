@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 	"wealth-vault/user-service/internal/domain"
 	"wealth-vault/user-service/internal/event"
 	storage "wealth-vault/user-service/internal/infra/storage"
@@ -230,6 +231,11 @@ func (u *GroupUsecase) RemoveMember(ctx context.Context, req *pb.RemoveMemberReq
 		},
 	)
 
+	msgContent := fmt.Sprintf("%s ได้ลบ %s ออกจากกลุ่ม", adminName, targetName)
+	u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
+		GroupID: groupID, SenderID: adminID, MsgType: "SYSTEM_ALERT", Content: msgContent, CreatedAt: time.Now(),
+	}})
+
 	if err := u.groupRepo.RemoveMemberAndTheirSharedItems(ctx, groupID, targetID, logEntry); err != nil {
 		return nil, err
 	}
@@ -276,6 +282,11 @@ func (u *GroupUsecase) LeaveGroup(ctx context.Context, req *pb.LeaveGroupRequest
 			"action": "leave_group",
 		},
 	)
+
+	msgContent := fmt.Sprintf("%s ได้ออกจากกลุ่มแล้ว", userName)
+	u.msgRepo.CreateMessage(context.Background(), []domain.GroupMessage{{
+		GroupID: groupID, SenderID: userID, MsgType: "SYSTEM_ALERT", Content: msgContent, CreatedAt: time.Now(),
+	}})
 
 	if err := u.groupRepo.RemoveMemberAndTheirSharedItems(ctx, groupID, userID, logEntry); err != nil {
 		return nil, err
