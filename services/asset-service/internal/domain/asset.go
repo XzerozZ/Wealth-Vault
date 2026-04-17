@@ -21,7 +21,7 @@ type AssetSummary struct {
 	Type      string
 	Name      string
 	Value     float64
-	Files     []FileAssociate
+	Files     []FileAssociate `json:"files" gorm:"-"`
 	CreatedAt time.Time
 }
 

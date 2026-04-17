@@ -91,7 +91,6 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 	var assets []domain.AssetSummary
 	var liabilities []domain.AssetSummary
 
-	// 1. ดึงข้อมูล Assets (UNION ALL)
 	assetQuery := `
 		SELECT id, 'account' as type, name, amount as value, created_at FROM accounts WHERE user_id = ? AND deleted_at IS NULL
 		UNION ALL
@@ -108,7 +107,6 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 		return nil, nil, err
 	}
 
-	// 2. ดึงข้อมูล Liabilities
 	liabilityQuery := `
 		SELECT id, 'liability' as type, name, principal as value, created_at 
 		FROM liabilities WHERE user_id = ? AND deleted_at IS NULL AND type != 'Expense'
@@ -118,9 +116,6 @@ func (r *AssetRepository) GetAllAssets(ctx context.Context, uid uuid.UUID) ([]do
 		return nil, nil, err
 	}
 
-	// --- ส่วนที่ดึงไฟล์แรกแบบรวดเดียว (Batch Fetch First File) ---
-
-	// รวบรวม ID ทั้งหมด
 	var allIDs []uuid.UUID
 	for _, a := range assets {
 		allIDs = append(allIDs, a.ID)
