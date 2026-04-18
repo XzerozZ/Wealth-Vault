@@ -3,10 +3,12 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -17,12 +19,14 @@ import (
 type CashUsecase struct {
 	cashRepo    repo.CashRepository
 	assetHelper helper.AssetHelper
+	userClient  userPb.UserServiceClient
 }
 
-func NewCashUsecase(r repo.CashRepository, ah helper.AssetHelper) *CashUsecase {
+func NewCashUsecase(r repo.CashRepository, ah helper.AssetHelper, uc userPb.UserServiceClient) *CashUsecase {
 	return &CashUsecase{
 		cashRepo:    r,
 		assetHelper: ah,
+		userClient:  uc,
 	}
 }
 
@@ -157,6 +161,18 @@ func (u *CashUsecase) DeleteCash(ctx context.Context, req *pb.DeleteAssetRequest
 	if err := u.cashRepo.SoftDeleteCash(ctx, id, uid); err != nil {
 		return nil, err
 	}
+
+	go func() {
+		bgCtx := context.Background()
+
+		_, err := u.userClient.MarkAssetMessagesDeleted(bgCtx, &userPb.MarkAssetDeletedRequest{
+			AssetId: id.String(),
+		})
+
+		if err != nil {
+			log.Printf("⚠️ Failed to notify User Service via gRPC: %v", err)
+		}
+	}()
 
 	return &pb.DeleteAssetResponse{
 		Success: true,

@@ -22,3 +22,12 @@ func (m *MockUserClient) DeleteAllReferencesByEntityID(
 	args := m.Called(ctx, req)
 	return args.Get(0).(*pb.DeleteByEntityResponse), args.Error(1)
 }
+
+func (m *MockUserClient) MarkAssetMessagesDeleted(
+	ctx context.Context,
+	req *pb.MarkAssetDeletedRequest,
+	opts ...grpc.CallOption,
+) (*pb.ActionResponse, error) {
+	args := m.Called(ctx, req)
+	return args.Get(0).(*pb.ActionResponse), args.Error(1)
+}

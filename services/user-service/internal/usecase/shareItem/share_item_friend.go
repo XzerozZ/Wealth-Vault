@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 	"wealth-vault/user-service/internal/domain"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
@@ -65,6 +66,13 @@ func (u *ShareItemUsecase) UnsharedIteminFriend(ctx context.Context, req *pb.Uns
 	if err := u.itemRepo.DeleteIteminFriend(ctx, itemID, userID); err != nil {
 		return nil, err
 	}
+
+	go func() {
+		if err := u.msgRepo.MarkAssetMessageAsDeleted(context.Background(), itemID); err != nil {
+			log.Printf("Failed to mark asset message as deleted: %v", err)
+		}
+	}()
+
 	return &pb.ShareItemResponse{Finish: true}, nil
 }
 

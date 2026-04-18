@@ -3,10 +3,12 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -17,12 +19,14 @@ import (
 type AccountUsecase struct {
 	accRepo     repo.AccountRepository
 	assetHelper helper.AssetHelper
+	userClient  userPb.UserServiceClient
 }
 
-func NewAccountUsecase(r repo.AccountRepository, ah helper.AssetHelper) *AccountUsecase {
+func NewAccountUsecase(r repo.AccountRepository, ah helper.AssetHelper, uc userPb.UserServiceClient) *AccountUsecase {
 	return &AccountUsecase{
 		accRepo:     r,
 		assetHelper: ah,
+		userClient:  uc,
 	}
 }
 
@@ -158,6 +162,18 @@ func (u *AccountUsecase) DeleteAccount(ctx context.Context, req *pb.DeleteAssetR
 	if err := u.accRepo.SoftDeleteAccount(ctx, id, uid); err != nil {
 		return nil, err
 	}
+
+	go func() {
+		bgCtx := context.Background()
+
+		_, err := u.userClient.MarkAssetMessagesDeleted(bgCtx, &userPb.MarkAssetDeletedRequest{
+			AssetId: id.String(),
+		})
+
+		if err != nil {
+			log.Printf("⚠️ Failed to notify User Service via gRPC: %v", err)
+		}
+	}()
 
 	return &pb.DeleteAssetResponse{
 		Success: true,

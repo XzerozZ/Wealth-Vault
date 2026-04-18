@@ -354,6 +354,50 @@ func (x *MessageDetail) GetIsMe() bool {
 	return false
 }
 
+type MarkAssetDeletedRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AssetId       string                 `protobuf:"bytes,1,opt,name=asset_id,json=assetId,proto3" json:"asset_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MarkAssetDeletedRequest) Reset() {
+	*x = MarkAssetDeletedRequest{}
+	mi := &file_proto_user_message_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MarkAssetDeletedRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MarkAssetDeletedRequest) ProtoMessage() {}
+
+func (x *MarkAssetDeletedRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_user_message_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MarkAssetDeletedRequest.ProtoReflect.Descriptor instead.
+func (*MarkAssetDeletedRequest) Descriptor() ([]byte, []int) {
+	return file_proto_user_message_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MarkAssetDeletedRequest) GetAssetId() string {
+	if x != nil {
+		return x.AssetId
+	}
+	return ""
+}
+
 var File_proto_user_message_proto protoreflect.FileDescriptor
 
 const file_proto_user_message_proto_rawDesc = "" +
@@ -384,7 +428,9 @@ const file_proto_user_message_proto_rawDesc = "" +
 	"\vsender_name\x18\a \x01(\tR\n" +
 	"senderName\x12!\n" +
 	"\fsender_image\x18\b \x01(\tR\vsenderImage\x12\x13\n" +
-	"\x05is_me\x18\t \x01(\bR\x04isMeB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\x05is_me\x18\t \x01(\bR\x04isMe\"4\n" +
+	"\x17MarkAssetDeletedRequest\x12\x19\n" +
+	"\basset_id\x18\x01 \x01(\tR\aassetIdB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var (
 	file_proto_user_message_proto_rawDescOnce sync.Once
@@ -398,19 +444,20 @@ func file_proto_user_message_proto_rawDescGZIP() []byte {
 	return file_proto_user_message_proto_rawDescData
 }
 
-var file_proto_user_message_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_proto_user_message_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_user_message_proto_goTypes = []any{
 	(*GetGroupMessagesRequest)(nil),    // 0: user.GetGroupMessagesRequest
 	(*GetPrivateMessagesRequest)(nil),  // 1: user.GetPrivateMessagesRequest
 	(*GetGroupMessagesResponse)(nil),   // 2: user.GetGroupMessagesResponse
 	(*GetPrivateMessagesResponse)(nil), // 3: user.GetPrivateMessagesResponse
 	(*MessageDetail)(nil),              // 4: user.MessageDetail
-	(*timestamppb.Timestamp)(nil),      // 5: google.protobuf.Timestamp
+	(*MarkAssetDeletedRequest)(nil),    // 5: user.MarkAssetDeletedRequest
+	(*timestamppb.Timestamp)(nil),      // 6: google.protobuf.Timestamp
 }
 var file_proto_user_message_proto_depIdxs = []int32{
 	4, // 0: user.GetGroupMessagesResponse.messages:type_name -> user.MessageDetail
 	4, // 1: user.GetPrivateMessagesResponse.messages:type_name -> user.MessageDetail
-	5, // 2: user.MessageDetail.created_at:type_name -> google.protobuf.Timestamp
+	6, // 2: user.MessageDetail.created_at:type_name -> google.protobuf.Timestamp
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -429,7 +476,7 @@ func file_proto_user_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_user_message_proto_rawDesc), len(file_proto_user_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

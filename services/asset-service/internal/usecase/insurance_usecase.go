@@ -9,6 +9,7 @@ import (
 	"wealth-vault/asset-service/internal/event"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -20,13 +21,15 @@ type InsuranceUsecase struct {
 	insRepo     repo.InsuranceRepository
 	assetHelper helper.AssetHelper
 	publisher   event.EventPublisher
+	userClient  userPb.UserServiceClient
 }
 
-func NewInsuranceUsecase(r repo.InsuranceRepository, ah helper.AssetHelper, e event.EventPublisher) *InsuranceUsecase {
+func NewInsuranceUsecase(r repo.InsuranceRepository, ah helper.AssetHelper, e event.EventPublisher, uc userPb.UserServiceClient) *InsuranceUsecase {
 	return &InsuranceUsecase{
 		insRepo:     r,
 		assetHelper: ah,
 		publisher:   e,
+		userClient:  uc,
 	}
 }
 
@@ -162,6 +165,18 @@ func (u *InsuranceUsecase) DeleteInsurance(ctx context.Context, req *pb.DeleteAs
 	if err := u.insRepo.SoftDeleteInsurances(ctx, id, uid); err != nil {
 		return nil, err
 	}
+
+	go func() {
+		bgCtx := context.Background()
+
+		_, err := u.userClient.MarkAssetMessagesDeleted(bgCtx, &userPb.MarkAssetDeletedRequest{
+			AssetId: id.String(),
+		})
+
+		if err != nil {
+			log.Printf("⚠️ Failed to notify User Service via gRPC: %v", err)
+		}
+	}()
 
 	return &pb.DeleteAssetResponse{
 		Success: true,

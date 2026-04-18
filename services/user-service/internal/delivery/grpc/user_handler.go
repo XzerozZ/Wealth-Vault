@@ -330,3 +330,12 @@ func (h *UserGRPCHandler) GetAllSharedItemIDsByUser(ctx context.Context, req *pb
 
 	return res, nil
 }
+
+func (h *UserGRPCHandler) MarkAssetMessageAsDeleted(ctx context.Context, req *pb.MarkAssetDeletedRequest) (*pb.ActionResponse, error) {
+	res, err := h.musecase.MarkAssetMessageAsDeleted(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}

@@ -24,7 +24,7 @@ var File_proto_user_user_request_proto protoreflect.FileDescriptor
 
 const file_proto_user_user_request_proto_rawDesc = "" +
 	"\n" +
-	"\x1dproto/user/user_request.proto\x12\x04user\x1a\x15proto/user/user.proto\x1a\x16proto/user/group.proto\x1a\x16proto/user/share.proto\x1a\x18proto/user/message.proto2\xab\x13\n" +
+	"\x1dproto/user/user_request.proto\x12\x04user\x1a\x15proto/user/user.proto\x1a\x16proto/user/group.proto\x1a\x16proto/user/share.proto\x1a\x18proto/user/message.proto2\xfc\x13\n" +
 	"\vUserService\x129\n" +
 	"\n" +
 	"CreateUser\x12\x17.user.CreateUserRequest\x1a\x12.user.UserResponse\x127\n" +
@@ -62,7 +62,8 @@ const file_proto_user_user_request_proto_rawDesc = "" +
 	"\x10GetSharedItemIDs\x12\x1d.user.GetSharedItemIDsRequest\x1a\x1e.user.GetSharedItemIDsResponse\x12l\n" +
 	"\x19GetAllSharedItemIDsByUser\x12&.user.GetAllSharedItemIDsByUserRequest\x1a'.user.GetAllSharedItemIDsByUserResponse\x12Q\n" +
 	"\x10GetGroupMessages\x12\x1d.user.GetGroupMessagesRequest\x1a\x1e.user.GetGroupMessagesResponse\x12W\n" +
-	"\x12GetPrivateMessages\x12\x1f.user.GetPrivateMessagesRequest\x1a .user.GetPrivateMessagesResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
+	"\x12GetPrivateMessages\x12\x1f.user.GetPrivateMessagesRequest\x1a .user.GetPrivateMessagesResponse\x12O\n" +
+	"\x18MarkAssetMessagesDeleted\x12\x1d.user.MarkAssetDeletedRequest\x1a\x14.user.ActionResponseB\x15Z\x13wealth-vault/pkg/pbb\x06proto3"
 
 var file_proto_user_user_request_proto_goTypes = []any{
 	(*CreateUserRequest)(nil),                 // 0: user.CreateUserRequest
@@ -95,27 +96,28 @@ var file_proto_user_user_request_proto_goTypes = []any{
 	(*GetAllSharedItemIDsByUserRequest)(nil),  // 27: user.GetAllSharedItemIDsByUserRequest
 	(*GetGroupMessagesRequest)(nil),           // 28: user.GetGroupMessagesRequest
 	(*GetPrivateMessagesRequest)(nil),         // 29: user.GetPrivateMessagesRequest
-	(*UserResponse)(nil),                      // 30: user.UserResponse
-	(*UserInfoResponse)(nil),                  // 31: user.UserInfoResponse
-	(*FriendListResponse)(nil),                // 32: user.FriendListResponse
-	(*CheckFriendshipResponse)(nil),           // 33: user.CheckFriendshipResponse
-	(*FriendResponse)(nil),                    // 34: user.FriendResponse
-	(*GetItemsSharedByFriendResponse)(nil),    // 35: user.GetItemsSharedByFriendResponse
-	(*SetCloseFriendResponse)(nil),            // 36: user.SetCloseFriendResponse
-	(*GetCloseFriendsResponse)(nil),           // 37: user.GetCloseFriendsResponse
-	(*GroupResponse)(nil),                     // 38: user.GroupResponse
-	(*AllGroupResponse)(nil),                  // 39: user.AllGroupResponse
-	(*GetGroupMembersResponse)(nil),           // 40: user.GetGroupMembersResponse
-	(*ActionResponse)(nil),                    // 41: user.ActionResponse
-	(*ShareItemResponse)(nil),                 // 42: user.ShareItemResponse
-	(*GetGroupItemsResponse)(nil),             // 43: user.GetGroupItemsResponse
-	(*GetFriendItemsResponse)(nil),            // 44: user.GetFriendItemsResponse
-	(*DeleteByEntityResponse)(nil),            // 45: user.DeleteByEntityResponse
-	(*GetItemSharedTargetsResponse)(nil),      // 46: user.GetItemSharedTargetsResponse
-	(*GetSharedItemIDsResponse)(nil),          // 47: user.GetSharedItemIDsResponse
-	(*GetAllSharedItemIDsByUserResponse)(nil), // 48: user.GetAllSharedItemIDsByUserResponse
-	(*GetGroupMessagesResponse)(nil),          // 49: user.GetGroupMessagesResponse
-	(*GetPrivateMessagesResponse)(nil),        // 50: user.GetPrivateMessagesResponse
+	(*MarkAssetDeletedRequest)(nil),           // 30: user.MarkAssetDeletedRequest
+	(*UserResponse)(nil),                      // 31: user.UserResponse
+	(*UserInfoResponse)(nil),                  // 32: user.UserInfoResponse
+	(*FriendListResponse)(nil),                // 33: user.FriendListResponse
+	(*CheckFriendshipResponse)(nil),           // 34: user.CheckFriendshipResponse
+	(*FriendResponse)(nil),                    // 35: user.FriendResponse
+	(*GetItemsSharedByFriendResponse)(nil),    // 36: user.GetItemsSharedByFriendResponse
+	(*SetCloseFriendResponse)(nil),            // 37: user.SetCloseFriendResponse
+	(*GetCloseFriendsResponse)(nil),           // 38: user.GetCloseFriendsResponse
+	(*GroupResponse)(nil),                     // 39: user.GroupResponse
+	(*AllGroupResponse)(nil),                  // 40: user.AllGroupResponse
+	(*GetGroupMembersResponse)(nil),           // 41: user.GetGroupMembersResponse
+	(*ActionResponse)(nil),                    // 42: user.ActionResponse
+	(*ShareItemResponse)(nil),                 // 43: user.ShareItemResponse
+	(*GetGroupItemsResponse)(nil),             // 44: user.GetGroupItemsResponse
+	(*GetFriendItemsResponse)(nil),            // 45: user.GetFriendItemsResponse
+	(*DeleteByEntityResponse)(nil),            // 46: user.DeleteByEntityResponse
+	(*GetItemSharedTargetsResponse)(nil),      // 47: user.GetItemSharedTargetsResponse
+	(*GetSharedItemIDsResponse)(nil),          // 48: user.GetSharedItemIDsResponse
+	(*GetAllSharedItemIDsByUserResponse)(nil), // 49: user.GetAllSharedItemIDsByUserResponse
+	(*GetGroupMessagesResponse)(nil),          // 50: user.GetGroupMessagesResponse
+	(*GetPrivateMessagesResponse)(nil),        // 51: user.GetPrivateMessagesResponse
 }
 var file_proto_user_user_request_proto_depIdxs = []int32{
 	0,  // 0: user.UserService.CreateUser:input_type -> user.CreateUserRequest
@@ -152,42 +154,44 @@ var file_proto_user_user_request_proto_depIdxs = []int32{
 	27, // 31: user.UserService.GetAllSharedItemIDsByUser:input_type -> user.GetAllSharedItemIDsByUserRequest
 	28, // 32: user.UserService.GetGroupMessages:input_type -> user.GetGroupMessagesRequest
 	29, // 33: user.UserService.GetPrivateMessages:input_type -> user.GetPrivateMessagesRequest
-	30, // 34: user.UserService.CreateUser:output_type -> user.UserResponse
-	30, // 35: user.UserService.GetUser:output_type -> user.UserResponse
-	31, // 36: user.UserService.GetUsersByEmail:output_type -> user.UserInfoResponse
-	30, // 37: user.UserService.UpdateUser:output_type -> user.UserResponse
-	32, // 38: user.UserService.GetFriendList:output_type -> user.FriendListResponse
-	33, // 39: user.UserService.CheckFriendship:output_type -> user.CheckFriendshipResponse
-	32, // 40: user.UserService.GetPendingRequests:output_type -> user.FriendListResponse
-	34, // 41: user.UserService.AddFriend:output_type -> user.FriendResponse
-	34, // 42: user.UserService.AcceptFriend:output_type -> user.FriendResponse
-	35, // 43: user.UserService.GetItemsSharedByFriend:output_type -> user.GetItemsSharedByFriendResponse
-	36, // 44: user.UserService.SetCloseFriend:output_type -> user.SetCloseFriendResponse
-	37, // 45: user.UserService.GetCloseFriends:output_type -> user.GetCloseFriendsResponse
-	34, // 46: user.UserService.DeleteFriend:output_type -> user.FriendResponse
-	38, // 47: user.UserService.CreateGroup:output_type -> user.GroupResponse
-	39, // 48: user.UserService.GetAllGroup:output_type -> user.AllGroupResponse
-	38, // 49: user.UserService.GetGroup:output_type -> user.GroupResponse
-	40, // 50: user.UserService.GetMember:output_type -> user.GetGroupMembersResponse
-	38, // 51: user.UserService.UpdateGroup:output_type -> user.GroupResponse
-	41, // 52: user.UserService.AddGroupMember:output_type -> user.ActionResponse
-	41, // 53: user.UserService.GrantGroupItemAccess:output_type -> user.ActionResponse
-	41, // 54: user.UserService.RemoveMember:output_type -> user.ActionResponse
-	41, // 55: user.UserService.LeaveGroup:output_type -> user.ActionResponse
-	41, // 56: user.UserService.DeleteGroup:output_type -> user.ActionResponse
-	42, // 57: user.UserService.ShareItem:output_type -> user.ShareItemResponse
-	43, // 58: user.UserService.GetSharedItem:output_type -> user.GetGroupItemsResponse
-	44, // 59: user.UserService.GetSharedIteminFriend:output_type -> user.GetFriendItemsResponse
-	42, // 60: user.UserService.UnsharedItem:output_type -> user.ShareItemResponse
-	42, // 61: user.UserService.UnsharedIteminFriend:output_type -> user.ShareItemResponse
-	45, // 62: user.UserService.DeleteAllReferencesByEntityID:output_type -> user.DeleteByEntityResponse
-	46, // 63: user.UserService.GetItemSharedTargets:output_type -> user.GetItemSharedTargetsResponse
-	47, // 64: user.UserService.GetSharedItemIDs:output_type -> user.GetSharedItemIDsResponse
-	48, // 65: user.UserService.GetAllSharedItemIDsByUser:output_type -> user.GetAllSharedItemIDsByUserResponse
-	49, // 66: user.UserService.GetGroupMessages:output_type -> user.GetGroupMessagesResponse
-	50, // 67: user.UserService.GetPrivateMessages:output_type -> user.GetPrivateMessagesResponse
-	34, // [34:68] is the sub-list for method output_type
-	0,  // [0:34] is the sub-list for method input_type
+	30, // 34: user.UserService.MarkAssetMessagesDeleted:input_type -> user.MarkAssetDeletedRequest
+	31, // 35: user.UserService.CreateUser:output_type -> user.UserResponse
+	31, // 36: user.UserService.GetUser:output_type -> user.UserResponse
+	32, // 37: user.UserService.GetUsersByEmail:output_type -> user.UserInfoResponse
+	31, // 38: user.UserService.UpdateUser:output_type -> user.UserResponse
+	33, // 39: user.UserService.GetFriendList:output_type -> user.FriendListResponse
+	34, // 40: user.UserService.CheckFriendship:output_type -> user.CheckFriendshipResponse
+	33, // 41: user.UserService.GetPendingRequests:output_type -> user.FriendListResponse
+	35, // 42: user.UserService.AddFriend:output_type -> user.FriendResponse
+	35, // 43: user.UserService.AcceptFriend:output_type -> user.FriendResponse
+	36, // 44: user.UserService.GetItemsSharedByFriend:output_type -> user.GetItemsSharedByFriendResponse
+	37, // 45: user.UserService.SetCloseFriend:output_type -> user.SetCloseFriendResponse
+	38, // 46: user.UserService.GetCloseFriends:output_type -> user.GetCloseFriendsResponse
+	35, // 47: user.UserService.DeleteFriend:output_type -> user.FriendResponse
+	39, // 48: user.UserService.CreateGroup:output_type -> user.GroupResponse
+	40, // 49: user.UserService.GetAllGroup:output_type -> user.AllGroupResponse
+	39, // 50: user.UserService.GetGroup:output_type -> user.GroupResponse
+	41, // 51: user.UserService.GetMember:output_type -> user.GetGroupMembersResponse
+	39, // 52: user.UserService.UpdateGroup:output_type -> user.GroupResponse
+	42, // 53: user.UserService.AddGroupMember:output_type -> user.ActionResponse
+	42, // 54: user.UserService.GrantGroupItemAccess:output_type -> user.ActionResponse
+	42, // 55: user.UserService.RemoveMember:output_type -> user.ActionResponse
+	42, // 56: user.UserService.LeaveGroup:output_type -> user.ActionResponse
+	42, // 57: user.UserService.DeleteGroup:output_type -> user.ActionResponse
+	43, // 58: user.UserService.ShareItem:output_type -> user.ShareItemResponse
+	44, // 59: user.UserService.GetSharedItem:output_type -> user.GetGroupItemsResponse
+	45, // 60: user.UserService.GetSharedIteminFriend:output_type -> user.GetFriendItemsResponse
+	43, // 61: user.UserService.UnsharedItem:output_type -> user.ShareItemResponse
+	43, // 62: user.UserService.UnsharedIteminFriend:output_type -> user.ShareItemResponse
+	46, // 63: user.UserService.DeleteAllReferencesByEntityID:output_type -> user.DeleteByEntityResponse
+	47, // 64: user.UserService.GetItemSharedTargets:output_type -> user.GetItemSharedTargetsResponse
+	48, // 65: user.UserService.GetSharedItemIDs:output_type -> user.GetSharedItemIDsResponse
+	49, // 66: user.UserService.GetAllSharedItemIDsByUser:output_type -> user.GetAllSharedItemIDsByUserResponse
+	50, // 67: user.UserService.GetGroupMessages:output_type -> user.GetGroupMessagesResponse
+	51, // 68: user.UserService.GetPrivateMessages:output_type -> user.GetPrivateMessagesResponse
+	42, // 69: user.UserService.MarkAssetMessagesDeleted:output_type -> user.ActionResponse
+	35, // [35:70] is the sub-list for method output_type
+	0,  // [0:35] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

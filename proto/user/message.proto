@@ -39,3 +39,7 @@ message MessageDetail {
   string sender_image = 8;
   bool is_me = 9;      
 }
+
+message MarkAssetDeletedRequest {
+    string asset_id = 1;
+}

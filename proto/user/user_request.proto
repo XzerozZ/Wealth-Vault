@@ -47,4 +47,5 @@ service UserService {
   
   rpc GetGroupMessages(GetGroupMessagesRequest) returns (GetGroupMessagesResponse);
   rpc GetPrivateMessages(GetPrivateMessagesRequest) returns (GetPrivateMessagesResponse);
+  rpc MarkAssetMessagesDeleted(MarkAssetDeletedRequest) returns (ActionResponse);
 }
