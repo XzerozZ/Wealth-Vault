@@ -393,3 +393,23 @@ func (r *ShareItemRepository) GetAllSharedItemIDsByUser(ctx context.Context, use
 
 	return itemIDs, nil
 }
+
+func (r *ShareItemRepository) GetGroupItemByID(ctx context.Context, id uuid.UUID) (*domain.GroupItem, error) {
+	var item domain.GroupItem
+	if err := r.db.WithContext(ctx).
+		Where("id = ?", id).
+		First(&item).Error; err != nil {
+		return nil, err
+	}
+	return &item, nil
+}
+
+func (r *ShareItemRepository) GetFriendItemByID(ctx context.Context, id uuid.UUID) (*domain.FriendItem, error) {
+	var item domain.FriendItem
+	if err := r.db.WithContext(ctx).
+		Where("id = ?", id).
+		First(&item).Error; err != nil {
+		return nil, err
+	}
+	return &item, nil
+}

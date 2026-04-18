@@ -72,12 +72,12 @@ func (m *MockMsgRepository) CloseAllGrantPromptsForTarget(ctx context.Context, g
 	return args.Error(0)
 }
 
-func (m *MockMsgRepository) MarkAssetMessageAsDeleted(ctx context.Context, assetID uuid.UUID) error {
+func (m *MockMsgRepository) MarkAssetMessageAsDeletedinAssetService(ctx context.Context, assetID uuid.UUID) error {
 	args := m.Called(ctx, assetID)
 	return args.Error(0)
 }
 
-func (m *MockMsgRepository) MarkAssetMessageAsDeletedinAssetService(ctx context.Context, assetID uuid.UUID) error {
-	args := m.Called(ctx, assetID)
+func (m *MockMsgRepository) MarkAllMemberAssetsAsUnshared(ctx context.Context, groupID, userID uuid.UUID) error {
+	args := m.Called(ctx, groupID, userID)
 	return args.Error(0)
 }

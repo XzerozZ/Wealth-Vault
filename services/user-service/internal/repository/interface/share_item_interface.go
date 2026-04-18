@@ -29,6 +29,8 @@ type ShareItemRepository interface {
 	GetItemSharedTargets(ctx context.Context, userID, itemID uuid.UUID, itemType string) (*domain.SharedTargetsResult, error)
 	GetSharedItemIDs(ctx context.Context, userID, targetID uuid.UUID, targetType string) ([]string, error)
 	GetAllSharedItemIDsByUser(ctx context.Context, userID uuid.UUID) ([]string, error)
+	GetFriendItemByID(ctx context.Context, id uuid.UUID) (*domain.FriendItem, error)
+	GetGroupItemByID(ctx context.Context, id uuid.UUID) (*domain.GroupItem, error)
 
 	// ------ Unshared Item ------
 	DeleteIteminGroup(ctx context.Context, itemID uuid.UUID, userID uuid.UUID) error
