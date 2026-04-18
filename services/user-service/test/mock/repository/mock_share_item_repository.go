@@ -293,3 +293,12 @@ func (m *MockShareItemRepository) GetAllSharedItemIDsByUser(
 	args := m.Called(ctx, userID)
 	return args.Get(0).([]string), args.Error(1)
 }
+
+func (m *MockShareItemRepository) GetFriendItemByID(ctx context.Context, id uuid.UUID) (*domain.FriendItem, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(*domain.FriendItem), args.Error(1)
+}
+func (m *MockShareItemRepository) GetGroupItemByID(ctx context.Context, id uuid.UUID) (*domain.GroupItem, error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(*domain.GroupItem), args.Error(1)
+}

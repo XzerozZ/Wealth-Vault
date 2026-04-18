@@ -63,12 +63,17 @@ func (u *ShareItemUsecase) UnsharedIteminFriend(ctx context.Context, req *pb.Uns
 		return nil, err
 	}
 
+	item, err := u.itemRepo.GetFriendItemByID(ctx, itemID)
+	if err != nil {
+		return nil, fmt.Errorf("item not found: %v", err)
+	}
+
 	if err := u.itemRepo.DeleteIteminFriend(ctx, itemID, userID); err != nil {
 		return nil, err
 	}
 
 	go func() {
-		if err := u.msgRepo.MarkAssetMessageAsDeleted(context.Background(), itemID); err != nil {
+		if err := u.msgRepo.MarkAssetMessageAsDeletedinAssetService(context.Background(), item.EntityID); err != nil {
 			log.Printf("Failed to mark asset message as deleted: %v", err)
 		}
 	}()

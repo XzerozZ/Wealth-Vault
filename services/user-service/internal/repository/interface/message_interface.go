@@ -17,7 +17,7 @@ type MsgRepository interface {
 	GetPrivateMessages(ctx context.Context, userID, friendID string) ([]domain.PrivateMessage, error)
 
 	UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error
-	MarkAssetMessageAsDeleted(ctx context.Context, assetID uuid.UUID) error
 	MarkAssetMessageAsDeletedinAssetService(ctx context.Context, assetID uuid.UUID) error
+	MarkAllMemberAssetsAsUnshared(ctx context.Context, groupID, userID uuid.UUID) error
 	CloseAllGrantPromptsForTarget(ctx context.Context, groupID, targetID uuid.UUID) error
 }

@@ -65,6 +65,11 @@ func (u *ShareItemUsecase) UnsharedIteminGroup(ctx context.Context, req *pb.Unsh
 		return nil, err
 	}
 
+	item, err := u.itemRepo.GetGroupItemByID(ctx, itemID)
+	if err != nil {
+		return nil, err
+	}
+
 	userID, err := utils.ParseUUID(req.UserId)
 	if err != nil {
 		return nil, err
@@ -74,7 +79,7 @@ func (u *ShareItemUsecase) UnsharedIteminGroup(ctx context.Context, req *pb.Unsh
 		return nil, err
 	}
 
-	go u.msgRepo.MarkAssetMessageAsDeleted(context.Background(), itemID)
+	go u.msgRepo.MarkAssetMessageAsDeletedinAssetService(context.Background(), item.EntityID)
 
 	return &pb.ShareItemResponse{Finish: true}, nil
 }
