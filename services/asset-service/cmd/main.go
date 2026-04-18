@@ -60,13 +60,13 @@ func main() {
 
 	// ------ Usecase ------
 	assUC := usecase.NewAssetUsecase(assRepo)
-	accUC := usecase.NewAccountUsecase(accRepo, assetHelper)
-	cashUC := usecase.NewCashUsecase(cashRepo, assetHelper)
-	inUC := usecase.NewInvestmentUsecase(inRepo, assetHelper)
-	buUC := usecase.NewBuildingUsecase(buRepo, assetHelper)
-	landUC := usecase.NewLandUsecase(landRepo, assetHelper)
-	insUC := usecase.NewInsuranceUsecase(insRepo, assetHelper, natsPublisher)
-	liaUC := usecase.NewLiabilityUsecase(liaRepo, assetHelper)
+	accUC := usecase.NewAccountUsecase(accRepo, assetHelper, userClient)
+	cashUC := usecase.NewCashUsecase(cashRepo, assetHelper, userClient)
+	inUC := usecase.NewInvestmentUsecase(inRepo, assetHelper, userClient)
+	buUC := usecase.NewBuildingUsecase(buRepo, assetHelper, userClient)
+	landUC := usecase.NewLandUsecase(landRepo, assetHelper, userClient)
+	insUC := usecase.NewInsuranceUsecase(insRepo, assetHelper, natsPublisher, userClient)
+	liaUC := usecase.NewLiabilityUsecase(liaRepo, assetHelper, userClient)
 
 	// ------ Handler ------
 	assetHandler := handler.NewAssetGRPCHandler(assUC, accUC, cashUC, inUC, buUC, landUC, insUC, liaUC)

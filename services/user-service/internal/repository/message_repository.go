@@ -93,3 +93,35 @@ func (r *MsgRepository) CloseAllGrantPromptsForTarget(ctx context.Context, group
 
 	return r.db.WithContext(ctx).Exec(query, statusMeta, groupID, targetID.String()).Error
 }
+
+func (r *MsgRepository) MarkAssetMessageAsDeleted(ctx context.Context, assetID uuid.UUID) error {
+	query := `
+        UPDATE group_messages 
+        SET metadata = jsonb_set(metadata::jsonb, '{is_deleted}', 'true'),
+            updated_at = NOW()
+        WHERE metadata->>'asset_id' = ? 
+        AND msg_type = 'ASSET_CARD'
+    `
+	return r.db.WithContext(ctx).Exec(query, assetID.String()).Error
+}
+
+func (r *MsgRepository) MarkAssetMessageAsDeletedinAssetService(ctx context.Context, assetID uuid.UUID) error {
+	assetStr := assetID.String()
+
+	errGroup := r.db.WithContext(ctx).Exec(`
+        UPDATE group_messages 
+        SET metadata = jsonb_set(metadata::jsonb, '{is_deleted}', 'true'),
+            updated_at = NOW()
+        WHERE metadata->>'asset_id' = ? AND msg_type = 'ASSET_CARD'`, assetStr).Error
+
+	errPrivate := r.db.WithContext(ctx).Exec(`
+        UPDATE private_messages 
+        SET metadata = jsonb_set(metadata::jsonb, '{is_deleted}', 'true'),
+            updated_at = NOW()
+        WHERE metadata->>'asset_id' = ? AND msg_type = 'ASSET_CARD'`, assetStr).Error
+
+	if errGroup != nil {
+		return errGroup
+	}
+	return errPrivate
+}

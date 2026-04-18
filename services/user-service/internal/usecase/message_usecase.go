@@ -71,3 +71,18 @@ func (u *MessageUsecase) GetPrivateMessages(ctx context.Context, req *pb.GetPriv
 		Messages: pbMsgs,
 	}, nil
 }
+
+func (u *MessageUsecase) MarkAssetMessageAsDeleted(ctx context.Context, req *pb.MarkAssetDeletedRequest) (*pb.ActionResponse, error) {
+	assetUUID, err := utils.ParseUUID(req.AssetId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := u.msgRepo.MarkAssetMessageAsDeletedinAssetService(ctx, assetUUID); err != nil {
+		return nil, err
+	}
+
+	return &pb.ActionResponse{
+		Success: true,
+	}, nil
+}

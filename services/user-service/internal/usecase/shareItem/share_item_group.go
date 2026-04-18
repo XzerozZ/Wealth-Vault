@@ -73,6 +73,9 @@ func (u *ShareItemUsecase) UnsharedIteminGroup(ctx context.Context, req *pb.Unsh
 	if err := u.itemRepo.DeleteIteminGroup(ctx, itemID, userID); err != nil {
 		return nil, err
 	}
+
+	go u.msgRepo.MarkAssetMessageAsDeleted(context.Background(), itemID)
+
 	return &pb.ShareItemResponse{Finish: true}, nil
 }
 

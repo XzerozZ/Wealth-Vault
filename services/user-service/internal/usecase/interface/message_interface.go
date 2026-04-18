@@ -8,4 +8,5 @@ import (
 type MessageUsecase interface {
 	GetGroupMessages(ctx context.Context, req *pb.GetGroupMessagesRequest) (*pb.GetGroupMessagesResponse, error)
 	GetPrivateMessages(ctx context.Context, req *pb.GetPrivateMessagesRequest) (*pb.GetPrivateMessagesResponse, error)
+	MarkAssetMessageAsDeleted(ctx context.Context, req *pb.MarkAssetDeletedRequest) (*pb.ActionResponse, error)
 }

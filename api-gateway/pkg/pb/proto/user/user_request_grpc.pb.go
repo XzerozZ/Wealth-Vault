@@ -53,6 +53,7 @@ const (
 	UserService_GetAllSharedItemIDsByUser_FullMethodName     = "/user.UserService/GetAllSharedItemIDsByUser"
 	UserService_GetGroupMessages_FullMethodName              = "/user.UserService/GetGroupMessages"
 	UserService_GetPrivateMessages_FullMethodName            = "/user.UserService/GetPrivateMessages"
+	UserService_MarkAssetMessagesDeleted_FullMethodName      = "/user.UserService/MarkAssetMessagesDeleted"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -93,6 +94,7 @@ type UserServiceClient interface {
 	GetAllSharedItemIDsByUser(ctx context.Context, in *GetAllSharedItemIDsByUserRequest, opts ...grpc.CallOption) (*GetAllSharedItemIDsByUserResponse, error)
 	GetGroupMessages(ctx context.Context, in *GetGroupMessagesRequest, opts ...grpc.CallOption) (*GetGroupMessagesResponse, error)
 	GetPrivateMessages(ctx context.Context, in *GetPrivateMessagesRequest, opts ...grpc.CallOption) (*GetPrivateMessagesResponse, error)
+	MarkAssetMessagesDeleted(ctx context.Context, in *MarkAssetDeletedRequest, opts ...grpc.CallOption) (*ActionResponse, error)
 }
 
 type userServiceClient struct {
@@ -443,6 +445,16 @@ func (c *userServiceClient) GetPrivateMessages(ctx context.Context, in *GetPriva
 	return out, nil
 }
 
+func (c *userServiceClient) MarkAssetMessagesDeleted(ctx context.Context, in *MarkAssetDeletedRequest, opts ...grpc.CallOption) (*ActionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ActionResponse)
+	err := c.cc.Invoke(ctx, UserService_MarkAssetMessagesDeleted_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
@@ -481,6 +493,7 @@ type UserServiceServer interface {
 	GetAllSharedItemIDsByUser(context.Context, *GetAllSharedItemIDsByUserRequest) (*GetAllSharedItemIDsByUserResponse, error)
 	GetGroupMessages(context.Context, *GetGroupMessagesRequest) (*GetGroupMessagesResponse, error)
 	GetPrivateMessages(context.Context, *GetPrivateMessagesRequest) (*GetPrivateMessagesResponse, error)
+	MarkAssetMessagesDeleted(context.Context, *MarkAssetDeletedRequest) (*ActionResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -592,6 +605,9 @@ func (UnimplementedUserServiceServer) GetGroupMessages(context.Context, *GetGrou
 }
 func (UnimplementedUserServiceServer) GetPrivateMessages(context.Context, *GetPrivateMessagesRequest) (*GetPrivateMessagesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetPrivateMessages not implemented")
+}
+func (UnimplementedUserServiceServer) MarkAssetMessagesDeleted(context.Context, *MarkAssetDeletedRequest) (*ActionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method MarkAssetMessagesDeleted not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -1226,6 +1242,24 @@ func _UserService_GetPrivateMessages_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_MarkAssetMessagesDeleted_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MarkAssetDeletedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).MarkAssetMessagesDeleted(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_MarkAssetMessagesDeleted_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).MarkAssetMessagesDeleted(ctx, req.(*MarkAssetDeletedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1368,6 +1402,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPrivateMessages",
 			Handler:    _UserService_GetPrivateMessages_Handler,
+		},
+		{
+			MethodName: "MarkAssetMessagesDeleted",
+			Handler:    _UserService_MarkAssetMessagesDeleted_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

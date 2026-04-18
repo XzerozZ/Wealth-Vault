@@ -6,6 +6,7 @@ import (
 	"wealth-vault/asset-service/internal/domain"
 	"wealth-vault/asset-service/internal/usecase"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	mock_client "wealth-vault/asset-service/test/mock/client"
 	mock_helper "wealth-vault/asset-service/test/mock/helper"
 	mock_repo "wealth-vault/asset-service/test/mock/repository"
 
@@ -17,7 +18,8 @@ import (
 func TestLiabilityUsecase(t *testing.T) {
 	repo := new(mock_repo.MockLiabilityRepository)
 	assetHelper := new(mock_helper.MockAssetHelper)
-	uc := usecase.NewLiabilityUsecase(repo, assetHelper)
+	userClient := new(mock_client.MockUserClient)
+	uc := usecase.NewLiabilityUsecase(repo, assetHelper, userClient)
 
 	ctx := context.Background()
 	userID := uuid.New()

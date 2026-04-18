@@ -71,3 +71,13 @@ func (m *MockMsgRepository) CloseAllGrantPromptsForTarget(ctx context.Context, g
 	args := m.Called(ctx, groupID, targetID)
 	return args.Error(0)
 }
+
+func (m *MockMsgRepository) MarkAssetMessageAsDeleted(ctx context.Context, assetID uuid.UUID) error {
+	args := m.Called(ctx, assetID)
+	return args.Error(0)
+}
+
+func (m *MockMsgRepository) MarkAssetMessageAsDeletedinAssetService(ctx context.Context, assetID uuid.UUID) error {
+	args := m.Called(ctx, assetID)
+	return args.Error(0)
+}

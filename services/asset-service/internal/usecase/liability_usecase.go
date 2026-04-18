@@ -3,10 +3,12 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 	"wealth-vault/asset-service/internal/domain"
 	repo "wealth-vault/asset-service/internal/repository/interface"
 	pb "wealth-vault/asset-service/pkg/pb/proto/asset"
+	userPb "wealth-vault/asset-service/pkg/pb/proto/user"
 	"wealth-vault/asset-service/pkg/utils"
 	helper "wealth-vault/asset-service/pkg/utils/helper"
 	"wealth-vault/asset-service/pkg/utils/mapper"
@@ -17,12 +19,14 @@ import (
 type LiabilityUsecase struct {
 	liaRepo     repo.LiabilityRepository
 	assetHelper helper.AssetHelper
+	userClient  userPb.UserServiceClient
 }
 
-func NewLiabilityUsecase(r repo.LiabilityRepository, ah helper.AssetHelper) *LiabilityUsecase {
+func NewLiabilityUsecase(r repo.LiabilityRepository, ah helper.AssetHelper, uc userPb.UserServiceClient) *LiabilityUsecase {
 	return &LiabilityUsecase{
 		liaRepo:     r,
 		assetHelper: ah,
+		userClient:  uc,
 	}
 }
 
@@ -159,6 +163,18 @@ func (u *LiabilityUsecase) DeleteLiability(ctx context.Context, req *pb.DeleteLi
 	if err := u.liaRepo.SoftDeleteLiability(ctx, id, uid); err != nil {
 		return nil, err
 	}
+
+	go func() {
+		bgCtx := context.Background()
+
+		_, err := u.userClient.MarkAssetMessagesDeleted(bgCtx, &userPb.MarkAssetDeletedRequest{
+			AssetId: id.String(),
+		})
+
+		if err != nil {
+			log.Printf("⚠️ Failed to notify User Service via gRPC: %v", err)
+		}
+	}()
 
 	return &pb.DeleteLiabilityResponse{
 		Success: true,
