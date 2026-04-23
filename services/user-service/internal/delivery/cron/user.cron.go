@@ -31,7 +31,7 @@ func (j *MailCronJob) Start() {
 		log.Fatalf("Error adding cron job: %v", err)
 	}
 
-	_, err = j.cron.AddFunc("* 10 * * *", j.AutoShareTrigger)
+	_, err = j.cron.AddFunc("0 10 * * *", j.AutoShareTrigger)
 	if err != nil {
 		log.Fatalf("Error adding cron job: %v", err)
 	}
