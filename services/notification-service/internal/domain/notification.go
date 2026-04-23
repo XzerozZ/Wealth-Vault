@@ -20,6 +20,7 @@ type Notification struct {
 	SenderID   *uuid.UUID
 	Channel    string `gorm:"type:varchar(20);not null"`
 	Message    string `gorm:"not null"`
+	Metadata   string `gorm:"type:jsonb;default:'{}'"`
 	CreatedAt  time.Time
 	IsRead     bool ` gorm:"default:false"`
 }

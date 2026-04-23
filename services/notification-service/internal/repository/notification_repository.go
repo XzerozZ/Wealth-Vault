@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"wealth-vault/notification-service/internal/domain"
 
 	"github.com/google/uuid"
@@ -50,4 +51,19 @@ func (r *NotificationRepository) MarkAllAsRead(ctx context.Context, receiverID u
 	}
 
 	return nil
+}
+
+func (r *NotificationRepository) UpdateNotificationMetadata(ctx context.Context, targetID, senderID uuid.UUID, notiType string, metaUpdates map[string]interface{}) error {
+	query := `
+		UPDATE notifications 
+		SET metadata = metadata || ?::jsonb,
+			updated_at = NOW()
+		WHERE target_id = ? 
+		AND sender_id = ? 
+		AND type = ?
+		AND (metadata->>'is_completed')::boolean = false
+	`
+
+	metaJSON, _ := json.Marshal(metaUpdates)
+	return r.db.WithContext(ctx).Exec(query, string(metaJSON), targetID, senderID, notiType).Error
 }

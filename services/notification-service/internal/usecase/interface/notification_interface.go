@@ -17,6 +17,7 @@ type NotificationUsecase interface {
 	HandleMemberRemoved(ctx context.Context, evt domain.MemberRemovedEvent) error
 	HandleGroupActivity(ctx context.Context, evt domain.GroupActivityEvent) error
 	HandleInsuranceExpiring(ctx context.Context, evt domain.InsuranceExpiringEvent) error
+	HandleFriendDecline(ctx context.Context, evt domain.FriendAcceptedEvent) error
 
 	GetHistory(ctx context.Context, userID uuid.UUID) ([]domain.Notification, error)
 	MarkAsRead(ctx context.Context, notificationID uuid.UUID, receiverID uuid.UUID) error

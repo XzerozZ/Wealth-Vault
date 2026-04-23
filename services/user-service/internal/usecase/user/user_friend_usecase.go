@@ -84,8 +84,22 @@ func (u *UserUsecase) AcceptFriend(ctx context.Context, req *pb.AcceptFriendRequ
 		return nil, err
 	}
 
+	accepter, err := u.userRepo.GetUser(ctx, currentUserID)
+	accepterName := "Unknown"
+	if err == nil {
+		accepterName = accepter.Username
+	}
+
+	evt := domain.FriendAcceptedEvent{
+		AccepterID:   req.UserId,
+		AccepterName: accepterName,
+		RequesterID:  req.RequesterId,
+		OccurredAt:   time.Now().Unix(),
+	}
+
 	if req.Action == "DECLINE" {
 		err := u.userRepo.RemoveFriend(ctx, currentUserID, requesterID)
+		go u.publisher.Publish("noti.friend.decline", evt)
 		if err != nil {
 			return &pb.FriendResponse{
 				Success: false,
@@ -107,19 +121,6 @@ func (u *UserUsecase) AcceptFriend(ctx context.Context, req *pb.AcceptFriendRequ
 	}
 
 	_ = u.userRepo.CreateFriendship(ctx, reverseFriend)
-	accepter, err := u.userRepo.GetUser(ctx, currentUserID)
-	accepterName := "Unknown"
-	if err == nil {
-		accepterName = accepter.Username
-	}
-
-	evt := domain.FriendAcceptedEvent{
-		AccepterID:   req.UserId,
-		AccepterName: accepterName,
-		RequesterID:  req.RequesterId,
-		OccurredAt:   time.Now().Unix(),
-	}
-
 	go u.publisher.Publish("noti.friend.accepted", evt)
 
 	return &pb.FriendResponse{

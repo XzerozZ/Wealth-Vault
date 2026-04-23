@@ -8,5 +8,6 @@ const (
 	SharedItem         = "noti.item.shared"
 	FriendRequest      = "noti.friend.request"
 	FriendAccepted     = "noti.friend.accepted"
+	FriendDecline      = "noti.friend.decline"
 	AccessGranted      = "noti.access.granted"
 )
