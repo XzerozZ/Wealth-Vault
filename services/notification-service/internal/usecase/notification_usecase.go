@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 	"wealth-vault/notification-service/internal/domain"
 	line "wealth-vault/notification-service/internal/infra/line"
@@ -83,7 +84,14 @@ func (u *NotificationUsecase) notifyTarget(
 	entityID uuid.UUID,
 	message string,
 	occurredAt int64,
+	metadata map[string]interface{},
 ) error {
+	metaStr := "{}"
+	if metadata != nil {
+		if b, err := json.Marshal(metadata); err == nil {
+			metaStr = string(b)
+		}
+	}
 
 	noti := &domain.Notification{
 		ID:         uuid.New(),
@@ -92,6 +100,7 @@ func (u *NotificationUsecase) notifyTarget(
 		Receiver:   receiverID,
 		SenderID:   senderID,
 		Message:    message,
+		Metadata:   metaStr,
 		Channel:    "IN_APP",
 		CreatedAt:  time.Unix(occurredAt, 0),
 		IsRead:     false,
@@ -152,7 +161,7 @@ func (u *NotificationUsecase) notifyMany(
 			continue
 		}
 
-		if err := u.notifyTarget(ctx, receiverID, senderUUID, entityType, entityID, message, occurredAt); err != nil {
+		if err := u.notifyTarget(ctx, receiverID, senderUUID, entityType, entityID, message, occurredAt, nil); err != nil {
 			return err
 		}
 	}

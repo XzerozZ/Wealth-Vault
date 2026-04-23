@@ -35,3 +35,8 @@ func (m *MockNotificationRepository) MarkAllAsRead(ctx context.Context, receiver
 	args := m.Called(ctx, receiverID)
 	return args.Error(0)
 }
+
+func (m *MockNotificationRepository) UpdateNotificationMetadata(ctx context.Context, targetID, senderID uuid.UUID, notiType string, metaUpdates map[string]interface{}) error {
+	args := m.Called(ctx, targetID, senderID, notiType, metaUpdates)
+	return args.Error(0)
+}

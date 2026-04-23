@@ -29,6 +29,7 @@ func StartConsumer(nc *nats.Conn, uc *usecase.NotificationUsecase) error {
 		{"noti.item.shared", wrap[domain.ItemSharedEvent](uc.HandleItemShared)},
 		{"noti.friend.request", wrap[domain.FriendRequestEvent](uc.HandleFriendRequest)},
 		{"noti.friend.accepted", wrap[domain.FriendAcceptedEvent](uc.HandleFriendAccepted)},
+		{"noti.friend.decline", wrap[domain.FriendAcceptedEvent](uc.HandleFriendDecline)},
 		{"noti.group.activity", wrap[domain.GroupActivityEvent](uc.HandleGroupActivity)},
 		{"noti.insurance.expiring", wrap[domain.InsuranceExpiringEvent](uc.HandleInsuranceExpiring)},
 	}
