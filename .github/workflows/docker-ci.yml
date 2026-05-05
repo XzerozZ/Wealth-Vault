@@ -1,0 +1,68 @@
+name: Wealth & Vault CI Pipeline
+
+# Trigger Strategy:
+# - Execute on every push to the 'main' branch.
+# - Execute when a new Git tag following the semantic versioning pattern (v1.2.3) is created.
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+# Define permissions for the GITHUB_TOKEN to allow pushing images to GHCR.
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Set up Docker Buildx for multi-platform builds and caching support.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Login to GitHub Container Registry (ghcr.io) using the built-in GITHUB_TOKEN.
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Automatically generate tags and labels for the Docker image.
+      # Tags include: branch name (for main), full Git SHA, and semantic version (if tag).
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            # Tag with 'main' on push to main branch
+            type=ref,event=branch
+            # Tag with the full Git commit SHA
+            type=raw,value=${{ github.sha }}
+            # Tag with semantic versioning (e.g., v1.2.3)
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      # Build and Push the Docker image.
+      # Context is set to the root directory by default.
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          # MODIFY HERE: Change 'context' to the specific service directory if this workflow 
+          # is moved or if you are building from a subdirectory (e.g., context: ./services/notification-service).
+          context: .
+          # MODIFY HERE: Change 'file' to the path of your Dockerfile (e.g., ./services/notification-service/dockerfile).
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Enable GitHub Actions cache for faster subsequent builds.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
