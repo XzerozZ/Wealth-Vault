@@ -10,6 +10,10 @@ on:
     tags:
       - 'v*'
 
+# Environment variables to resolve Node.js deprecation warnings
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 # Define permissions for the GITHUB_TOKEN to allow pushing images to GHCR.
 permissions:
   contents: read
@@ -42,27 +46,32 @@ jobs:
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
-            # Tag with 'main' on push to main branch
+            # Tag with the branch name (e.g., 'main')
             type=ref,event=branch
-            # Tag with the full Git commit SHA
+            # Tag with the full 40-character Git commit SHA
             type=raw,value=${{ github.sha }}
             # Tag with semantic versioning (e.g., v1.2.3)
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
       # Build and Push the Docker image.
-      # Context is set to the root directory by default.
       - name: Build and Push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
-          # MODIFY HERE: Change 'context' to the specific service directory if this workflow 
-          # is moved or if you are building from a subdirectory (e.g., context: ./services/notification-service).
+          # MODIFY HERE: The build context. Set to '.' for the root directory.
+          # For Go microservices in a monorepo, keeping the root as context is usually necessary 
+          # if the Dockerfile references shared folders like /proto.
           context: .
-          # MODIFY HERE: Change 'file' to the path of your Dockerfile (e.g., ./services/notification-service/dockerfile).
-          file: ./Dockerfile
+          
+          # MODIFY HERE: The path to the Dockerfile. 
+          # Updated to a valid path found in the repository: ./api-gateway/dockerfile
+          # If you copy this to another service, change this to: ./services/notification-service/dockerfile
+          file: ./api-gateway/dockerfile
+          
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Enable GitHub Actions cache for faster subsequent builds.
+          
+          # Implementation of GitHub Actions cache (type=gha) for faster subsequent builds.
           cache-from: type=gha
           cache-to: type=gha,mode=max
