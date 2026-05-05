@@ -1,8 +1,20 @@
+version: '3.8'
+
+networks:
+  wealth_net:
+    driver: bridge
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:15-alpine 
     container_name: wealth_and_vault
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin123
@@ -10,88 +22,114 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data 
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - wealth_net
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d wealthvault"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
-    image: dpage/pgadmin4:latest
+    image: dpage/pgadmin4:8.4
     container_name: pgadmin_wealth
     ports:
       - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
-    restart: always
+    restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy 
+    networks:
+      - wealth_net
+    logging: *default-logging
 
   nats-server:
-    image: nats:2.10
+    image: nats:2.10-alpine
+    container_name: nats-server
     ports:
       - "4222:4222"
       - "8222:8222"
     command: ["-js"]
+    networks:
+      - wealth_net
+    logging: *default-logging
 
   user-service:
     build:
       context: ./services/user-service  
       dockerfile: dockerfile 
     container_name: user-service
-    restart: always
+    restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - ./services/user-service/.user.env
-    ports:
-      - "50051:50051"
+    networks:
+      - wealth_net
+    logging: *default-logging
 
   auth-service:
     build:
       context: ./services/auth-service  
       dockerfile: dockerfile 
     container_name: auth-service
-    restart: always
+    restart: unless-stopped
     depends_on:
-      - nats-server
-      - postgres
+      postgres:
+        condition: service_healthy
+      nats-server:
+        condition: service_started
     env_file:
       - ./services/auth-service/.auth.env
-    ports:
-      - "50052:50052"
+    networks:
+      - wealth_net
+    logging: *default-logging
 
   asset-service:
     build:
       context: ./services/asset-service  
       dockerfile: dockerfile 
     container_name: asset-service
-    restart: always
+    restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - ./services/asset-service/.asset.env
-    ports:
-      - "50053:50053"
+    networks:
+      - wealth_net
+    logging: *default-logging
 
   notification-service:
     build:
       context: ./services/notification-service  
       dockerfile: dockerfile 
     container_name: notification-service
-    restart: always
+    restart: unless-stopped
     depends_on:
-      - nats-server
-      - postgres
+      postgres:
+        condition: service_healthy
+      nats-server:
+        condition: service_started
     env_file:
       - ./services/notification-service/.noti.env
-    ports:
-      - "50054:50054"
+    networks:
+      - wealth_net
+    logging: *default-logging
 
   api-gateway:
     build:
       context: ./api-gateway              
       dockerfile: dockerfile
     container_name: api-gateway
-    restart: always
+    restart: unless-stopped
     depends_on:
       - notification-service
       - user-service
@@ -101,6 +139,9 @@ services:
       - ./api-gateway/.env
     ports:
       - "8080:8080"
+    networks:
+      - wealth_net
+    logging: *default-logging
 
 volumes:
   postgres_data:
