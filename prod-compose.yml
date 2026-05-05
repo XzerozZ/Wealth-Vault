@@ -1,0 +1,197 @@
+networks:
+  wealth_net:
+    driver: bridge
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:15-alpine 
+    container_name: wealth_and_vault
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: wealthvault
+    volumes:
+      - postgres_data:/var/lib/postgresql/data 
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - wealth_net
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d wealthvault"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:8.4
+    container_name: pgadmin_wealth
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy 
+    networks:
+      - wealth_net
+    logging: *default-logging
+
+  nats-server:
+    image: nats:2.10-alpine
+    container_name: nats-server
+    ports:
+      - "${NATS_PORT}:${NATS_PORT}"
+      - "8222:8222"
+    command: ["-js"]
+    networks:
+      - wealth_net
+    logging: *default-logging
+
+  user-service:
+    image: ghcr.io/xzerozz/wealth-vault/user-service:0.0.1
+    container_name: user-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: wealth_and_vault
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_USER_NAME}
+      GRPC_PORT: ${USER_PORT}
+      ASSET_HOST: ${ASSET_HOST}
+      ASSET_PORT: ${ASSET_PORT}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      SUPABASE_URL: ${SUPABASE_URL}
+      BUCKET_NAME: ${BUCKET_NAME}
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: ${NATS_PORT}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+    networks:
+      - wealth_net
+    logging: *default-logging
+
+  auth-service:
+    image: ghcr.io/xzerozz/wealth-vault/auth-service:0.0.1
+    container_name: auth-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats-server:
+        condition: service_started
+    environment:
+      DB_HOST: wealth_and_vault
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_AUTH_NAME}
+      GRPC_PORT: ${AUTH_PORT}
+      User_HOST: ${User_HOST}
+      User_PORT: ${User_PORT}
+      GOOGLE_CLIENT: ${GOOGLE_CLIENT}
+      JWT_SECRET: ${JWT_SECRET}
+      EMAIL_HOST: ${EMAIL_HOST}
+      EMAIL_PORT: ${EMAIL_PORT}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+    networks:
+      - wealth_net
+    logging: *default-logging
+
+  asset-service:
+    image: ghcr.io/xzerozz/wealth-vault/asset-service:0.0.1
+    container_name: asset-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: wealth_and_vault
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_ASSET_NAME}
+      GRPC_PORT: ${ASSET_PORT}
+      User_HOST: ${User_HOST}
+      User_PORT: ${User_PORT}
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: ${NATS_PORT}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      SUPABASE_URL: ${SUPABASE_URL}
+      BUCKET_NAME: ${BUCKET_NAME}
+    networks:
+      - wealth_net
+    logging: *default-logging
+
+  notification-service:
+    image: ghcr.io/xzerozz/wealth-vault/notification-service:0.0.1
+    container_name: notification-service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats-server:
+        condition: service_started
+    environment:
+      DB_HOST: wealth_and_vault
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NOTI_NAME}
+      NOTI_PORT: ${NOTI_PORT}
+      NATS_HOST: ${NATS_HOST}
+      NATS_PORT: ${NATS_PORT}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
+      CHANNEL_ACCESS_TOKEN: ${CHANNEL_ACCESS_TOKEN}
+      FCM_CLIENT_FILE: ${FCM_CLIENT_FILE}
+    networks:
+      - wealth_net
+    logging: *default-logging
+
+  api-gateway:
+    image: ghcr.io/xzerozz/wealth-vault/api-gateway:0.0.1
+    container_name: api-gateway
+    restart: unless-stopped
+    depends_on:
+      - notification-service
+      - user-service
+      - auth-service
+      - asset-service
+    environment:
+      APP_PORT: ${APP_PORT}
+      USER_HOST: ${USER_HOST}
+      USER_PORT: ${USER_PORT}
+      AUTH_HOST: ${AUTH_HOST}
+      AUTH_PORT: ${AUTH_PORT}
+      ASSET_HOST: ${ASSET_HOST}
+      ASSET_PORT: ${ASSET_PORT}
+      NOTI_HOST: ${NOTI_HOST}
+      NOTI_PORT: ${NOTI_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      SUPABASE_KEY: ${SUPABASE_KEY}
+      SUPABASE_URL: ${SUPABASE_URL}
+      BUCKET_NAME: ${BUCKET_NAME}
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    networks:
+      - wealth_net
+    logging: *default-logging
+
+volumes:
+  postgres_data:
