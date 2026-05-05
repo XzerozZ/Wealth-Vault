@@ -13,7 +13,8 @@ WORKDIR /app
 COPY api-gateway/ ./api-gateway/
 
 WORKDIR /app/api-gateway
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/api-gateway ./cmd/main.go
+
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/gateway-bin ./cmd/main.go
 
 # ---------- Runtime Stage ----------
 FROM gcr.io/distroless/base-debian12
@@ -22,8 +23,8 @@ WORKDIR /app
 
 ENV PORT=8080
 
-COPY --from=builder /app/api-gateway /app/api-gateway
+COPY --from=builder /app/gateway-bin /app/gateway-bin
 
 EXPOSE 8080
 
-CMD ["/app/api-gateway"]
+CMD ["/app/gateway-bin"]
