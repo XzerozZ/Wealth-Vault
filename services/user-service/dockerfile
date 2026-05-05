@@ -3,11 +3,19 @@ FROM golang:1.25-bookworm AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY proto/ ./proto/
+
+COPY services/user-service/go.mod services/user-service/go.sum ./services/user-service/
+
+WORKDIR /app/services/user-service
 RUN go mod download
 
-COPY . .
-RUN go build -o user-service ./cmd/main.go
+WORKDIR /app
+COPY services/user-service/ ./services/user-service/
+
+WORKDIR /app/services/user-service
+
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/user-service ./cmd/main.go
 
 # ---------- Runtime Stage ----------
 FROM gcr.io/distroless/base-debian12
@@ -17,7 +25,7 @@ WORKDIR /app
 ENV DB_HOST=postgres
 ENV DB_PORT=5432
 ENV DB_USER=admin
-ENV DB_NAME=finaluser
+ENV DB_NAME=wealthvault
 ENV SSL_MODE=disable
 ENV GRPC_PORT=50051
 

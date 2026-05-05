@@ -3,16 +3,24 @@ FROM golang:1.25-bookworm AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY proto/ ./proto/
+COPY api-gateway/go.mod api-gateway/go.sum ./api-gateway/
+
+WORKDIR /app/api-gateway
 RUN go mod download
 
-COPY . .
-RUN go build -o api-gateway ./cmd/main.go
+WORKDIR /app
+COPY api-gateway/ ./api-gateway/
+
+WORKDIR /app/api-gateway
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/api-gateway ./cmd/main.go
 
 # ---------- Runtime Stage ----------
 FROM gcr.io/distroless/base-debian12
 
 WORKDIR /app
+
+ENV PORT=8080
 
 COPY --from=builder /app/api-gateway /app/api-gateway
 

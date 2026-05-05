@@ -3,11 +3,17 @@ FROM golang:1.25-bookworm AS builder
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY proto/ ./proto/
+COPY services/notification-service/go.mod services/notification-service/go.sum ./services/notification-service/
+
+WORKDIR /app/services/notification-service
 RUN go mod download
 
-COPY . .
-RUN go build -o notification-service ./cmd/main.go
+WORKDIR /app
+COPY services/notification-service/ ./services/notification-service/
+
+WORKDIR /app/services/notification-service
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/notification-service ./cmd/main.go
 
 # ---------- Runtime Stage ----------
 FROM gcr.io/distroless/base-debian12
@@ -17,9 +23,9 @@ WORKDIR /app
 ENV DB_HOST=postgres
 ENV DB_PORT=5432
 ENV DB_USER=admin
-ENV DB_NAME=finaluser
+ENV DB_NAME=noti_db
 ENV SSL_MODE=disable
-ENV GRPC_PORT=50051
+ENV GRPC_PORT=50054
 
 COPY --from=builder /app/notification-service /app/notification-service
 
