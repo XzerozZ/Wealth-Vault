@@ -63,7 +63,7 @@ services:
   user-service:
     build:
       context: ./services/user-service  
-      dockerfile: dockerfile 
+      dockerfile: ./services/user-service/dockerfile 
     container_name: user-service
     restart: unless-stopped
     depends_on:
@@ -78,7 +78,7 @@ services:
   auth-service:
     build:
       context: ./services/auth-service  
-      dockerfile: dockerfile 
+      dockerfile: ./services/auth-service/dockerfile 
     container_name: auth-service
     restart: unless-stopped
     depends_on:
@@ -95,7 +95,7 @@ services:
   asset-service:
     build:
       context: ./services/asset-service  
-      dockerfile: dockerfile 
+      dockerfile: ./services/asset-service/dockerfile 
     container_name: asset-service
     restart: unless-stopped
     depends_on:
@@ -110,7 +110,7 @@ services:
   notification-service:
     build:
       context: ./services/notification-service  
-      dockerfile: dockerfile 
+      dockerfile: ./services/notification-service/dockerfile 
     container_name: notification-service
     restart: unless-stopped
     depends_on:
@@ -127,7 +127,7 @@ services:
   api-gateway:
     build:
       context: ./api-gateway              
-      dockerfile: dockerfile
+      dockerfile: ./api-gateway/dockerfile
     container_name: api-gateway
     restart: unless-stopped
     depends_on:
