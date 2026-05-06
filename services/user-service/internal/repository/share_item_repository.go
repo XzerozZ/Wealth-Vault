@@ -355,11 +355,12 @@ func (r *ShareItemRepository) GetSharedItemIDs(ctx context.Context, userID, targ
 
 func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUserID, friendID uuid.UUID) ([]domain.SharedItemSummary, error) {
 	var items []domain.SharedItemSummary
-
+	now := time.Now()
 	query := `
 		SELECT entity_id, entity_type 
 		FROM friend_items 
 		WHERE owner_id = ? AND friend_id = ? 
+		AND share_at <= ?
 
 		UNION
 
@@ -368,9 +369,10 @@ func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUser
 		INNER JOIN group_item_viewers giv ON gi.id = giv.group_item_id
 		WHERE gi.owner_id = ? 
 		AND giv.viewer_id = ?
+		AND gi.share_at <= ?
 	`
 
-	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, friendID, myUserID).Scan(&items).Error
+	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, now, friendID, myUserID, now).Scan(&items).Error
 	if err != nil {
 		return nil, err
 	}
