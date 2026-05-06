@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 	"wealth-vault/user-service/internal/domain"
 
 	"github.com/google/uuid"
@@ -26,6 +27,7 @@ func (r *MsgRepository) CreatePrivateMessage(ctx context.Context, log []domain.P
 
 func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, userID string) ([]domain.GroupMessage, error) {
 	var msgs []domain.GroupMessage
+	now := time.Now().Unix()
 	if err := r.db.WithContext(ctx).
 		Table("group_messages").
 		Joins("JOIN group_members ON group_members.group_id::uuid = group_messages.group_id::uuid").
@@ -34,7 +36,10 @@ func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, us
 		Where("group_messages.created_at >= group_members.joined_at").
 		Where(
 			r.db.Where("group_messages.sender_id = ?::uuid", userID).
-				Or("group_messages.msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}),
+				Or(`
+					(group_messages.metadata->>'share_at')::bigint <= ? 
+					OR group_messages.metadata->>'share_at' IS NULL
+				`, now),
 		).
 		Order("group_messages.created_at DESC").
 		Preload("Sender").
@@ -47,10 +52,18 @@ func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, us
 
 func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID string) ([]domain.PrivateMessage, error) {
 	var msgs []domain.PrivateMessage
+	now := time.Now().Unix()
 	if err := r.db.WithContext(ctx).
 		Where(
 			r.db.Where("sender_id = ? AND receiver_id = ?", userID, friendID).
 				Or("sender_id = ? AND receiver_id = ?", friendID, userID),
+		).
+		Where(
+			r.db.Where("sender_id = ?", userID).
+				Or(`
+					(metadata->>'share_at')::bigint <= ? 
+					OR metadata->>'share_at' IS NULL
+				`, now),
 		).
 		Order("created_at DESC").Preload("Sender").Find(&msgs).Error; err != nil {
 		return nil, err

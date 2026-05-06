@@ -158,13 +158,13 @@ func (u *ShareItemUsecase) prepareGroupShares(ctx context.Context, targets []*pb
 			"snapshot_title": assetDisplayName,
 			"item_name":      assetName,
 			"action_url":     fmt.Sprintf("/asset/%s/%s", entityType, entityID),
+			"share_at":       shareTime.Unix(),
 		})
 
 		agg.groupMsgs = append(agg.groupMsgs, domain.GroupMessage{
 			GroupID:   groupID,
 			SenderID:  userID,
 			MsgType:   MsgTypeAssetCard,
-			Content:   "",
 			Metadata:  string(cardMeta),
 			CreatedAt: now,
 		})
@@ -219,6 +219,7 @@ func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*p
 			"snapshot_title": assetDisplayName,
 			"item_name":      assetName,
 			"action_url":     fmt.Sprintf("/asset/%s/%s", entityType, entityID),
+			"share_at":       shareTime.Unix(),
 		})
 
 		agg.privateMsgs = append(agg.privateMsgs, domain.PrivateMessage{
