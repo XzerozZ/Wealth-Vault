@@ -5,14 +5,16 @@ import (
 	assetPb "wealth-vault/user-service/pkg/pb/proto/asset"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 	"wealth-vault/user-service/pkg/utils"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
-	if b == nil {
-		return nil
-	}
+func isDeletedPB(ts *timestamppb.Timestamp) bool {
+	return ts != nil && ts.IsValid() && ts.Seconds > 0
+}
 
-	if b.DeletedAt != nil && b.DeletedAt.IsValid() && b.DeletedAt.Seconds > 0 {
+func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
+	if b == nil || isDeletedPB(b.DeletedAt) {
 		return nil
 	}
 
@@ -41,11 +43,7 @@ func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
 }
 
 func MapLandToPreview(l *assetPb.Land) *pb.AssetPreview {
-	if l == nil {
-		return nil
-	}
-
-	if l.DeletedAt != nil && l.DeletedAt.IsValid() && l.DeletedAt.Seconds > 0 {
+	if l == nil || isDeletedPB(l.DeletedAt) {
 		return nil
 	}
 
@@ -75,7 +73,7 @@ func MapLandToPreview(l *assetPb.Land) *pb.AssetPreview {
 }
 
 func MapAccountToPreview(a *assetPb.Account) *pb.AssetPreview {
-	if a == nil {
+	if a == nil || isDeletedPB(a.DeletedAt) {
 		return nil
 	}
 
@@ -105,7 +103,7 @@ func MapAccountToPreview(a *assetPb.Account) *pb.AssetPreview {
 }
 
 func MapCashToPreview(c *assetPb.Cash) *pb.AssetPreview {
-	if c == nil {
+	if c == nil || isDeletedPB(c.DeletedAt) {
 		return nil
 	}
 
@@ -131,11 +129,7 @@ func MapCashToPreview(c *assetPb.Cash) *pb.AssetPreview {
 }
 
 func MapInsuranceToPreview(i *assetPb.Insurance) *pb.AssetPreview {
-	if i == nil {
-		return nil
-	}
-
-	if i.DeletedAt != nil && i.DeletedAt.IsValid() && i.DeletedAt.Seconds > 0 {
+	if i == nil || isDeletedPB(i.DeletedAt) {
 		return nil
 	}
 
@@ -166,11 +160,7 @@ func MapInsuranceToPreview(i *assetPb.Insurance) *pb.AssetPreview {
 }
 
 func MapInvestmentToPreview(inv *assetPb.Investment) *pb.AssetPreview {
-	if inv == nil {
-		return nil
-	}
-
-	if inv.DeletedAt != nil && inv.DeletedAt.IsValid() && inv.DeletedAt.Seconds > 0 {
+	if inv == nil || isDeletedPB(inv.DeletedAt) {
 		return nil
 	}
 
@@ -194,11 +184,7 @@ func MapInvestmentToPreview(inv *assetPb.Investment) *pb.AssetPreview {
 }
 
 func MapLiabilityToPreview(l *assetPb.Liability) *pb.AssetPreview {
-	if l == nil {
-		return nil
-	}
-
-	if l.DeletedAt != nil && l.DeletedAt.IsValid() && l.DeletedAt.Seconds > 0 {
+	if l == nil || isDeletedPB(l.DeletedAt) {
 		return nil
 	}
 
