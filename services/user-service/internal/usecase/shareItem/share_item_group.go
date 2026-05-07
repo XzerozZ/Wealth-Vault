@@ -50,7 +50,7 @@ func (u *ShareItemUsecase) GetSharedIteminGroup(ctx context.Context, req *pb.Get
 		responseItems = append(responseItems, &pb.GroupItemDetail{
 			GroupItemId: item.ID.String(),
 			SharedBy:    item.OwnerID.String(),
-			SharedAt:    timestamppb.New(item.CreatedAt),
+			SharedAt:    timestamppb.New(item.ShareAt),
 			Type:        item.EntityType,
 			AssetDetail: previewMap[item.EntityID.String()],
 		})
