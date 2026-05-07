@@ -8,7 +8,8 @@ import (
 	"wealth-vault/user-service/pkg/utils"
 )
 
-const GhostDuration = 7 * 24 * time.Hour
+// const GhostDuration = 7 * 24 * time.Hour
+const GhostDuration = 2 * time.Minute
 
 func createGhostPreview(id string, name string, itemtype string) *pb.AssetPreview {
 	return &pb.AssetPreview{
