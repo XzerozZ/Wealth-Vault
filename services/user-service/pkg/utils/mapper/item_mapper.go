@@ -5,19 +5,23 @@ import (
 	assetPb "wealth-vault/user-service/pkg/pb/proto/asset"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 	"wealth-vault/user-service/pkg/utils"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func isDeletedPB(ts *timestamppb.Timestamp) bool {
-	return ts != nil && ts.IsValid() && ts.Seconds > 0
-}
-
 func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
-	if b == nil || isDeletedPB(b.DeletedAt) {
+	if b == nil {
 		return nil
 	}
 
+	if b.DeletedAt != nil && b.DeletedAt.IsValid() && b.DeletedAt.Seconds > 0 {
+		t := b.DeletedAt.AsTime()
+		if t.Unix() <= 0 {
+			goto ProcessActive
+		}
+
+		return nil
+	}
+
+ProcessActive:
 	locationText := "ไม่ระบุตำแหน่ง"
 	if b.Location != nil {
 		locationText = fmt.Sprintf("%s, %s", b.Location.District, b.Location.Province)
@@ -43,10 +47,20 @@ func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
 }
 
 func MapLandToPreview(l *assetPb.Land) *pb.AssetPreview {
-	if l == nil || isDeletedPB(l.DeletedAt) {
+	if l == nil {
 		return nil
 	}
 
+	if l.DeletedAt != nil && l.DeletedAt.IsValid() && l.DeletedAt.Seconds > 0 {
+		t := l.DeletedAt.AsTime()
+		if t.Unix() <= 0 {
+			goto ProcessActive
+		}
+
+		return nil
+	}
+
+ProcessActive:
 	locationText := "ไม่ระบุตำแหน่ง"
 	if l.Location != nil {
 		locationText = fmt.Sprintf("%s, %s", l.Location.District, l.Location.Province)
@@ -73,16 +87,22 @@ func MapLandToPreview(l *assetPb.Land) *pb.AssetPreview {
 }
 
 func MapAccountToPreview(a *assetPb.Account) *pb.AssetPreview {
-	if a == nil || isDeletedPB(a.DeletedAt) {
+	if a == nil {
 		return nil
 	}
 
 	fmt.Printf("DEBUG MAPPER: ID=%s, DeletedAt=%v\n", a.Id, a.DeletedAt)
 
 	if a.DeletedAt != nil && a.DeletedAt.IsValid() && a.DeletedAt.Seconds > 0 {
+		t := a.DeletedAt.AsTime()
+		if t.Unix() <= 0 {
+			goto ProcessActive
+		}
+
 		return nil
 	}
 
+ProcessActive:
 	imageURL := ""
 	if len(a.Files) > 0 && a.Files[0] != nil {
 		imageURL = a.Files[0].Url
@@ -103,14 +123,20 @@ func MapAccountToPreview(a *assetPb.Account) *pb.AssetPreview {
 }
 
 func MapCashToPreview(c *assetPb.Cash) *pb.AssetPreview {
-	if c == nil || isDeletedPB(c.DeletedAt) {
+	if c == nil {
 		return nil
 	}
 
 	if c.DeletedAt != nil && c.DeletedAt.IsValid() && c.DeletedAt.Seconds > 0 {
+		t := c.DeletedAt.AsTime()
+		if t.Unix() <= 0 {
+			goto ProcessActive
+		}
+
 		return nil
 	}
 
+ProcessActive:
 	imageURL := ""
 	if len(c.Files) > 0 && c.Files[0] != nil {
 		imageURL = c.Files[0].Url
@@ -129,10 +155,20 @@ func MapCashToPreview(c *assetPb.Cash) *pb.AssetPreview {
 }
 
 func MapInsuranceToPreview(i *assetPb.Insurance) *pb.AssetPreview {
-	if i == nil || isDeletedPB(i.DeletedAt) {
+	if i == nil {
 		return nil
 	}
 
+	if i.DeletedAt != nil && i.DeletedAt.IsValid() && i.DeletedAt.Seconds > 0 {
+		t := i.DeletedAt.AsTime()
+		if t.Unix() <= 0 {
+			goto ProcessActive
+		}
+
+		return nil
+	}
+
+ProcessActive:
 	expDateStr := "ไม่ระบุ"
 	if i.ExpDate != nil {
 		expDateStr = i.ExpDate.AsTime().String()
@@ -160,10 +196,20 @@ func MapInsuranceToPreview(i *assetPb.Insurance) *pb.AssetPreview {
 }
 
 func MapInvestmentToPreview(inv *assetPb.Investment) *pb.AssetPreview {
-	if inv == nil || isDeletedPB(inv.DeletedAt) {
+	if inv == nil {
 		return nil
 	}
 
+	if inv.DeletedAt != nil && inv.DeletedAt.IsValid() && inv.DeletedAt.Seconds > 0 {
+		t := inv.DeletedAt.AsTime()
+		if t.Unix() <= 0 {
+			goto ProcessActive
+		}
+
+		return nil
+	}
+
+ProcessActive:
 	imageURL := ""
 	if len(inv.Files) > 0 && inv.Files[0] != nil {
 		imageURL = inv.Files[0].Url
@@ -184,10 +230,20 @@ func MapInvestmentToPreview(inv *assetPb.Investment) *pb.AssetPreview {
 }
 
 func MapLiabilityToPreview(l *assetPb.Liability) *pb.AssetPreview {
-	if l == nil || isDeletedPB(l.DeletedAt) {
+	if l == nil {
 		return nil
 	}
 
+	if l.DeletedAt != nil && l.DeletedAt.IsValid() && l.DeletedAt.Seconds > 0 {
+		t := l.DeletedAt.AsTime()
+		if t.Unix() <= 0 {
+			goto ProcessActive
+		}
+
+		return nil
+	}
+
+ProcessActive:
 	imageURL := ""
 	if len(l.Files) > 0 && l.Files[0] != nil {
 		imageURL = l.Files[0].Url
