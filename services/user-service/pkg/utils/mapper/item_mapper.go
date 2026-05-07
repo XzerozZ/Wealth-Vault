@@ -2,27 +2,10 @@ package mapper
 
 import (
 	"fmt"
-	"time"
 	assetPb "wealth-vault/user-service/pkg/pb/proto/asset"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 	"wealth-vault/user-service/pkg/utils"
 )
-
-// const GhostDuration = 7 * 24 * time.Hour
-const GhostDuration = 2 * time.Minute
-
-func createGhostPreview(id string, name string, itemtype string) *pb.AssetPreview {
-	return &pb.AssetPreview{
-		Asset: &pb.AssetPreview_Deleted{
-			Deleted: &pb.DeletedPreview{
-				Id:           id,
-				OriginalName: name,
-				OriginalType: itemtype,
-				Message:      "รายการนี้ถูกลบไปแล้ว : ไม่สามารถแสดงรายละเอียดได้",
-			},
-		},
-	}
-}
 
 func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
 	if b == nil {
@@ -30,19 +13,9 @@ func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
 	}
 
 	if b.DeletedAt != nil && b.DeletedAt.IsValid() && b.DeletedAt.Seconds > 0 {
-		t := b.DeletedAt.AsTime()
-		if t.Unix() <= 0 {
-			goto ProcessActive
-		}
-
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-
-		return createGhostPreview(b.Id, b.Name, "building")
+		return nil
 	}
 
-ProcessActive:
 	locationText := "ไม่ระบุตำแหน่ง"
 	if b.Location != nil {
 		locationText = fmt.Sprintf("%s, %s", b.Location.District, b.Location.Province)
@@ -73,18 +46,9 @@ func MapLandToPreview(l *assetPb.Land) *pb.AssetPreview {
 	}
 
 	if l.DeletedAt != nil && l.DeletedAt.IsValid() && l.DeletedAt.Seconds > 0 {
-		t := l.DeletedAt.AsTime()
-		if t.Unix() <= 0 {
-			goto ProcessActive
-		}
-
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(l.Id, l.Name, "land")
+		return nil
 	}
 
-ProcessActive:
 	locationText := "ไม่ระบุตำแหน่ง"
 	if l.Location != nil {
 		locationText = fmt.Sprintf("%s, %s", l.Location.District, l.Location.Province)
@@ -118,18 +82,9 @@ func MapAccountToPreview(a *assetPb.Account) *pb.AssetPreview {
 	fmt.Printf("DEBUG MAPPER: ID=%s, DeletedAt=%v\n", a.Id, a.DeletedAt)
 
 	if a.DeletedAt != nil && a.DeletedAt.IsValid() && a.DeletedAt.Seconds > 0 {
-		t := a.DeletedAt.AsTime()
-		if t.Unix() <= 0 {
-			goto ProcessActive
-		}
-
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(a.Id, a.Name, "account")
+		return nil
 	}
 
-ProcessActive:
 	imageURL := ""
 	if len(a.Files) > 0 && a.Files[0] != nil {
 		imageURL = a.Files[0].Url
@@ -155,18 +110,9 @@ func MapCashToPreview(c *assetPb.Cash) *pb.AssetPreview {
 	}
 
 	if c.DeletedAt != nil && c.DeletedAt.IsValid() && c.DeletedAt.Seconds > 0 {
-		t := c.DeletedAt.AsTime()
-		if t.Unix() <= 0 {
-			goto ProcessActive
-		}
-
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(c.Id, c.Name, "cash")
+		return nil
 	}
 
-ProcessActive:
 	imageURL := ""
 	if len(c.Files) > 0 && c.Files[0] != nil {
 		imageURL = c.Files[0].Url
@@ -190,18 +136,9 @@ func MapInsuranceToPreview(i *assetPb.Insurance) *pb.AssetPreview {
 	}
 
 	if i.DeletedAt != nil && i.DeletedAt.IsValid() && i.DeletedAt.Seconds > 0 {
-		t := i.DeletedAt.AsTime()
-		if t.Unix() <= 0 {
-			goto ProcessActive
-		}
-
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(i.Id, i.Name, "insurance")
+		return nil
 	}
 
-ProcessActive:
 	expDateStr := "ไม่ระบุ"
 	if i.ExpDate != nil {
 		expDateStr = i.ExpDate.AsTime().String()
@@ -234,18 +171,9 @@ func MapInvestmentToPreview(inv *assetPb.Investment) *pb.AssetPreview {
 	}
 
 	if inv.DeletedAt != nil && inv.DeletedAt.IsValid() && inv.DeletedAt.Seconds > 0 {
-		t := inv.DeletedAt.AsTime()
-		if t.Unix() <= 0 {
-			goto ProcessActive
-		}
-
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(inv.Id, inv.Name, "investment")
+		return nil
 	}
 
-ProcessActive:
 	imageURL := ""
 	if len(inv.Files) > 0 && inv.Files[0] != nil {
 		imageURL = inv.Files[0].Url
@@ -271,18 +199,9 @@ func MapLiabilityToPreview(l *assetPb.Liability) *pb.AssetPreview {
 	}
 
 	if l.DeletedAt != nil && l.DeletedAt.IsValid() && l.DeletedAt.Seconds > 0 {
-		t := l.DeletedAt.AsTime()
-		if t.Unix() <= 0 {
-			goto ProcessActive
-		}
-
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(l.Id, l.Name, "liability")
+		return nil
 	}
 
-ProcessActive:
 	imageURL := ""
 	if len(l.Files) > 0 && l.Files[0] != nil {
 		imageURL = l.Files[0].Url
