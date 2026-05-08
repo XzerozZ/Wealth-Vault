@@ -1,5 +1,6 @@
 networks:
   wealth_net:
+    name: wealth_vault_shared_net
     driver: bridge
 
 x-logging: &default-logging
