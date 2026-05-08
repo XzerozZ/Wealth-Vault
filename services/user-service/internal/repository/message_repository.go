@@ -37,12 +37,14 @@ func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, us
 		Where("group_messages.created_at >= group_members.joined_at").
 		Where(
 			r.db.Where("group_messages.sender_id = ?::uuid", userID).
-				Or(`
-                    (
-                        (group_messages.metadata->>'share_at')::bigint <= ? 
-                        OR group_messages.metadata->>'share_at' IS NULL
-                    )
-                `, now),
+				Or(
+					r.db.Where("group_messages.sender_id != ?::uuid", userID).
+						Where("group_messages.msg_type != ?", "GRANT_ACCESS").
+						Where(
+							r.db.Where("(group_messages.metadata->>'share_at')::bigint <= ?", now).
+								Or("group_messages.metadata->>'share_at' IS NULL"),
+						),
+				),
 		).
 		Order("group_messages.created_at DESC").
 		Preload("Sender").
