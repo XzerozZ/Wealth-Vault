@@ -1,8 +1,6 @@
 networks:
   wealth_net:
     driver: bridge
-  wealth_and_vault_ma_leaw_wealth_net:
-    driver: bridge
 
 x-logging: &default-logging
   driver: "json-file"
@@ -24,7 +22,6 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d wealthvault"]
@@ -46,7 +43,6 @@ services:
         condition: service_healthy 
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
 
   nats-server:
@@ -58,7 +54,6 @@ services:
     command: ["-js"]
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
 
   user-service:
@@ -88,7 +83,6 @@ services:
       EMAIL_PASS: ${EMAIL_PASS}
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
 
   auth-service:
@@ -117,7 +111,6 @@ services:
       EMAIL_PASS: ${EMAIL_PASS}
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
 
   asset-service:
@@ -143,7 +136,6 @@ services:
       BUCKET_NAME: ${BUCKET_NAME}
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
 
   notification-service:
@@ -170,7 +162,6 @@ services:
       FCM_CLIENT_FILE: ${FCM_CLIENT_FILE}
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
 
   api-gateway:
@@ -200,7 +191,6 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     networks:
       - wealth_net
-      - wealth_and_vault_ma_leaw_wealth_net
     logging: *default-logging
 
 volumes:
