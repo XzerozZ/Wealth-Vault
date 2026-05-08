@@ -34,16 +34,15 @@ func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, us
 		Joins("JOIN group_members ON group_members.group_id::uuid = group_messages.group_id::uuid").
 		Where("group_messages.group_id = ?::uuid", groupID).
 		Where("group_members.user_id = ?::uuid", userID).
-		// เงื่อนไขหลัก: ต้องส่งหลังจากวันที่เราเข้ากลุ่ม
 		Where("group_messages.created_at >= group_members.joined_at").
-		// รวมเงื่อนไขการมองเห็น (Visibility Logic)
 		Where(
-			r.db.Where("group_messages.sender_id = ?::uuid", userID). // 1. เราเป็นคนส่ง
-											Or("group_messages.msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}). // 2. เป็น Type พิเศษ
-											Or(`
-                    (group_messages.metadata->>'share_at')::bigint <= ? 
-                    OR group_messages.metadata->>'share_at' IS NULL
-                `, now), // 3. ถึงเวลาแชร์ หรือไม่ได้ตั้งเวลาแชร์ไว้
+			r.db.Where("group_messages.sender_id = ?::uuid", userID).
+				Or(`
+                    (
+                        (group_messages.metadata->>'share_at')::bigint <= ? 
+                        OR group_messages.metadata->>'share_at' IS NULL
+                    )
+                `, now),
 		).
 		Order("group_messages.created_at DESC").
 		Preload("Sender").
@@ -59,19 +58,18 @@ func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID
 	now := time.Now().Unix()
 
 	if err := r.db.WithContext(ctx).
-		// เงื่อนไขคู่สนทนา
 		Where(
 			r.db.Where("sender_id = ? AND receiver_id = ?", userID, friendID).
 				Or("sender_id = ? AND receiver_id = ?", friendID, userID),
 		).
-		// รวมเงื่อนไขการมองเห็น (Visibility Logic)
 		Where(
-			r.db.Where("sender_id = ?", userID). // 1. เราเป็นคนส่ง
-								Or("msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}). // 2. เป็น Type พิเศษ
-								Or(`
-                    (metadata->>'share_at')::bigint <= ? 
-                    OR metadata->>'share_at' IS NULL
-                `, now), // 3. ถึงเวลาแชร์ หรือไม่ได้ตั้งเวลาแชร์ไว้
+			r.db.Where("sender_id = ?", userID).
+				Or(`
+                    (
+                        (metadata->>'share_at')::bigint <= ? 
+                        OR metadata->>'share_at' IS NULL
+                    )
+                `, now),
 		).
 		Order("created_at DESC").
 		Preload("Sender").

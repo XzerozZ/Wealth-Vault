@@ -149,36 +149,34 @@ func (u *ShareItemUsecase) AddMemberToGroup(ctx context.Context, req *pb.AddMemb
 		})
 
 		existingMembers, _, _ := u.groupRepo.GetMember(bgCtx, groupID)
-		for i, newID := range targetUUIDs {
-			newNames := addedNames[i]
-			for _, m := range existingMembers {
-				isNew := false
-				for _, tid := range targetUUIDs {
-					if m.ID == tid {
-						isNew = true
-						break
-					}
+		newNamesStr := strings.Join(addedNames, ", ")
+		for _, m := range existingMembers {
+			isNew := false
+			for _, tid := range targetUUIDs {
+				if m.ID == tid {
+					isNew = true
+					break
 				}
-				if isNew {
-					continue
-				}
-
-				promptMeta, _ := json.Marshal(map[string]interface{}{
-					"is_action_required": true,
-					"is_completed":       false,
-					"target_user_id":     newID.String(),
-					"type":               "GRANT_ACCESS_PROMPT",
-				})
-
-				u.msgRepo.CreateMessage(bgCtx, []domain.GroupMessage{{
-					GroupID:   groupID,
-					SenderID:  m.ID,
-					MsgType:   MsgTypeGrantAccess,
-					Content:   fmt.Sprintf("คุณต้องการแชร์รายการของคุณให้ %s หรือไม่?", newNames),
-					Metadata:  string(promptMeta),
-					CreatedAt: time.Now(),
-				}})
 			}
+			if isNew {
+				continue
+			}
+
+			promptMeta, _ := json.Marshal(map[string]interface{}{
+				"is_action_required": true,
+				"is_completed":       false,
+				"target_user_ids":    req.TargetUserIds,
+				"type":               "GRANT_ACCESS_PROMPT",
+			})
+
+			u.msgRepo.CreateMessage(bgCtx, []domain.GroupMessage{{
+				GroupID:   groupID,
+				SenderID:  m.ID,
+				MsgType:   MsgTypeGrantAccess,
+				Content:   fmt.Sprintf("คุณต้องการแชร์รายการของคุณให้ %s หรือไม่?", newNamesStr),
+				Metadata:  string(promptMeta),
+				CreatedAt: time.Now(),
+			}})
 		}
 	}()
 
