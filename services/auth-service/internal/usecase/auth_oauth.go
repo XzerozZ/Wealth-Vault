@@ -26,7 +26,11 @@ func (u *AuthUsecase) LoginWithGoogle(ctx context.Context, googleIDToken string)
 
 	existingUser, err := u.authRepo.FindByEmailAndProvider(ctx, email, ProviderGoogle)
 	if err != nil {
-		return nil, fmt.Errorf("database error: %w", err)
+		if err.Error() == "record not found" {
+			existingUser = nil
+		} else {
+			return nil, fmt.Errorf("database error: %w", err)
+		}
 	}
 
 	var userID uuid.UUID
