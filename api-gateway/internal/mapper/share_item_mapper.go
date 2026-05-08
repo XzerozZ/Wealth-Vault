@@ -66,6 +66,7 @@ func MapGroupItemsToDomain(protoItems []*pb.GroupItemDetail) []domain.GroupItemR
 				dtoItem.Type = "insurance"
 				dtoItem.AssetDetail = domain.InsuranceDetail{
 					ID:             v.Insurance.Id,
+					Name:           v.Insurance.Name,
 					CompanyName:    v.Insurance.CompanyName,
 					TypeName:       v.Insurance.TypeName,
 					PolNum:         v.Insurance.PolNum,
@@ -164,6 +165,7 @@ func MapFriendItemsToDomain(protoItems []*pb.FriendItemDetail) []domain.FriendIt
 				dtoItem.Type = "insurance"
 				dtoItem.AssetDetail = domain.InsuranceDetail{
 					ID:             v.Insurance.Id,
+					Name:           v.Insurance.Name,
 					CompanyName:    v.Insurance.CompanyName,
 					TypeName:       v.Insurance.TypeName,
 					PolNum:         v.Insurance.PolNum,

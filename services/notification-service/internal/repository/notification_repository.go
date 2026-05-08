@@ -54,16 +54,16 @@ func (r *NotificationRepository) MarkAllAsRead(ctx context.Context, receiverID u
 }
 
 func (r *NotificationRepository) UpdateNotificationMetadata(ctx context.Context, targetID, senderID uuid.UUID, notiType string, metaUpdates map[string]interface{}) error {
+	metaJSON, _ := json.Marshal(metaUpdates)
 	query := `
 		UPDATE notifications 
 		SET metadata = metadata || ?::jsonb,
 			updated_at = NOW()
-		WHERE target_id = ? 
+		WHERE receiver = ? 
 		AND sender_id = ? 
-		AND type = ?
+		AND entity_type = ?
 		AND (metadata->>'is_completed')::boolean = false
 	`
 
-	metaJSON, _ := json.Marshal(metaUpdates)
 	return r.db.WithContext(ctx).Exec(query, string(metaJSON), targetID, senderID, notiType).Error
 }

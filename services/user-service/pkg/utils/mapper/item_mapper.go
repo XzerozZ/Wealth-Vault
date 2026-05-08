@@ -2,26 +2,10 @@ package mapper
 
 import (
 	"fmt"
-	"time"
 	assetPb "wealth-vault/user-service/pkg/pb/proto/asset"
 	pb "wealth-vault/user-service/pkg/pb/proto/user"
 	"wealth-vault/user-service/pkg/utils"
 )
-
-const GhostDuration = 7 * 24 * time.Hour
-
-func createGhostPreview(id string, name string, itemtype string) *pb.AssetPreview {
-	return &pb.AssetPreview{
-		Asset: &pb.AssetPreview_Deleted{
-			Deleted: &pb.DeletedPreview{
-				Id:           id,
-				OriginalName: name,
-				OriginalType: itemtype,
-				Message:      "รายการนี้ถูกลบไปแล้ว : ไม่สามารถแสดงรายละเอียดได้",
-			},
-		},
-	}
-}
 
 func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
 	if b == nil {
@@ -34,11 +18,7 @@ func MapBuildingToPreview(b *assetPb.Building) *pb.AssetPreview {
 			goto ProcessActive
 		}
 
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-
-		return createGhostPreview(b.Id, b.Name, "building")
+		return nil
 	}
 
 ProcessActive:
@@ -77,10 +57,7 @@ func MapLandToPreview(l *assetPb.Land) *pb.AssetPreview {
 			goto ProcessActive
 		}
 
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(l.Id, l.Name, "land")
+		return nil
 	}
 
 ProcessActive:
@@ -122,10 +99,7 @@ func MapAccountToPreview(a *assetPb.Account) *pb.AssetPreview {
 			goto ProcessActive
 		}
 
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(a.Id, a.Name, "account")
+		return nil
 	}
 
 ProcessActive:
@@ -159,10 +133,7 @@ func MapCashToPreview(c *assetPb.Cash) *pb.AssetPreview {
 			goto ProcessActive
 		}
 
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(c.Id, c.Name, "cash")
+		return nil
 	}
 
 ProcessActive:
@@ -194,10 +165,7 @@ func MapInsuranceToPreview(i *assetPb.Insurance) *pb.AssetPreview {
 			goto ProcessActive
 		}
 
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(i.Id, i.Name, "insurance")
+		return nil
 	}
 
 ProcessActive:
@@ -238,10 +206,7 @@ func MapInvestmentToPreview(inv *assetPb.Investment) *pb.AssetPreview {
 			goto ProcessActive
 		}
 
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(inv.Id, inv.Name, "investment")
+		return nil
 	}
 
 ProcessActive:
@@ -275,10 +240,7 @@ func MapLiabilityToPreview(l *assetPb.Liability) *pb.AssetPreview {
 			goto ProcessActive
 		}
 
-		if time.Since(t) > GhostDuration {
-			return nil
-		}
-		return createGhostPreview(l.Id, l.Name, "liability")
+		return nil
 	}
 
 ProcessActive:

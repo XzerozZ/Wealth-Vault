@@ -44,7 +44,7 @@ func (u *ShareItemUsecase) GetSharedIteminFriend(ctx context.Context, req *pb.Ge
 		responseItems = append(responseItems, &pb.FriendItemDetail{
 			FriendItemId: item.ID.String(),
 			SharedBy:     item.OwnerID.String(),
-			SharedAt:     timestamppb.New(item.CreatedAt),
+			SharedAt:     timestamppb.New(item.ShareAt),
 			Type:         item.EntityType,
 			AssetDetail:  previewMap[item.EntityID.String()],
 		})

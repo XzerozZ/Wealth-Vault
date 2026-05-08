@@ -110,11 +110,16 @@ func (r *ShareItemRepository) IsItemSharedtoEmail(ctx context.Context, entityID 
 
 func (r *ShareItemRepository) GetSharedIteminGroup(ctx context.Context, groupID, userID uuid.UUID) ([]domain.GroupItem, error) {
 	var items []domain.GroupItem
+	now := time.Now()
+
 	err := r.db.WithContext(ctx).
 		Joins("LEFT JOIN group_item_viewers v ON v.group_item_id = group_items.id").
 		Where("group_items.group_id = ?", groupID).
 		Where("group_items.owner_id = ? OR v.viewer_id = ?", userID, userID).
-		Where("group_items.share_at <= ?", time.Now()).
+		Where(
+			r.db.Where("group_items.owner_id = ?", userID).
+				Or("group_items.share_at <= ?", now),
+		).
 		Order("group_items.share_at DESC").
 		Preload("User").
 		Distinct().
@@ -129,9 +134,16 @@ func (r *ShareItemRepository) GetSharedIteminGroup(ctx context.Context, groupID,
 
 func (r *ShareItemRepository) GetSharedIteminFriend(ctx context.Context, friendID, userID uuid.UUID) ([]domain.FriendItem, error) {
 	var items []domain.FriendItem
-	err := r.db.WithContext(ctx).Where(
-		r.db.Where("owner_id = ? AND friend_id = ?", userID, friendID).Or("owner_id = ? AND friend_id = ?", friendID, userID),
-	).Where("share_at <= ?", time.Now()).Order("share_at DESC").Preload("User").Find(&items).Error
+	now := time.Now()
+
+	err := r.db.WithContext(ctx).
+		Where(
+			r.db.Where("owner_id = ? AND friend_id = ?", userID, friendID).
+				Or("owner_id = ? AND friend_id = ? AND share_at <= ?", friendID, userID, now),
+		).
+		Order("share_at DESC").
+		Preload("User").
+		Find(&items).Error
 
 	if err != nil {
 		return nil, err
@@ -355,11 +367,12 @@ func (r *ShareItemRepository) GetSharedItemIDs(ctx context.Context, userID, targ
 
 func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUserID, friendID uuid.UUID) ([]domain.SharedItemSummary, error) {
 	var items []domain.SharedItemSummary
-
+	now := time.Now()
 	query := `
 		SELECT entity_id, entity_type 
 		FROM friend_items 
 		WHERE owner_id = ? AND friend_id = ? 
+		AND share_at <= ?
 
 		UNION
 
@@ -368,9 +381,10 @@ func (r *ShareItemRepository) GetItemsSharedByFriend(ctx context.Context, myUser
 		INNER JOIN group_item_viewers giv ON gi.id = giv.group_item_id
 		WHERE gi.owner_id = ? 
 		AND giv.viewer_id = ?
+		AND gi.share_at <= ?
 	`
 
-	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, friendID, myUserID).Scan(&items).Error
+	err := r.db.WithContext(ctx).Raw(query, friendID, myUserID, now, friendID, myUserID, now).Scan(&items).Error
 	if err != nil {
 		return nil, err
 	}

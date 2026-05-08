@@ -22,5 +22,6 @@ type Notification struct {
 	Message    string `gorm:"not null"`
 	Metadata   string `gorm:"type:jsonb;default:'{}'"`
 	CreatedAt  time.Time
+	UpdatedAt  time.Time
 	IsRead     bool ` gorm:"default:false"`
 }

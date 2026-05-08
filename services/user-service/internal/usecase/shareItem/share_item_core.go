@@ -153,18 +153,19 @@ func (u *ShareItemUsecase) prepareGroupShares(ctx context.Context, targets []*pb
 		})
 
 		cardMeta, _ := json.Marshal(map[string]interface{}{
-			"asset_id":       entityID.String(),
-			"asset_type":     entityType,
-			"snapshot_title": assetDisplayName,
-			"item_name":      assetName,
-			"action_url":     fmt.Sprintf("/asset/%s/%s", entityType, entityID),
+			"asset_id":         entityID.String(),
+			"asset_type":       entityType,
+			"snapshot_title":   assetDisplayName,
+			"item_name":        assetName,
+			"action_url":       fmt.Sprintf("/asset/%s/%s", entityType, entityID),
+			"share_at":         shareTime.Unix(),
+			"share_at_display": shareTime,
 		})
 
 		agg.groupMsgs = append(agg.groupMsgs, domain.GroupMessage{
 			GroupID:   groupID,
 			SenderID:  userID,
 			MsgType:   MsgTypeAssetCard,
-			Content:   "",
 			Metadata:  string(cardMeta),
 			CreatedAt: now,
 		})
@@ -214,11 +215,13 @@ func (u *ShareItemUsecase) prepareFriendShares(ctx context.Context, targets []*p
 		})
 
 		cardMeta, _ := json.Marshal(map[string]interface{}{
-			"asset_id":       entityID.String(),
-			"asset_type":     entityType,
-			"snapshot_title": assetDisplayName,
-			"item_name":      assetName,
-			"action_url":     fmt.Sprintf("/asset/%s/%s", entityType, entityID),
+			"asset_id":         entityID.String(),
+			"asset_type":       entityType,
+			"snapshot_title":   assetDisplayName,
+			"item_name":        assetName,
+			"action_url":       fmt.Sprintf("/asset/%s/%s", entityType, entityID),
+			"share_at":         shareTime.Unix(),
+			"share_at_display": shareTime,
 		})
 
 		agg.privateMsgs = append(agg.privateMsgs, domain.PrivateMessage{
