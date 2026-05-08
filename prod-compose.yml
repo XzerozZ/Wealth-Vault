@@ -57,7 +57,7 @@ services:
     logging: *default-logging
 
   user-service:
-    image: ghcr.io/xzerozz/wealth-vault/user-service:0.0.1
+    image: ghcr.io/xzerozz/wealth-vault/user-service:0.0.4
     container_name: user-service
     restart: unless-stopped
     depends_on:
@@ -86,7 +86,7 @@ services:
     logging: *default-logging
 
   auth-service:
-    image: ghcr.io/xzerozz/wealth-vault/auth-service:0.0.1
+    image: ghcr.io/xzerozz/wealth-vault/auth-service:0.0.4
     container_name: auth-service
     restart: unless-stopped
     depends_on:
@@ -114,7 +114,7 @@ services:
     logging: *default-logging
 
   asset-service:
-    image: ghcr.io/xzerozz/wealth-vault/asset-service:0.0.1
+    image: ghcr.io/xzerozz/wealth-vault/asset-service:0.0.4
     container_name: asset-service
     restart: unless-stopped
     depends_on:
@@ -139,7 +139,7 @@ services:
     logging: *default-logging
 
   notification-service:
-    image: ghcr.io/xzerozz/wealth-vault/notification-service:0.0.1
+    image: ghcr.io/xzerozz/wealth-vault/notification-service:0.0.4
     container_name: notification-service
     restart: unless-stopped
     depends_on:
@@ -165,7 +165,7 @@ services:
     logging: *default-logging
 
   api-gateway:
-    image: ghcr.io/xzerozz/wealth-vault/api-gateway:0.0.1
+    image: ghcr.io/xzerozz/wealth-vault/api-gateway:0.0.4
     container_name: api-gateway
     restart: unless-stopped
     depends_on:
