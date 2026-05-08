@@ -63,6 +63,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "${USER_PORT}:${USER_PORT}"
     environment:
       DB_HOST: wealth_and_vault
       DB_PORT: 5432
@@ -94,6 +96,8 @@ services:
         condition: service_healthy
       nats-server:
         condition: service_started
+    ports:
+      - "${AUTH_PORT}:${AUTH_PORT}"
     environment:
       DB_HOST: wealth_and_vault
       DB_PORT: 5432
@@ -120,6 +124,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "${ASSET_PORT}:${ASSET_PORT}"
     environment:
       DB_HOST: wealth_and_vault
       DB_PORT: 5432
@@ -147,6 +153,8 @@ services:
         condition: service_healthy
       nats-server:
         condition: service_started
+    ports:
+      - "${NOTI_PORT}:${NOTI_PORT}"
     environment:
       DB_HOST: wealth_and_vault
       DB_PORT: 5432
