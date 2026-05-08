@@ -36,10 +36,11 @@ func (r *MsgRepository) GetGroupMessages(ctx context.Context, groupID string, us
 		Where("group_messages.created_at >= group_members.joined_at").
 		Where(
 			r.db.Where("group_messages.sender_id = ?::uuid", userID).
+				Or("group_messages.msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}).
 				Or(`
-					(group_messages.metadata->>'share_at')::bigint <= ? 
-					OR group_messages.metadata->>'share_at' IS NULL
-				`, now),
+                    (group_messages.metadata->>'share_at')::bigint <= ? 
+                    OR group_messages.metadata->>'share_at' IS NULL
+                `, now),
 		).
 		Order("group_messages.created_at DESC").
 		Preload("Sender").
@@ -60,12 +61,15 @@ func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID
 		).
 		Where(
 			r.db.Where("sender_id = ?", userID).
+				Or("msg_type IN ?", []string{"ASSET_CARD", "SYSTEM_ALERT"}).
 				Or(`
-					(metadata->>'share_at')::bigint <= ? 
-					OR metadata->>'share_at' IS NULL
-				`, now),
+                    (metadata->>'share_at')::bigint <= ? 
+                    OR metadata->>'share_at' IS NULL
+                `, now),
 		).
-		Order("created_at DESC").Preload("Sender").Find(&msgs).Error; err != nil {
+		Order("created_at DESC").
+		Preload("Sender").
+		Find(&msgs).Error; err != nil {
 		return nil, err
 	}
 
