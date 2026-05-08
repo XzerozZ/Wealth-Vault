@@ -70,8 +70,8 @@ func LoadConfigs() *Configs {
 			Port: requireEnv("GRPC_PORT"),
 		},
 		UserGRPC: UserGRPC{
-			Host: requireEnv("User_HOST"),
-			Port: requireEnv("User_PORT"),
+			Host: requireEnv("USER_HOST"),
+			Port: requireEnv("USER_PORT"),
 		},
 		PostgreSQL: PostgreSQL{
 			Host:     requireEnv("DB_HOST"),

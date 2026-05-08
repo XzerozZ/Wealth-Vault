@@ -78,8 +78,8 @@ func LoadConfigs() *Configs {
 			Port: requireEnv("NATS_PORT"),
 		},
 		UserGRPC: UserGRPC{
-			Host: requireEnv("User_HOST"),
-			Port: requireEnv("User_PORT"),
+			Host: requireEnv("USER_HOST"),
+			Port: requireEnv("USER_PORT"),
 		},
 	}
 }

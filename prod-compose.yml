@@ -101,8 +101,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_AUTH_NAME}
       GRPC_PORT: ${AUTH_PORT}
-      User_HOST: ${User_HOST}
-      User_PORT: ${User_PORT}
+      USER_HOST: ${USER_HOST}
+      USER_PORT: ${USER_PORT}
       GOOGLE_CLIENT: ${GOOGLE_CLIENT}
       JWT_SECRET: ${JWT_SECRET}
       EMAIL_HOST: ${EMAIL_HOST}
@@ -127,8 +127,8 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_ASSET_NAME}
       GRPC_PORT: ${ASSET_PORT}
-      User_HOST: ${User_HOST}
-      User_PORT: ${User_PORT}
+      USER_HOST: ${USER_HOST}
+      USER_PORT: ${USER_PORT}
       NATS_HOST: ${NATS_HOST}
       NATS_PORT: ${NATS_PORT}
       SUPABASE_KEY: ${SUPABASE_KEY}
