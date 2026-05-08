@@ -84,6 +84,8 @@ services:
       EMAIL_PORT: ${EMAIL_PORT}
       EMAIL_USER: ${EMAIL_USER}
       EMAIL_PASS: ${EMAIL_PASS}
+    ports:
+      - "${USER_PORT}:${USER_PORT}"
     networks:
       - wealth_net
     logging: *default-logging
@@ -112,6 +114,8 @@ services:
       EMAIL_PORT: ${EMAIL_PORT}
       EMAIL_USER: ${EMAIL_USER}
       EMAIL_PASS: ${EMAIL_PASS}
+    ports:
+      - "${AUTH_PORT}:${AUTH_PORT}"
     networks:
       - wealth_net
     logging: *default-logging
@@ -137,6 +141,8 @@ services:
       SUPABASE_KEY: ${SUPABASE_KEY}
       SUPABASE_URL: ${SUPABASE_URL}
       BUCKET_NAME: ${BUCKET_NAME}
+    ports:
+      - "${ASSET_PORT}:${ASSET_PORT}"
     networks:
       - wealth_net
     logging: *default-logging
@@ -163,6 +169,8 @@ services:
       AUTH_PORT: ${AUTH_PORT}
       CHANNEL_ACCESS_TOKEN: ${CHANNEL_ACCESS_TOKEN}
       FCM_CLIENT_FILE: ${FCM_CLIENT_FILE}
+    ports:
+      - "${NOTI_PORT}:${NOTI_PORT}"
     networks:
       - wealth_net
     logging: *default-logging
