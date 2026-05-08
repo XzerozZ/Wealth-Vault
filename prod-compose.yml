@@ -2,6 +2,8 @@ networks:
   wealth_net:
     name: wealth_vault_shared_net
     driver: bridge
+  gateway-nginx:
+    external: true
 
 x-logging: &default-logging
   driver: "json-file"
@@ -192,6 +194,7 @@ services:
       - "${APP_PORT}:${APP_PORT}"
     networks:
       - wealth_net
+      - gateway-nginx
     logging: *default-logging
 
 volumes:
