@@ -193,8 +193,10 @@ services:
     ports:
       - "${APP_PORT}:${APP_PORT}"
     networks:
-      - wealth_net
-      - gateway-nginx
+      wealth_net:      
+        aliases:
+          - api-gateway-internal
+      gateway-nginx:
     logging: *default-logging
 
 volumes:
