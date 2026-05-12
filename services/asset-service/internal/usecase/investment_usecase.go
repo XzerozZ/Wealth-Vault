@@ -126,6 +126,8 @@ func (u *InvestmentUsecase) UpdateInvestment(ctx context.Context, req *pb.Update
 		return nil, err
 	}
 
+	in.Amount = in.CostPerPrice * in.Quantity
+
 	syncParams := domain.FileSyncParams{
 		UserID:        uid,
 		EntityID:      id,

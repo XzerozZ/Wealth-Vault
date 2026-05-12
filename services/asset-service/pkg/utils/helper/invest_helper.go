@@ -47,11 +47,6 @@ func ApplyUpdateInFields(req *pb.UpdateInvestmentRequest, in *domain.Investment)
 				in.CostPerPrice = req.Invest.CostPrice
 			}
 
-		case "amount":
-			if req.Invest.Amount != 0 {
-				in.Amount = req.Invest.Amount
-			}
-
 		case "description":
 			if req.Invest.Description != "" {
 				in.Description = req.Invest.Description

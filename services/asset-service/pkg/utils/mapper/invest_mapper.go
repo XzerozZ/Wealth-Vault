@@ -33,6 +33,7 @@ func ToInvestmentDomain(req *pb.CreateInvestmentRequest, userID uuid.UUID) *doma
 		BrokerName:   req.BrokerName,
 		Quantity:     req.Quantity,
 		CostPerPrice: req.CostPrice,
+		Amount:       req.CostPrice * req.Quantity,
 		Description:  req.Description,
 		Files:        ToDomainFiles(req.NewFiles, userID),
 	}

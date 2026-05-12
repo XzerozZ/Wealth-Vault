@@ -197,13 +197,6 @@ func (h *InvestmentHandler) UpdateInvestment(c *fiber.Ctx) error {
 		}
 	}
 
-	if req.Amount != "" {
-		amount, err = utils.Parseamount(req.Amount)
-		if err != nil {
-			return err
-		}
-	}
-
 	inputType := strings.ToUpper(strings.TrimSpace(req.Type))
 	assetTypeEnum := pb.InvestmentType(mapper.SafeMapEnum(pb.InvestmentType_value, inputType, "INVEST_TYPE_"))
 	var newPbFiles []*pb.FileInfo
