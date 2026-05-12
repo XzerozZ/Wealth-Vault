@@ -121,7 +121,7 @@ services:
     logging: *default-logging
 
   asset-service:
-    image: ghcr.io/xzerozz/wealth-vault/asset-service:0.0.4
+    image: ghcr.io/xzerozz/wealth-vault/asset-service:0.0.5
     container_name: asset-service
     restart: unless-stopped
     depends_on:
@@ -176,7 +176,7 @@ services:
     logging: *default-logging
 
   api-gateway:
-    image: ghcr.io/xzerozz/wealth-vault/api-gateway:0.0.4
+    image: ghcr.io/xzerozz/wealth-vault/api-gateway:0.0.5
     container_name: api-gateway
     restart: unless-stopped
     depends_on:
