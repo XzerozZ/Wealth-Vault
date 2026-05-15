@@ -231,13 +231,13 @@ func (u *ShareItemUsecase) GrantAccess(ctx context.Context, req *pb.GrantAccessR
 }
 
 func (u *ShareItemUsecase) updateMessageToCompleted(groupID, ownerID, targetID uuid.UUID) {
-	newMeta, _ := json.Marshal(map[string]interface{}{
-		"is_action_required": true,
-		"is_completed":       true,
-		"target_user_id":     targetID.String(),
-		"type":               "GRANT_ACCESS_PROMPT",
-		"completed_at":       time.Now().Unix(),
-	})
+	updateData := map[string]interface{}{
+		"is_completed": true,
+		"completed_at": time.Now().Unix(),
+		"status":       "accepted",
+	}
+
+	newMeta, _ := json.Marshal(updateData)
 
 	err := u.msgRepo.UpdateGrantMessageStatus(context.Background(), groupID, ownerID, targetID, string(newMeta))
 	if err != nil {

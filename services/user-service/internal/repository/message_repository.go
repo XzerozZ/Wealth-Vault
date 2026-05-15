@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 	"wealth-vault/user-service/internal/domain"
 
@@ -83,35 +84,39 @@ func (r *MsgRepository) GetPrivateMessages(ctx context.Context, userID, friendID
 }
 
 func (r *MsgRepository) UpdateGrantMessageStatus(ctx context.Context, groupID, ownerID, targetID uuid.UUID, newMetadata string) error {
+	searchPattern := fmt.Sprintf(`{"target_user_ids": ["%s"]}`, targetID.String())
 	query := `
-        WITH target_msg AS (
-            SELECT id FROM group_messages
-            WHERE group_id = ? 
-            AND sender_id = ? 
-            AND metadata->>'target_user_id' = ? 
-            AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
-            AND (metadata->>'is_completed')::boolean = false
-        )
         UPDATE group_messages
-        SET metadata = ?, updated_at = NOW()
-        FROM target_msg
-        WHERE group_messages.id = target_msg.id
+        SET metadata = ?::jsonb, 
+            updated_at = NOW()
+        WHERE group_id = ? 
+        AND sender_id = ? 
+        AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
+        AND metadata @> ?::jsonb
+        AND (metadata->>'is_completed' = 'false' OR metadata->>'is_completed' IS NULL)
     `
-	result := r.db.WithContext(ctx).Exec(query, groupID, ownerID, targetID.String(), newMetadata)
+
+	result := r.db.WithContext(ctx).Exec(query,
+		newMetadata,
+		groupID,
+		ownerID,
+		searchPattern,
+	)
+
 	return result.Error
 }
 
 func (r *MsgRepository) CloseAllGrantPromptsForTarget(ctx context.Context, groupID, targetID uuid.UUID) error {
-	statusMeta := `{"is_action_required": true, "is_completed": true, "status": "member_left"}`
+	statusMeta := `{"is_action_required": true, "is_completed": true, "status": "member_left", "type": "GRANT_ACCESS_PROMPT"}`
 
 	query := `
         UPDATE group_messages 
-        SET metadata = ?::jsonb,
+        SET metadata = metadata || ?::jsonb,
             updated_at = NOW()
         WHERE group_id = ? 
-        AND metadata->>'target_user_id' = ? 
         AND metadata->>'type' = 'GRANT_ACCESS_PROMPT'
-        AND (metadata->>'is_completed')::boolean = false
+        AND jsonb_exists(metadata->'target_user_ids', ?)
+        AND (metadata->>'is_completed' = 'false' OR metadata->>'is_completed' IS NULL)
     `
 
 	return r.db.WithContext(ctx).Exec(query, statusMeta, groupID, targetID.String()).Error
