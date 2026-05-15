@@ -60,7 +60,7 @@ services:
     logging: *default-logging
 
   user-service:
-    image: ghcr.io/xzerozz/wealth-vault/user-service:0.0.4
+    image: ghcr.io/xzerozz/wealth-vault/user-service:0.0.5
     container_name: user-service
     restart: unless-stopped
     depends_on:
