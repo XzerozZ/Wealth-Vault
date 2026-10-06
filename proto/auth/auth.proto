@@ -18,6 +18,41 @@ message AuthResponse {
   string access_token = 2;
   string refresh_token = 3;
   string user_id = 4;
+  int32 access_token_expires_in = 5;
+}
+
+message LineExchangeRequest {
+  string id_token = 1;
+  string channel_id = 2;
+}
+
+message LineChallengeRequest {
+  string challenge_id = 1;
+  string channel_id = 2;
+  string action = 3;
+  string email = 4;
+  string password = 5;
+  string username = 6;
+  string first_name = 7;
+  string last_name = 8;
+}
+
+message LineAuthResponse {
+  string status = 1;
+  string challenge_id = 2;
+  string user_id = 3;
+  string display_name = 4;
+  string access_token = 5;
+  string refresh_token = 6;
+  int32 access_token_expires_in = 7;
+}
+
+message RevokeSessionRequest {
+  string refresh_token = 1;
+}
+
+message RevokeSessionResponse {
+  bool success = 1;
 }
 
 message RefreshTokenRequest {

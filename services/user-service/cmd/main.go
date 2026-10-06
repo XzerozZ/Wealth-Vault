@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net"
+	"os"
+	"time"
 	grpcclient "wealth-vault/user-service/client"
 	config "wealth-vault/user-service/configs"
 	userCron "wealth-vault/user-service/internal/delivery/cron"
@@ -23,6 +25,14 @@ import (
 )
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--healthcheck" {
+		conn, err := net.DialTimeout("tcp", "127.0.0.1:"+os.Getenv("GRPC_PORT"), time.Second)
+		if err != nil {
+			os.Exit(1)
+		}
+		_ = conn.Close()
+		return
+	}
 	cfg := config.LoadConfigs()
 	database.InitDB(cfg.PostgreSQL)
 	db := database.GetDB()

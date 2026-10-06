@@ -75,7 +75,7 @@ func (u *NotificationUsecase) HandleInsuranceExpiring(ctx context.Context, evt d
 			}
 		}
 
-		if lineUserID == "" {
+		if lineUserID == "" || u.lineClient == nil {
 			return
 		}
 

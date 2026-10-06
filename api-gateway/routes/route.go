@@ -28,6 +28,7 @@ func Setup(
 	infoHandler *handlers.InfoHandler,
 ) {
 	api := app.Group("/api")
+	api.Get("/health", func(c *fiber.Ctx) error { return c.JSON(fiber.Map{"status": "ok"}) })
 
 	auth := api.Group("/auth")
 	auth.Post("/register", authHandler.RegisterLocal)
@@ -38,6 +39,11 @@ func Setup(
 	auth.Post("/forgot/password", authHandler.ForgotPassword)
 	auth.Post("/forgot/otp", authHandler.VerifyForgotPasswordOTP)
 	auth.Patch("/reset/password", authHandler.ResetPassword)
+
+	liffAuth := api.Group("/v2/auth")
+	liffAuth.Post("/line/exchange", authHandler.ExchangeLine)
+	liffAuth.Post("/line/challenge/complete", authHandler.CompleteLineChallenge)
+	liffAuth.Post("/session/revoke", authHandler.RevokeLIFFSession)
 
 	api.Get("/user", middleware.JWTMiddleware(jwt), userHandler.GetUser)
 	api.Post("/user/search", middleware.JWTMiddleware(jwt), userHandler.GetUsersByEmail)

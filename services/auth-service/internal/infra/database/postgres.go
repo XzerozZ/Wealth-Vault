@@ -28,11 +28,15 @@ func InitDB(config configs.PostgreSQL) {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	_ = db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&domain.AuthAccount{},
 		&domain.AuthOTP{},
 		&domain.AuthSession{},
-	)
+		&domain.LineIdentity{},
+		&domain.LineChallenge{},
+	); err != nil {
+		log.Fatalf("Failed to migrate auth database: %v", err)
+	}
 
 	log.Println("Database connection established successfully!")
 }

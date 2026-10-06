@@ -44,10 +44,6 @@ func TestRefreshToken(t *testing.T) {
 			}, nil)
 
 		mockRepo.
-			On("RevokeSession", mock.Anything, refreshToken).
-			Return(nil)
-
-		mockRepo.
 			On("FindByID", mock.Anything, userID.String()).
 			Return(&domain.AuthAccount{
 				UserID: userID,
@@ -62,7 +58,7 @@ func TestRefreshToken(t *testing.T) {
 			Return("new_refresh_token", nil)
 
 		mockRepo.
-			On("CreateSession", mock.Anything, mock.AnythingOfType("*domain.AuthSession")).
+			On("RotateSession", mock.Anything, refreshToken, mock.AnythingOfType("*domain.AuthSession")).
 			Return(nil)
 
 		res, err := uc.RefreshToken(context.Background(), refreshToken)

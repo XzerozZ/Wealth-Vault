@@ -132,6 +132,12 @@ func TestAcceptFriend(t *testing.T) {
 		userRepo.
 			On("RemoveFriend", ctx, u1, u2).
 			Return(nil)
+		userRepo.
+			On("GetUser", ctx, u1).
+			Return(&domain.User{Username: "Alice"}, nil)
+		pub.
+			On("Publish", "noti.friend.decline", mock.Anything).
+			Return(nil)
 
 		res, err := uc.AcceptFriend(ctx, &pb.AcceptFriendRequest{
 			UserId:      u1.String(),
@@ -170,10 +176,24 @@ func TestAcceptFriend(t *testing.T) {
 		res, err := uc.AcceptFriend(ctx, &pb.AcceptFriendRequest{
 			UserId:      u1.String(),
 			RequesterId: u2.String(),
+			Action:      "ACCEPT",
 		})
 
 		assert.NoError(t, err)
 		assert.True(t, res.Success)
+	})
+
+	t.Run("unknown action cannot accept", func(t *testing.T) {
+		userRepo := new(mock_repo.MockUserRepository)
+		uc := usecase.NewUserUsecase(userRepo, nil, nil, nil, nil)
+		res, err := uc.AcceptFriend(ctx, &pb.AcceptFriendRequest{
+			UserId:      uuid.NewString(),
+			RequesterId: uuid.NewString(),
+			Action:      "reject",
+		})
+		assert.Nil(t, res)
+		assert.EqualError(t, err, "invalid friend action")
+		userRepo.AssertNotCalled(t, "UpdateFriendStatus", mock.Anything, mock.Anything, mock.Anything, mock.Anything)
 	})
 }
 

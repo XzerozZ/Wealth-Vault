@@ -4,6 +4,7 @@ import (
 	"context"
 	"regexp"
 	"testing"
+	"time"
 	"wealth-vault/auth-service/internal/domain"
 	"wealth-vault/auth-service/internal/repository"
 	testutil "wealth-vault/auth-service/test/testdb"
@@ -100,6 +101,37 @@ func TestRevokeSession(t *testing.T) {
 	err := repo.RevokeSession(context.Background(), token)
 
 	assert.NoError(t, err)
+}
+
+func TestRotateSessionAtomic(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		updated   int64
+		wantError bool
+	}{
+		{"first refresh wins", 1, false},
+		{"replayed refresh rejected", 0, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			mock := testutil.NewMockDB(t)
+			defer mock.Close()
+			repo := repository.NewAuthRepository(mock.DB)
+			next := &domain.AuthSession{ID: uuid.New(), UserID: uuid.New(), AccessToken: "next-access", RefreshToken: "next-refresh", RefreshExpiresAt: time.Now().Add(time.Hour)}
+			mock.Mock.ExpectBegin()
+			mock.Mock.ExpectExec(regexp.QuoteMeta(`UPDATE "auth_sessions" SET`)).WillReturnResult(sqlmock.NewResult(0, tc.updated))
+			if tc.wantError {
+				mock.Mock.ExpectRollback()
+			} else {
+				mock.Mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "auth_sessions"`)).WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(next.ID))
+				mock.Mock.ExpectCommit()
+			}
+			err := repo.RotateSession(context.Background(), "old-refresh", next)
+			if (err != nil) != tc.wantError {
+				t.Fatalf("err=%v", err)
+			}
+			assert.NoError(t, mock.Mock.ExpectationsWereMet())
+		})
+	}
 }
 
 func TestDeleteExpiredSessions(t *testing.T) {

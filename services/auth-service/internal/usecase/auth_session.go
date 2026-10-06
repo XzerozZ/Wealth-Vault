@@ -28,16 +28,19 @@ func (u *AuthUsecase) RefreshToken(ctx context.Context, refreshTokenStr string) 
 		return nil, fmt.Errorf("refresh token expired")
 	}
 
-	if err := u.authRepo.RevokeSession(ctx, refreshTokenStr); err != nil {
-		return nil, fmt.Errorf("failed to revoke old session: %w", err)
-	}
-
 	user, err := u.authRepo.FindByID(ctx, session.UserID.String())
 	if err != nil {
 		return nil, errors.New("user not found")
 	}
 
-	return u.GenerateTokensAndSession(ctx, user.UserID, user.Email)
+	next, output, err := u.newSession(user.UserID, user.Email)
+	if err != nil {
+		return nil, err
+	}
+	if err := u.authRepo.RotateSession(ctx, refreshTokenStr, next); err != nil {
+		return nil, fmt.Errorf("failed to rotate session: %w", err)
+	}
+	return output, nil
 }
 
 func (u *AuthUsecase) CleanupSessions(ctx context.Context) error {

@@ -31,6 +31,9 @@ func (j *AuthCronJob) Start() {
 	if _, err := j.cron.AddFunc("@every 1h", j.runCleanupOTP); err != nil {
 		log.Fatalf("Error adding OTP cleanup job: %v", err)
 	}
+	if _, err := j.cron.AddFunc("@every 1h", j.runCleanupLINE); err != nil {
+		log.Fatalf("Error adding LINE challenge cleanup job: %v", err)
+	}
 
 	j.cron.Start()
 	log.Println("Auth Cleanup Job started")
@@ -59,6 +62,14 @@ func (j *AuthCronJob) runCleanupOTP() {
 		log.Printf("Cleanup failed: %v\n", err)
 	} else {
 		log.Println("Cleanup completed successfully")
+	}
+}
+
+func (j *AuthCronJob) runCleanupLINE() {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	if err := j.usecase.DeleteExpiredLineChallenges(ctx); err != nil {
+		log.Printf("LINE challenge cleanup failed: %v", err)
 	}
 }
 

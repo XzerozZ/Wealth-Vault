@@ -39,6 +39,8 @@ type AuthUsecase struct {
 	token           token.Generator
 	mailclient      mail.NotificationClient
 	googleValidator google.GoogleTokenValidator
+	lineChannelID   string
+	lineVerifier    LineVerifier
 }
 
 func NewAuthUsecase(
@@ -66,16 +68,27 @@ func HashPassword(password string) (string, error) {
 }
 
 func (u *AuthUsecase) GenerateTokensAndSession(ctx context.Context, userID uuid.UUID, email string) (*domain.AuthOutput, error) {
+	session, output, err := u.newSession(userID, email)
+	if err != nil {
+		return nil, err
+	}
+	if err := u.authRepo.CreateSession(ctx, session); err != nil {
+		return nil, fmt.Errorf("failed to create session: %w", err)
+	}
+	return output, nil
+}
+
+func (u *AuthUsecase) newSession(userID uuid.UUID, email string) (*domain.AuthSession, *domain.AuthOutput, error) {
 	userIDStr := userID.String()
 
 	accessToken, err := u.token.CreateToken(userIDStr, email, TokenTypeAccess, AccessTokenTTL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create access token: %w", err)
+		return nil, nil, fmt.Errorf("failed to create access token: %w", err)
 	}
 
 	refreshToken, err := u.token.CreateToken(userIDStr, email, TokenTypeRefresh, RefreshTokenTTL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create refresh token: %w", err)
+		return nil, nil, fmt.Errorf("failed to create refresh token: %w", err)
 	}
 
 	session := &domain.AuthSession{
@@ -87,11 +100,7 @@ func (u *AuthUsecase) GenerateTokensAndSession(ctx context.Context, userID uuid.
 		Revoked:          false,
 	}
 
-	if err := u.authRepo.CreateSession(ctx, session); err != nil {
-		return nil, fmt.Errorf("failed to create session: %w", err)
-	}
-
-	return &domain.AuthOutput{
+	return session, &domain.AuthOutput{
 		UserID:       userIDStr,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,

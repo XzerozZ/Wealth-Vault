@@ -74,6 +74,9 @@ func (u *UserUsecase) AddFriend(ctx context.Context, req *pb.FriendRequest) (*pb
 }
 
 func (u *UserUsecase) AcceptFriend(ctx context.Context, req *pb.AcceptFriendRequest) (*pb.FriendResponse, error) {
+	if req.Action != "ACCEPT" && req.Action != "DECLINE" {
+		return nil, errors.New("invalid friend action")
+	}
 	currentUserID, err := utils.ParseUUID(req.UserId)
 	if err != nil {
 		return nil, err
@@ -86,7 +89,7 @@ func (u *UserUsecase) AcceptFriend(ctx context.Context, req *pb.AcceptFriendRequ
 
 	accepter, err := u.userRepo.GetUser(ctx, currentUserID)
 	accepterName := "Unknown"
-	if err == nil {
+	if err == nil && accepter != nil {
 		accepterName = accepter.Username
 	}
 

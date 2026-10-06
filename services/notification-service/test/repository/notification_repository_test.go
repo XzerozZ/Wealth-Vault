@@ -48,6 +48,8 @@ func TestNotificationRepository(t *testing.T) {
 				sqlmock.AnyArg(),
 				sqlmock.AnyArg(),
 				sqlmock.AnyArg(),
+				sqlmock.AnyArg(),
+				sqlmock.AnyArg(),
 			).
 			WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(item.ID))
 

@@ -19,4 +19,7 @@ service AuthService {
   rpc GetProviderAccount(GetProviderAccountRequest) returns (GetProviderAccountsResponse);
 
   rpc LinkLineAccount(LinkLineAccountRequest) returns (LinkAccountResponse);
+  rpc ExchangeLine(LineExchangeRequest) returns (LineAuthResponse);
+  rpc CompleteLineChallenge(LineChallengeRequest) returns (LineAuthResponse);
+  rpc RevokeSession(RevokeSessionRequest) returns (RevokeSessionResponse);
 }

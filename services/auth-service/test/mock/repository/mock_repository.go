@@ -47,6 +47,51 @@ func (m *MockAuthRepository) RevokeSession(ctx context.Context, refreshToken str
 	return args.Error(0)
 }
 
+func (m *MockAuthRepository) RotateSession(ctx context.Context, oldRefreshToken string, next *domain.AuthSession) error {
+	args := m.Called(ctx, oldRefreshToken, next)
+	return args.Error(0)
+}
+
+func (m *MockAuthRepository) FindLocalAccountByEmail(ctx context.Context, email string) (*domain.AuthAccount, error) {
+	args := m.Called(ctx, email)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.AuthAccount), args.Error(1)
+}
+
+func (m *MockAuthRepository) FindLineIdentity(ctx context.Context, channelID, subject string) (*domain.LineIdentity, error) {
+	args := m.Called(ctx, channelID, subject)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.LineIdentity), args.Error(1)
+}
+
+func (m *MockAuthRepository) SaveLineChallenge(ctx context.Context, challenge *domain.LineChallenge) error {
+	return m.Called(ctx, challenge).Error(0)
+}
+
+func (m *MockAuthRepository) ClaimLineChallenge(ctx context.Context, digest string) (*domain.LineChallenge, error) {
+	args := m.Called(ctx, digest)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.LineChallenge), args.Error(1)
+}
+
+func (m *MockAuthRepository) ReleaseLineChallenge(ctx context.Context, digest string) error {
+	return m.Called(ctx, digest).Error(0)
+}
+
+func (m *MockAuthRepository) LinkLineIdentity(ctx context.Context, identity *domain.LineIdentity) error {
+	return m.Called(ctx, identity).Error(0)
+}
+
+func (m *MockAuthRepository) DeleteExpiredLineChallenges(ctx context.Context) error {
+	return m.Called(ctx).Error(0)
+}
+
 func (m *MockAuthRepository) GetValidOTP(ctx context.Context, userID uuid.UUID, code string) (*domain.AuthOTP, error) {
 	args := m.Called(ctx, userID, code)
 	return args.Get(0).(*domain.AuthOTP), args.Error(1)

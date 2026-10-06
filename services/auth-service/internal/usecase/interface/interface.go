@@ -19,4 +19,8 @@ type AuthUsecase interface {
 	DeleteExpiredOTPs(ctx context.Context) error
 
 	GetAllProviderAccounts(ctx context.Context, userID string) ([]domain.AuthAccount, error)
+	ExchangeLine(ctx context.Context, rawIDToken, channelID string) (*domain.LineAuthResult, error)
+	CompleteLineChallenge(ctx context.Context, input domain.LineChallengeInput) (*domain.LineAuthResult, error)
+	RevokeRefreshSession(ctx context.Context, refreshToken string) error
+	DeleteExpiredLineChallenges(ctx context.Context) error
 }

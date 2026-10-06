@@ -36,3 +36,44 @@ type AuthSession struct {
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
 }
+
+// LIFF identities are separate from legacy provider accounts so existing Kotlin
+// LINE links remain untouched during the migration.
+type LineIdentity struct {
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	ChannelID string    `gorm:"type:varchar(80);not null;uniqueIndex:idx_line_channel_subject"`
+	Subject   string    `gorm:"type:varchar(255);not null;uniqueIndex:idx_line_channel_subject"`
+	UserID    uuid.UUID `gorm:"type:uuid;not null;index"`
+	CreatedAt time.Time
+}
+
+type LineChallenge struct {
+	Digest     string    `gorm:"type:varchar(64);primaryKey"`
+	ChannelID  string    `gorm:"type:varchar(80);not null"`
+	Subject    string    `gorm:"type:varchar(255);not null"`
+	ExpiresAt  time.Time `gorm:"not null;index"`
+	ConsumedAt *time.Time
+	Attempts   int `gorm:"not null;default:0"`
+	CreatedAt  time.Time
+}
+
+type LineAuthResult struct {
+	Status               string
+	ChallengeID          string
+	UserID               string
+	DisplayName          string
+	AccessToken          string
+	RefreshToken         string
+	AccessTokenExpiresIn int32
+}
+
+type LineChallengeInput struct {
+	ChallengeID string
+	ChannelID   string
+	Action      string
+	Email       string
+	Password    string
+	Username    string
+	FirstName   string
+	LastName    string
+}

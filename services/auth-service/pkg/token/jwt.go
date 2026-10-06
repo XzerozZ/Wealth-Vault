@@ -1,6 +1,8 @@
 package token
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"time"
 
@@ -18,11 +20,16 @@ func NewJWTGenerate(secret string) *JWTGenerate {
 }
 
 func (j *JWTGenerate) CreateToken(userID string, email string, tokenType string, duration time.Duration) (string, error) {
+	nonce := make([]byte, 16)
+	if _, err := rand.Read(nonce); err != nil {
+		return "", err
+	}
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"email":   email,
 		"type":    tokenType,
 		"exp":     time.Now().Add(duration).Unix(),
+		"jti":     hex.EncodeToString(nonce),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

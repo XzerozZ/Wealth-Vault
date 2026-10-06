@@ -18,9 +18,9 @@ services:
       POSTGRES_PASSWORD: admin123
       POSTGRES_DB: wealthvault
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data 
+      - postgres_liff_local_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - wealth_net
@@ -35,7 +35,7 @@ services:
     image: dpage/pgadmin4:8.4
     container_name: pgadmin_wealth
     ports:
-      - "5050:80"
+      - "127.0.0.1:5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -51,9 +51,40 @@ services:
     image: nats:2.10-alpine
     container_name: nats-server
     ports:
-      - "4222:4222"
-      - "8222:8222"
-    command: ["-js"]
+      - "127.0.0.1:4222:4222"
+      - "127.0.0.1:8222:8222"
+    command: ["-js", "-m", "8222"]
+    networks:
+      - wealth_net
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8222/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - wealth_net
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
     networks:
       - wealth_net
     logging: *default-logging
@@ -67,11 +98,24 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      nats-server:
+        condition: service_healthy
     env_file:
       - ./services/user-service/.user.env
+    environment:
+      APP_ENV: local
+      EMAIL_HOST: mailpit
+      EMAIL_PORT: "1025"
+      EMAIL_USER: dev@wealthvault.invalid
+      EMAIL_PASS: local-only
     networks:
       - wealth_net
     logging: *default-logging
+    healthcheck:
+      test: ["CMD", "/app/user-service", "--healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   auth-service:
     build:
@@ -83,12 +127,27 @@ services:
       postgres:
         condition: service_healthy
       nats-server:
-        condition: service_started
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
     env_file:
       - ./services/auth-service/.auth.env
+    environment:
+      APP_ENV: local
+      USER_HOST: user-service
+      USER_PORT: ${USER_PORT}
+      EMAIL_HOST: mailpit
+      EMAIL_PORT: "1025"
+      EMAIL_USER: dev@wealthvault.invalid
+      EMAIL_PASS: local-only
     networks:
       - wealth_net
     logging: *default-logging
+    healthcheck:
+      test: ["CMD", "/app/auth-service", "--healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   asset-service:
     build:
@@ -99,11 +158,22 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      nats-server:
+        condition: service_healthy
     env_file:
       - ./services/asset-service/.asset.env
+    environment:
+      APP_ENV: local
+      USER_HOST: user-service
+      USER_PORT: ${USER_PORT}
     networks:
       - wealth_net
     logging: *default-logging
+    healthcheck:
+      test: ["CMD", "/app/asset-service", "--healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   notification-service:
     build:
@@ -115,12 +185,21 @@ services:
       postgres:
         condition: service_healthy
       nats-server:
-        condition: service_started
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
     env_file:
       - ./services/notification-service/.noti.env
+    environment:
+      APP_ENV: local
     networks:
       - wealth_net
     logging: *default-logging
+    healthcheck:
+      test: ["CMD", "/app/notification-service", "--healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   api-gateway:
     build:
@@ -129,17 +208,21 @@ services:
     container_name: api-gateway
     restart: unless-stopped
     depends_on:
-      - notification-service
-      - user-service
-      - auth-service
-      - asset-service
+      notification-service:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      asset-service:
+        condition: service_healthy
     env_file:
       - ./api-gateway/.env
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     networks:
       - wealth_net
     logging: *default-logging
 
 volumes:
-  postgres_data:
+  postgres_liff_local_data:

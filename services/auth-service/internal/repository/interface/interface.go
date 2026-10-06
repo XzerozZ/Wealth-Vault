@@ -15,6 +15,7 @@ type AuthRepository interface {
 	CreateSession(ctx context.Context, session *domain.AuthSession) error
 	GetSessionByRefreshToken(ctx context.Context, refreshToken string) (*domain.AuthSession, error)
 	RevokeSession(ctx context.Context, refreshToken string) error
+	RotateSession(ctx context.Context, oldRefreshToken string, next *domain.AuthSession) error
 	GetValidOTP(ctx context.Context, userID uuid.UUID, code string) (*domain.AuthOTP, error)
 	DeleteOTP(ctx context.Context, userID uuid.UUID) error
 	UpdatePassword(ctx context.Context, userID uuid.UUID, newHash string) error
@@ -23,4 +24,11 @@ type AuthRepository interface {
 
 	FindByUserIDAndProvider(ctx context.Context, userID uuid.UUID, provider string) (*domain.AuthAccount, error)
 	FindAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.AuthAccount, error)
+	FindLocalAccountByEmail(ctx context.Context, email string) (*domain.AuthAccount, error)
+	FindLineIdentity(ctx context.Context, channelID, subject string) (*domain.LineIdentity, error)
+	SaveLineChallenge(ctx context.Context, challenge *domain.LineChallenge) error
+	ClaimLineChallenge(ctx context.Context, digest string) (*domain.LineChallenge, error)
+	ReleaseLineChallenge(ctx context.Context, digest string) error
+	LinkLineIdentity(ctx context.Context, identity *domain.LineIdentity) error
+	DeleteExpiredLineChallenges(ctx context.Context) error
 }

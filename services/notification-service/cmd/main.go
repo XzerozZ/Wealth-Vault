@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"net"
+	"os"
+	"time"
 	grpcclient "wealth-vault/notification-service/client"
 	"wealth-vault/notification-service/configs"
 	"wealth-vault/notification-service/internal/delivery/http"
@@ -10,6 +13,7 @@ import (
 	line "wealth-vault/notification-service/internal/infra/line"
 	"wealth-vault/notification-service/internal/infra/nats"
 	push_provider "wealth-vault/notification-service/internal/infra/push_provider"
+	push_interface "wealth-vault/notification-service/internal/infra/push_provider/interface"
 	socket "wealth-vault/notification-service/internal/infra/socket"
 	"wealth-vault/notification-service/internal/repository"
 	"wealth-vault/notification-service/internal/usecase"
@@ -19,6 +23,14 @@ import (
 )
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "--healthcheck" {
+		conn, err := net.DialTimeout("tcp", "127.0.0.1:"+os.Getenv("NOTI_PORT"), time.Second)
+		if err != nil {
+			os.Exit(1)
+		}
+		_ = conn.Close()
+		return
+	}
 	cfg := configs.LoadConfigs()
 	database.InitDB(cfg.PostgreSQL)
 	db := database.GetDB()
@@ -29,9 +41,13 @@ func main() {
 	nc, _ := nats.NewNATSConnection(cfg.NATS.Host, cfg.NATS.Port)
 	hub := socket.NewSocketHub()
 
-	fcmClient, err := push_provider.NewFCMProvider(cfg.FCM.CredentialsFile)
-	if err != nil {
-		log.Fatalf("Failed to initialize FCM: %v", err)
+	var fcmClient push_interface.PushProvider
+	if os.Getenv("APP_ENV") != "local" {
+		fcm, err := push_provider.NewFCMProvider(cfg.FCM.CredentialsFile)
+		if err != nil {
+			log.Fatalf("Failed to initialize FCM: %v", err)
+		}
+		fcmClient = fcm
 	}
 
 	authClient, err := grpcclient.NewAuthClient(cfg.AuthService.Host, cfg.AuthService.Port)
@@ -39,7 +55,10 @@ func main() {
 		log.Fatal("auth service:", err)
 	}
 
-	lineAPIClient := line.NewLineClient(cfg.Line.Token)
+	var lineAPIClient line.LineClient
+	if os.Getenv("APP_ENV") != "local" {
+		lineAPIClient = line.NewLineClient(cfg.Line.Token)
+	}
 
 	// ------ repository ------
 	notiRepo := repository.NewNotificationRepository(db)

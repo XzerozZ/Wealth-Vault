@@ -15,9 +15,10 @@ func (h *AuthGRPCHandler) RefreshToken(ctx context.Context, req *pb.RefreshToken
 	}
 
 	return &pb.AuthResponse{
-		Success:      true,
-		UserId:       output.UserID,
-		AccessToken:  output.AccessToken,
-		RefreshToken: output.RefreshToken,
+		Success:              true,
+		UserId:               output.UserID,
+		AccessToken:          output.AccessToken,
+		RefreshToken:         output.RefreshToken,
+		AccessTokenExpiresIn: 900,
 	}, nil
 }

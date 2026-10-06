@@ -6,6 +6,7 @@ import (
 	"log"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"wealth-vault/api-gateway/internal/domain"
@@ -236,6 +237,14 @@ func (h *UserHandler) AcceptFriend(c *fiber.Ctx) error {
 	var req domain.AcceptFriendRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+	switch strings.ToUpper(strings.TrimSpace(req.Action)) {
+	case "ACCEPT":
+		req.Action = "ACCEPT"
+	case "DECLINE", "REJECT":
+		req.Action = "DECLINE"
+	default:
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid_friend_action"})
 	}
 
 	ctx, cancel := context.WithTimeout(c.UserContext(), 3*time.Second)
