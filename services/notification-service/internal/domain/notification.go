@@ -25,3 +25,9 @@ type Notification struct {
 	UpdatedAt  time.Time
 	IsRead     bool ` gorm:"default:false"`
 }
+
+type NotificationPreference struct {
+	UserID      uuid.UUID `gorm:"type:uuid;primaryKey"`
+	LineEnabled bool      `gorm:"not null;default:false"`
+	UpdatedAt   time.Time
+}

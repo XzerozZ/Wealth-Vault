@@ -28,10 +28,13 @@ func InitDB(config configs.PostgreSQL) {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	_ = db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&domain.Notification{},
+		&domain.NotificationPreference{},
 		&domain.DeviceToken{},
-	)
+	); err != nil {
+		log.Fatalf("Failed to migrate notification database: %v", err)
+	}
 
 	log.Println("Database connection established successfully!")
 }

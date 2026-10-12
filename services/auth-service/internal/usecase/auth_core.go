@@ -88,6 +88,16 @@ func (u *AuthUsecase) GetAllProviderAccounts(ctx context.Context, userID string)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get provider accounts: %w", err)
 	}
+	if u.lineChannelID != "" {
+		identity, err := u.authRepo.FindLineIdentityByUserID(ctx, uid, u.lineChannelID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get LINE identity: %w", err)
+		}
+		if identity != nil {
+			// Prefer the verified LIFF identity over any legacy LINE provider account.
+			accounts = append(accounts, domain.AuthAccount{UserID: uid, Provider: ProviderLine, ProviderAccountID: identity.Subject})
+		}
+	}
 
 	return accounts, nil
 }

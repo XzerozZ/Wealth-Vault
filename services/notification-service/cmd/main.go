@@ -56,7 +56,8 @@ func main() {
 	}
 
 	var lineAPIClient line.LineClient
-	if os.Getenv("APP_ENV") != "local" {
+	lineEnabled := os.Getenv("LINE_NOTIFICATIONS_ENABLED") == "true"
+	if lineEnabled && cfg.Line.Token != "" {
 		lineAPIClient = line.NewLineClient(cfg.Line.Token)
 	}
 
@@ -67,7 +68,10 @@ func main() {
 	dispatcher := push_provider.NewDispatcher(fcmClient, nil, deviceRepo)
 
 	deviceUC := usecase.NewDeviceUsecase(deviceRepo)
-	notiUC := usecase.NewNotificationUsecase(notiRepo, deviceRepo, hub, dispatcher, lineAPIClient, authClient)
+	notiUC := usecase.NewNotificationUsecase(notiRepo, deviceRepo, hub, dispatcher, lineAPIClient, authClient, usecase.LineOptions{
+		Enabled: lineEnabled,
+		LiffURL: os.Getenv("LINE_LIFF_URL"),
+	})
 
 	worker.StartConsumer(nc, notiUC)
 
@@ -86,6 +90,8 @@ func main() {
 
 	notiGroup := app.Group("/notifications")
 	notiGroup.Get("/", notiHandler.GetNotifications)
+	notiGroup.Get("/line-settings", notiHandler.GetLineSettings)
+	notiGroup.Put("/line-settings", notiHandler.SetLineSettings)
 	notiGroup.Put("/read-all", notiHandler.MarkAllAsRead)
 	notiGroup.Put("/:id/read", notiHandler.MarkAsRead)
 

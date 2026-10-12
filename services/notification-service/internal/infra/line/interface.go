@@ -1,5 +1,7 @@
 package line
 
+import "context"
+
 type LineClient interface {
-	SendTextMessage(to string, text string) error
+	SendTextMessage(ctx context.Context, to string, text string, retryKey string) error
 }

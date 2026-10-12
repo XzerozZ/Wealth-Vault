@@ -1,12 +1,16 @@
 package mock
 
-import "github.com/stretchr/testify/mock"
+import (
+	"context"
+
+	"github.com/stretchr/testify/mock"
+)
 
 type MockLineClient struct {
 	mock.Mock
 }
 
-func (m *MockLineClient) SendTextMessage(to string, text string) error {
-	args := m.Called(to, text)
+func (m *MockLineClient) SendTextMessage(ctx context.Context, to string, text string, retryKey string) error {
+	args := m.Called(ctx, to, text, retryKey)
 	return args.Error(0)
 }

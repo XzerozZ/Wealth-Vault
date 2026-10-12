@@ -222,7 +222,7 @@ func TestNotificationUsecase(t *testing.T) {
 		authClient := new(mock_client.MockAuthClient)
 		lineClient := new(mock_line.MockLineClient)
 
-		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient)
+		uc := usecase.NewNotificationUsecase(repo, drepo, hub, dispatch, lineClient, authClient, usecase.LineOptions{Enabled: true, LiffURL: "https://liff.line.me/test"})
 
 		ctx := context.Background()
 		userID := uuid.New()
@@ -238,6 +238,7 @@ func TestNotificationUsecase(t *testing.T) {
 		}
 
 		repo.On("CreateNotification", ctx, mock.Anything).Return(nil).Once()
+		repo.On("GetLineEnabled", mock.Anything, userID).Return(true, nil).Once()
 		hub.On("IsOnline", userID.String()).Return(false).Once()
 		dispatch.On("SendToUser",
 			mock.Anything,
@@ -266,7 +267,7 @@ func TestNotificationUsecase(t *testing.T) {
 			return req.UserId == userID.String()
 		})).Return(mockGrpcResponse, nil).Once()
 
-		lineClient.On("SendTextMessage", lineID, mock.AnythingOfType("string")).Return(nil).Once()
+		lineClient.On("SendTextMessage", mock.Anything, lineID, mock.AnythingOfType("string"), mock.AnythingOfType("string")).Return(nil).Once()
 		err := uc.HandleInsuranceExpiring(ctx, evt)
 		assert.NoError(t, err)
 		time.Sleep(150 * time.Millisecond)

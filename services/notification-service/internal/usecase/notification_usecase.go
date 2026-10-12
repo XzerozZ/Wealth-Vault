@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"time"
 	"wealth-vault/notification-service/internal/domain"
 	line "wealth-vault/notification-service/internal/infra/line"
@@ -17,12 +18,18 @@ import (
 )
 
 type NotificationUsecase struct {
-	repo       repo.NotificationRepository
-	drepo      repo.DeviceRepository
-	hub        socket.ISocketHub
-	dispatch   dispatch.Dispatcher
-	lineClient line.LineClient
-	authClient pb.AuthServiceClient
+	repo        repo.NotificationRepository
+	drepo       repo.DeviceRepository
+	hub         socket.ISocketHub
+	dispatch    dispatch.Dispatcher
+	lineClient  line.LineClient
+	authClient  pb.AuthServiceClient
+	lineOptions LineOptions
+}
+
+type LineOptions struct {
+	Enabled bool
+	LiffURL string
 }
 
 func NewNotificationUsecase(
@@ -32,8 +39,9 @@ func NewNotificationUsecase(
 	dispatch dispatch.Dispatcher,
 	lineClient line.LineClient,
 	authClient pb.AuthServiceClient,
+	options ...LineOptions,
 ) *NotificationUsecase {
-	return &NotificationUsecase{
+	u := &NotificationUsecase{
 		repo:       repo,
 		drepo:      drepo,
 		hub:        hub,
@@ -41,6 +49,10 @@ func NewNotificationUsecase(
 		lineClient: lineClient,
 		authClient: authClient,
 	}
+	if len(options) > 0 {
+		u.lineOptions = options[0]
+	}
+	return u
 }
 
 func (u *NotificationUsecase) GetHistory(ctx context.Context, uid uuid.UUID) ([]domain.Notification, error) {
@@ -58,6 +70,18 @@ func (u *NotificationUsecase) MarkAsRead(ctx context.Context, notiID uuid.UUID, 
 
 func (u *NotificationUsecase) MarkAllAsRead(ctx context.Context, receiverID uuid.UUID) error {
 	return u.repo.MarkAllAsRead(ctx, receiverID)
+}
+
+func (u *NotificationUsecase) GetLineEnabled(ctx context.Context, userID uuid.UUID) (bool, error) {
+	return u.repo.GetLineEnabled(ctx, userID)
+}
+
+func (u *NotificationUsecase) SetLineEnabled(ctx context.Context, userID uuid.UUID, enabled bool) error {
+	return u.repo.SetLineEnabled(ctx, userID, enabled)
+}
+
+func (u *NotificationUsecase) LineAvailable() bool {
+	return u.lineOptions.Enabled && u.lineClient != nil && u.authClient != nil && strings.HasPrefix(u.lineOptions.LiffURL, "https://liff.line.me/")
 }
 
 func (u *NotificationUsecase) emitToUser(userID string, event string, payload interface{}) {
@@ -118,8 +142,9 @@ func (u *NotificationUsecase) notifyTarget(
 			Payload: noti,
 		})
 	} else {
-		go u.sendPush(ctx, receiverID, message, noti)
+		go u.sendPush(context.Background(), receiverID, message, noti)
 	}
+	u.queueLineNotification(noti)
 
 	return nil
 }

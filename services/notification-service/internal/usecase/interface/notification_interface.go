@@ -22,4 +22,7 @@ type NotificationUsecase interface {
 	GetHistory(ctx context.Context, userID uuid.UUID) ([]domain.Notification, error)
 	MarkAsRead(ctx context.Context, notificationID uuid.UUID, receiverID uuid.UUID) error
 	MarkAllAsRead(ctx context.Context, receiverID uuid.UUID) error
+	GetLineEnabled(ctx context.Context, userID uuid.UUID) (bool, error)
+	SetLineEnabled(ctx context.Context, userID uuid.UUID, enabled bool) error
+	LineAvailable() bool
 }

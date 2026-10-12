@@ -186,6 +186,24 @@ func TestLogin(t *testing.T) {
 }
 
 func TestGetAllProviderAccounts(t *testing.T) {
+	t.Run("includes verified LIFF identity for notification lookup", func(t *testing.T) {
+		mockRepo := new(mock_repo.MockAuthRepository)
+		uc := usecase.NewAuthUsecase(mockRepo, nil, nil, nil, nil)
+		uc.ConfigureLINE("liff-channel", nil)
+		userID := uuid.New()
+		ctx := context.Background()
+		mockRepo.On("FindAllByUserID", ctx, userID).Return([]domain.AuthAccount{{UserID: userID, Provider: "local"}}, nil).Once()
+		mockRepo.On("FindLineIdentityByUserID", ctx, userID, "liff-channel").Return(&domain.LineIdentity{UserID: userID, ChannelID: "liff-channel", Subject: "U0123456789abcdef0123456789abcdef"}, nil).Once()
+
+		accounts, err := uc.GetAllProviderAccounts(ctx, userID.String())
+
+		assert.NoError(t, err)
+		assert.Len(t, accounts, 2)
+		assert.Equal(t, "line", accounts[1].Provider)
+		assert.Equal(t, "U0123456789abcdef0123456789abcdef", accounts[1].ProviderAccountID)
+		mockRepo.AssertExpectations(t)
+	})
+
 	t.Run("success", func(t *testing.T) {
 		mockRepo := new(mock_repo.MockAuthRepository)
 		uc := usecase.NewAuthUsecase(mockRepo, nil, nil, nil, nil)

@@ -40,11 +40,16 @@ type LineVerifier interface {
 
 type LINEIDTokenVerifier struct{ client *http.Client }
 
+const lineAccessTokenPrefix = "line_access_token:"
+
 func NewLINEIDTokenVerifier() *LINEIDTokenVerifier {
 	return &LINEIDTokenVerifier{client: &http.Client{Timeout: 5 * time.Second, CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }}}
 }
 
 func (v *LINEIDTokenVerifier) Verify(ctx context.Context, rawIDToken, expectedChannelID string) (*VerifiedLineIdentity, error) {
+	if strings.HasPrefix(rawIDToken, lineAccessTokenPrefix) {
+		return v.verifyAccessToken(ctx, strings.TrimPrefix(rawIDToken, lineAccessTokenPrefix), expectedChannelID)
+	}
 	if len(rawIDToken) < 20 || len(rawIDToken) > 6000 || expectedChannelID == "" {
 		return nil, ErrLineRejected
 	}
@@ -80,6 +85,68 @@ func (v *LINEIDTokenVerifier) Verify(ctx context.Context, rawIDToken, expectedCh
 		return nil, ErrLineRejected
 	}
 	return &VerifiedLineIdentity{Subject: claims.Subject, Email: strings.ToLower(strings.TrimSpace(claims.Email)), DisplayName: strings.TrimSpace(claims.Name)}, nil
+}
+
+// LIFF may retain an expired ID token when reopened from LINE's recent tabs.
+// A current LINE access token is independently verified before reading userinfo.
+func (v *LINEIDTokenVerifier) verifyAccessToken(ctx context.Context, accessToken, expectedChannelID string) (*VerifiedLineIdentity, error) {
+	if len(accessToken) < 20 || len(accessToken) > 6000 || expectedChannelID == "" {
+		return nil, ErrLineRejected
+	}
+	verifyURL := "https://api.line.me/oauth2/v2.1/verify?access_token=" + url.QueryEscape(accessToken)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, verifyURL, nil)
+	if err != nil {
+		return nil, ErrLineUnavailable
+	}
+	response, err := v.client.Do(request)
+	if err != nil {
+		return nil, ErrLineUnavailable
+	}
+	defer response.Body.Close()
+	if response.StatusCode == http.StatusBadRequest || response.StatusCode == http.StatusUnauthorized {
+		return nil, ErrLineRejected
+	}
+	if response.StatusCode != http.StatusOK {
+		return nil, ErrLineUnavailable
+	}
+	var verified struct {
+		ChannelID string `json:"client_id"`
+		ExpiresIn int64  `json:"expires_in"`
+	}
+	if err := json.NewDecoder(io.LimitReader(response.Body, 16_384)).Decode(&verified); err != nil {
+		return nil, ErrLineUnavailable
+	}
+	if verified.ChannelID != expectedChannelID || verified.ExpiresIn <= 0 {
+		return nil, ErrLineRejected
+	}
+
+	profileRequest, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://api.line.me/oauth2/v2.1/userinfo", nil)
+	if err != nil {
+		return nil, ErrLineUnavailable
+	}
+	profileRequest.Header.Set("Authorization", "Bearer "+accessToken)
+	profileResponse, err := v.client.Do(profileRequest)
+	if err != nil {
+		return nil, ErrLineUnavailable
+	}
+	defer profileResponse.Body.Close()
+	if profileResponse.StatusCode == http.StatusBadRequest || profileResponse.StatusCode == http.StatusUnauthorized || profileResponse.StatusCode == http.StatusForbidden {
+		return nil, ErrLineRejected
+	}
+	if profileResponse.StatusCode != http.StatusOK {
+		return nil, ErrLineUnavailable
+	}
+	var profile struct {
+		Subject string `json:"sub"`
+		Name    string `json:"name"`
+	}
+	if err := json.NewDecoder(io.LimitReader(profileResponse.Body, 16_384)).Decode(&profile); err != nil {
+		return nil, ErrLineUnavailable
+	}
+	if profile.Subject == "" {
+		return nil, ErrLineRejected
+	}
+	return &VerifiedLineIdentity{Subject: profile.Subject, DisplayName: strings.TrimSpace(profile.Name)}, nil
 }
 
 func (u *AuthUsecase) ConfigureLINE(channelID string, verifier LineVerifier) {

@@ -93,6 +93,38 @@ func (h *Handler) GetNotifications(c *fiber.Ctx) error {
 	})
 }
 
+func (h *Handler) GetLineSettings(c *fiber.Ctx) error {
+	userID, err := uuid.Parse(c.Get("X-User-ID"))
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+	enabled, err := h.uc.GetLineEnabled(c.Context(), userID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "could not load LINE settings"})
+	}
+	return c.JSON(fiber.Map{"data": fiber.Map{"enabled": enabled, "available": h.uc.LineAvailable()}})
+}
+
+func (h *Handler) SetLineSettings(c *fiber.Ctx) error {
+	userID, err := uuid.Parse(c.Get("X-User-ID"))
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "unauthorized"})
+	}
+	var body struct {
+		Enabled *bool `json:"enabled"`
+	}
+	if err := c.BodyParser(&body); err != nil || body.Enabled == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "enabled must be a boolean"})
+	}
+	if *body.Enabled && !h.uc.LineAvailable() {
+		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{"error": "LINE notifications are not configured"})
+	}
+	if err := h.uc.SetLineEnabled(c.Context(), userID, *body.Enabled); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "could not save LINE settings"})
+	}
+	return c.JSON(fiber.Map{"data": fiber.Map{"enabled": *body.Enabled}})
+}
+
 func (h *Handler) MarkAsRead(c *fiber.Ctx) error {
 	userID := c.Get("X-User-ID")
 	if userID == "" {

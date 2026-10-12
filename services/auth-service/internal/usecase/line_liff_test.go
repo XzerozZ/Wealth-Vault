@@ -52,6 +52,49 @@ func TestLINEIDTokenVerifier(t *testing.T) {
 	}
 }
 
+func TestLINEAccessTokenVerifier(t *testing.T) {
+	accessToken := strings.Repeat("a", 40)
+	profileCalled := false
+	verifier := &LINEIDTokenVerifier{client: &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		switch req.URL.Path {
+		case "/oauth2/v2.1/verify":
+			if req.Method != http.MethodGet || req.URL.Query().Get("access_token") != accessToken {
+				t.Fatal("incorrect access-token verification request")
+			}
+			return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader(`{"client_id":"test-channel","expires_in":3600}`)), Header: make(http.Header)}, nil
+		case "/oauth2/v2.1/userinfo":
+			profileCalled = true
+			if req.Header.Get("Authorization") != "Bearer "+accessToken {
+				t.Fatal("userinfo request did not use verified token")
+			}
+			return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader(`{"sub":"line-subject","name":"Tester"}`)), Header: make(http.Header)}, nil
+		default:
+			t.Fatal("unexpected LINE endpoint")
+			return nil, nil
+		}
+	})}}
+	identity, err := verifier.Verify(context.Background(), lineAccessTokenPrefix+accessToken, "test-channel")
+	if err != nil || !profileCalled || identity.Subject != "line-subject" || identity.DisplayName != "Tester" {
+		t.Fatalf("identity=%+v err=%v", identity, err)
+	}
+
+	for _, response := range []string{
+		`{"client_id":"wrong-channel","expires_in":3600}`,
+		`{"client_id":"test-channel","expires_in":0}`,
+	} {
+		profileCalled = false
+		rejected := &LINEIDTokenVerifier{client: &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+			if req.URL.Path == "/oauth2/v2.1/userinfo" {
+				profileCalled = true
+			}
+			return &http.Response{StatusCode: 200, Body: io.NopCloser(strings.NewReader(response)), Header: make(http.Header)}, nil
+		})}}
+		if _, err := rejected.Verify(context.Background(), lineAccessTokenPrefix+accessToken, "test-channel"); err != ErrLineRejected || profileCalled {
+			t.Fatalf("invalid access token metadata was accepted: err=%v profileCalled=%v", err, profileCalled)
+		}
+	}
+}
+
 func intToString(value int64) string { return strconv.FormatInt(value, 10) }
 
 type lineVerifierFunc func(context.Context, string, string) (*VerifiedLineIdentity, error)

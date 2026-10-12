@@ -111,6 +111,18 @@ func (r *AuthRepository) FindLineIdentity(ctx context.Context, channelID, subjec
 	return &identity, nil
 }
 
+func (r *AuthRepository) FindLineIdentityByUserID(ctx context.Context, userID uuid.UUID, channelID string) (*domain.LineIdentity, error) {
+	var identity domain.LineIdentity
+	err := r.db.WithContext(ctx).Where("user_id = ? AND channel_id = ?", userID, channelID).First(&identity).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &identity, nil
+}
+
 func (r *AuthRepository) SaveLineChallenge(ctx context.Context, challenge *domain.LineChallenge) error {
 	return r.db.WithContext(ctx).Create(challenge).Error
 }

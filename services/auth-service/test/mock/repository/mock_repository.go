@@ -68,6 +68,14 @@ func (m *MockAuthRepository) FindLineIdentity(ctx context.Context, channelID, su
 	return args.Get(0).(*domain.LineIdentity), args.Error(1)
 }
 
+func (m *MockAuthRepository) FindLineIdentityByUserID(ctx context.Context, userID uuid.UUID, channelID string) (*domain.LineIdentity, error) {
+	args := m.Called(ctx, userID, channelID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*domain.LineIdentity), args.Error(1)
+}
+
 func (m *MockAuthRepository) SaveLineChallenge(ctx context.Context, challenge *domain.LineChallenge) error {
 	return m.Called(ctx, challenge).Error(0)
 }

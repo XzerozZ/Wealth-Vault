@@ -3,14 +3,33 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"wealth-vault/notification-service/internal/domain"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type NotificationRepository struct {
 	db *gorm.DB
+}
+
+func (r *NotificationRepository) GetLineEnabled(ctx context.Context, userID uuid.UUID) (bool, error) {
+	var preference domain.NotificationPreference
+	err := r.db.WithContext(ctx).Where("user_id = ?", userID).First(&preference).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return false, nil
+	}
+	return preference.LineEnabled, err
+}
+
+func (r *NotificationRepository) SetLineEnabled(ctx context.Context, userID uuid.UUID, enabled bool) error {
+	preference := domain.NotificationPreference{UserID: userID, LineEnabled: enabled}
+	return r.db.WithContext(ctx).Clauses(clause.OnConflict{
+		Columns:   []clause.Column{{Name: "user_id"}},
+		DoUpdates: clause.Assignments(map[string]interface{}{"line_enabled": enabled, "updated_at": gorm.Expr("NOW()")}),
+	}).Create(&preference).Error
 }
 
 func NewNotificationRepository(db *gorm.DB) *NotificationRepository {

@@ -36,6 +36,15 @@ func (m *MockNotificationRepository) MarkAllAsRead(ctx context.Context, receiver
 	return args.Error(0)
 }
 
+func (m *MockNotificationRepository) GetLineEnabled(ctx context.Context, userID uuid.UUID) (bool, error) {
+	args := m.Called(ctx, userID)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *MockNotificationRepository) SetLineEnabled(ctx context.Context, userID uuid.UUID, enabled bool) error {
+	return m.Called(ctx, userID, enabled).Error(0)
+}
+
 func (m *MockNotificationRepository) UpdateNotificationMetadata(ctx context.Context, targetID, senderID uuid.UUID, notiType string, metaUpdates map[string]interface{}) error {
 	args := m.Called(ctx, targetID, senderID, notiType, metaUpdates)
 	return args.Error(0)

@@ -26,6 +26,7 @@ type AuthRepository interface {
 	FindAllByUserID(ctx context.Context, userID uuid.UUID) ([]domain.AuthAccount, error)
 	FindLocalAccountByEmail(ctx context.Context, email string) (*domain.AuthAccount, error)
 	FindLineIdentity(ctx context.Context, channelID, subject string) (*domain.LineIdentity, error)
+	FindLineIdentityByUserID(ctx context.Context, userID uuid.UUID, channelID string) (*domain.LineIdentity, error)
 	SaveLineChallenge(ctx context.Context, challenge *domain.LineChallenge) error
 	ClaimLineChallenge(ctx context.Context, digest string) (*domain.LineChallenge, error)
 	ReleaseLineChallenge(ctx context.Context, digest string) error
